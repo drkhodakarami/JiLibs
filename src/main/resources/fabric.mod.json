@@ -8,9 +8,9 @@
     "TheMentor"
   ],
   "contact": {
-    "homepage": "",
-    "sources": "",
-    "issues": ""
+    "homepage": "https://www.youtube.com/@TheMentorCodeLab",
+    "sources": "https://github.com/drkhodakarami/JiLibs/issues",
+    "issues": "https://github.com/drkhodakarami/JiLibs"
   },
   "license": "MIT",
   "icon": "assets/jilibs/icon.png",

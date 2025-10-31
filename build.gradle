@@ -94,8 +94,29 @@ def getSubprojectVersion(Project project) {
         parameters.directory = project.name
     }
 
+    def fullHash = ""
 
-    return version + "+" + hashProvider.get().substring(0, 8) + DigestUtils.sha256Hex(project.rootProject.minecraft_version).substring(0, 2)
+    try {
+        fullHash = hashProvider.get()
+    } catch (Exception e) {
+        logger.warn("Could not get commit hash for project ${project.name}: " + e.getMessage())
+        fullHash = ""
+    }
+
+    def shortHash
+    if (fullHash && fullHash.length() >= 8) {
+        shortHash = fullHash.substring(0, 8)
+    } else if (fullHash && fullHash.length() > 0) {
+        // hash exists but is shorter than 8 (rare)
+        shortHash = fullHash
+    } else {
+        shortHash = "unknown"
+        logger.warn("Using fallback version suffix for ${project.name} because no commit hash could be determined.")
+    }
+
+    logger.lifecycle(project.name + " Version: " + version + "+" + shortHash + DigestUtils.sha256Hex(project.rootProject.minecraft_version).substring(0, 2))
+
+    return version + "+" + shortHash + DigestUtils.sha256Hex(project.rootProject.minecraft_version).substring(0, 2)
 }
 
 //======================================================================================== SETTING UP MODULE DEPENDENCIES
@@ -395,8 +416,132 @@ def addPomMetadataInformation(Project project, MavenPom pom) {
 //======================================================================================== SETUP SUB PROJECTS
 
 subprojects {
+    if (metaProjects.contains(it.name)) {
+        return
+    }
 
+    base {
+        archivesName = project.name
+    }
+
+    dependencies {
+        // Make all modules depend on the core api
+        if (project.name != "jilibs-core") {
+           modImplementation project(path: ':jilibs-core', configuration: 'namedElements')
+        }
+    }
+
+    publishing {
+        publications {
+            mavenJava(MavenPublication) {
+                pom {
+                    addPomMetadataInformation(project, pom)
+                }
+                artifact(remapJar) {
+                    builtBy(remapJar)
+                }
+
+                artifact(remapSourcesJar) {
+                    builtBy remapSourcesJar
+                }
+            }
+        }
+    }
+
+    def projectName = it.name
+    def projectVersion = getSubprojectVersion(it)
+
+    // Skip publishing if the artifact already exists on the maven server
+    tasks.withType(PublishToMavenRepository).configureEach {
+        onlyIf {
+            if (!repsyUrl) {
+                // Always try to publish if the maven url is not set (e.g locally)
+                return true
+            }
+
+            //https://repo.repsy.io/mvn/jiraiyah/jilibs
+            def artifactPath = repsyUrl + "/${projectName}/${projectVersion}/${projectName}-${projectVersion}.pom"
+
+            boolean exists = HttpClient.newHttpClient().withCloseable { client ->
+                def request = HttpRequest.newBuilder()
+                        .uri(URI.create(artifactPath))
+                        .method("HEAD", HttpRequest.BodyPublishers.noBody())
+                        .build()
+
+                def response = client.send(request, HttpResponse.BodyHandlers.discarding())
+                response.statusCode() == 200
+            }
+
+            if (exists) {
+                logger.lifecycle("${projectName}-${projectVersion}.pom has already been published")
+            } else {
+                logger.lifecycle("${projectName}-${projectVersion}.pom does not exist, publishing")
+            }
+
+            return !exists
+        }
+    }
+
+    // We manually handle the pom generation
+    loom.disableDeprecatedPomGeneration(publishing.publications.mavenJava)
+
+    javadoc.enabled = false
 }
+
+//======================================================================================== SETTING UP PUBLISHING TO MAVEN
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifact(remapJar) {
+                builtBy(remapJar)
+            }
+
+            artifact(sourcesJar) {
+                builtBy remapSourcesJar
+            }
+
+            artifact javadocJar
+
+            pom {
+                addPomMetadataInformation(rootProject, pom)
+            }
+
+            List<Map<String, String>> dependencies = []
+
+            subprojects.each {
+
+                if (metaProjects.contains(it.name)) {
+                    return
+                }
+
+                dependencies.add([
+                        'groupId': it.group,
+                        'artifactId': it.name,
+                        'version': getSubprojectVersion(it),
+                        'scope': 'compile'
+                ])
+            }
+
+            def thisGroup = group
+            def thisVersion = version
+
+            pom.withXml {
+                def depsNode = asNode().appendNode("dependencies")
+                for (dep in dependencies) {
+                    def depNode = depsNode.appendNode("dependency")
+                    depNode.appendNode("groupId", dep['groupId'])
+                    depNode.appendNode("artifactId", dep['artifactId'])
+                    depNode.appendNode("version", dep['version'])
+                    depNode.appendNode("scope", dep['scope'])
+                }
+            }
+        }
+    }
+}
+
+// Required until the deprecation is removed. Fabric API's main jar that is published to maven does not contain sub modules.
+loom.disableDeprecatedPomGeneration(publishing.publications.mavenJava)
 
 //======================================================================================== SETTING UP PUBLISHING REPOSITORY
 void setupRepositories(RepositoryHandler repositories, String repsyUrl, String repsyUsername, String repsyPassword) {
@@ -411,3 +556,114 @@ void setupRepositories(RepositoryHandler repositories, String repsyUrl, String r
         }
     }
 }
+
+//======================================================================================== SETTING UP ORDER OF OPERATION FOR REMAP JAR
+subprojects.each {
+    if (metaProjects.contains(it.name)) {
+        return
+    }
+
+    remapJar.dependsOn("${it.path}:remapJar")
+}
+
+//======================================================================================== SETTING UP SUB PROJECT DEPENDENCY ON MAIN
+//This will be used for "game test" and "client game test" modular projects
+def devOnlyModules = []
+
+dependencies {
+    afterEvaluate {
+        subprojects.each {
+            if (metaProjects.contains(it.name)) {
+                return
+            }
+
+            api project(path: "${it.path}", configuration: "namedElements")
+            clientImplementation project("${it.path}:").sourceSets.client.output
+        }
+    }
+}
+
+configurations {
+    nestedJars {
+        transitive = false
+    }
+}
+
+dependencies {
+    subprojects.each {
+        if (it.name in devOnlyModules || metaProjects.contains(it.name)) {
+            return
+        }
+
+        nestedJars project("${it.path}")
+    }
+}
+
+remapJar {
+    nestedJars.from configurations.nestedJars
+}
+
+//======================================================================================== FILE NAME SANITY CHECK
+// Attempt to create a single jar with all files from all nested jars, this will fail if there are duplicate files.
+tasks.register("checkNoDuplicateFiles", Zip) {
+    inputs.files configurations.nestedJars
+    destinationDirectory = layout.buildDirectory.dir("test")
+
+    from {
+        configurations.nestedJars.files.collect { zipTree(it) }
+    }
+
+    // We expect these files to be duplicated, so exclude them.
+    exclude 'META-INF/**'
+    exclude 'fabric.mod.json'
+}
+
+check.dependsOn "checkNoDuplicateFiles"
+
+//======================================================================================== PUBLISHING TO WEBSITES
+//publishMods {
+//    file = remapJar
+//    changelog = providers.environmentVariable("CHANGELOG").getOrElse("No changelog provided")
+//    type = project.prerelease == "true" ? BETA : STABLE
+//    displayName = "[${project.minecraft_version}] Ji Libs $project.version"
+//    modLoaders.add("fabric")
+//    dryRun = providers.environmentVariable("CURSEFORGE_API_KEY").getOrNull() == null
+//
+//    curseforge {
+//        accessToken = providers.environmentVariable("CURSEFORGE_API_KEY")
+//        projectId = "306612"
+//        minecraftVersions.add(project.curseforge_minecraft_version)
+//    }
+//    modrinth {
+//        accessToken = providers.environmentVariable("MODRINTH_TOKEN")
+//        projectId = "P7dR8mSH"
+//        minecraftVersions.add(project.minecraft_version)
+//    }
+//    github {
+//        accessToken = providers.environmentVariable("GITHUB_TOKEN")
+//        repository = providers.environmentVariable("GITHUB_REPOSITORY").getOrElse("FabricMC/dryrun")
+//        commitish = providers.environmentVariable("GITHUB_REF_NAME").getOrElse("dryrun")
+//    }
+//}
+//
+//assemble.dependsOn remapJar
+
+//======================================================================================== NOT USED
+
+import java.util.stream.Collectors
+
+//======================================================================================== RELEASE VERSION SANITY CHECK
+// A task to ensure that the version being released has not already been released.
+tasks.register('checkVersion') {
+    doFirst {
+        def xml = new URL(repsyUrl + "/jilibs/maven-metadata.xml").text
+        def metadata = new groovy.xml.XmlSlurper().parseText(xml)
+        def versions = metadata.versioning.versions.version*.text();
+        if (versions.contains(version)) {
+            throw new RuntimeException("${version} has already been released!")
+        }
+    }
+}
+
+//tasks.publishMods.dependsOn checkVersion
+//publish.mustRunAfter checkVersion

@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
-  "id": "jilibs-api-core",
-  "name": "Ji Libs Core",
+  "id": "jilibs-api-logger",
+  "name": "Ji Libs Logger",
   "description": "Contains the essentials for Fabric API modules.",
   "version": "${version}",
   "environment": "*",
   "license": "MIT",
-  "icon": "assets/jilibs-api-core/icon.png",
+  "icon": "assets/jilibs-api-logger/icon.png",
   "contact": {
     "homepage": "https://www.youtube.com/@TheMentorCodeLab",
     "issues": "https://github.com/drkhodakarami/JiLibs/issues",

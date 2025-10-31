@@ -26,6 +26,25 @@ public abstract class CommitHashValueSource extends AbstractGitValueSource<Strin
 
 	@Override
 	public String obtain() {
-		return git("log", "-1", "--format=%H", "--", getParameters().getDirectory().get());
+		String dir = getParameters().getDirectory().get();
+		// Try the directory-specific last commit first
+		String hash = "";
+		try {
+			hash = git("log", "-1", "--format=%H", "--", dir);
+		} catch (Exception e) {
+			// ignore, we'll try fallback
+		}
+
+		// If nothing touched that directory, fall back to repository HEAD
+		if (hash == null || hash.isEmpty()) {
+			try {
+				hash = git("rev-parse", "HEAD");
+			} catch (Exception e) {
+				// Could not determine a repo-wide HEAD (e.g., no commits). Return empty.
+				hash = "";
+			}
+		}
+
+		return hash != null ? hash : "";
 	}
 }

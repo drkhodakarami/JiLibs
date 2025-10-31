@@ -1,0 +1,42 @@
+plugins {
+    id 'version-catalog'
+}
+
+version = rootProject.version
+
+publishing.publications {
+    register('mavenJava', MavenPublication) {
+        from components.versionCatalog
+    }
+}
+
+//tasks.withType(GenerateModuleMetadata) {
+    // todo: RemoteSignJar fails when this is false (as set by parent build script)
+//    enabled = true
+//}
+
+// Avoid configuration ordering issues by creating the catalog entries during task execution time
+tasks.register('configureCatalog') {
+    doConfigureCatalog()
+}
+
+tasks.named('generateCatalogAsToml') {
+    dependsOn('configureCatalog')
+}
+
+def doConfigureCatalog() {
+    for (proj in rootProject.allprojects) {
+        if (proj == project) { // the catalog itself
+            continue
+        }
+
+        String catalogName = proj.name
+        catalogName = catalogName.substring('jilibs-'.length())
+
+        catalog {
+            versionCatalog {
+                library(catalogName, "dev.jiraiyah.jilibs:${proj.name}:${proj.version}")
+            }
+        }
+    }
+}
