@@ -40,3 +40,4 @@ replay_*.log
 *.jfr
 
 */local.properties
+local.properties
