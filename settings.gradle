@@ -1,0 +1,45 @@
+pluginManagement {
+    repositories {
+        maven {
+            name = 'Fabric'
+            url = 'https://maven.fabricmc.net/'
+        }
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+
+rootProject.name = "jilibs"
+
+include 'jilibs-bom'
+include 'jilibs-catalog'
+
+def focus = new File('focused.txt')
+
+if (focus.exists()) {
+    focus.eachLine {
+        include it
+    }
+
+    return // Skip the rest of the includes
+}
+
+//include 'jilibs-core'
+//include 'jilibs-logger'
+//include 'jilibs-reference'
+//include 'jilibs-config'
+//include 'jilibs-register'
+//include 'jilibs-ticklogic'
+//include 'jilibs-base'
+//include 'jilibs-gui'
+//include 'jilibs-energy'
+//include 'jilibs-inventory'
+//include 'jilibs-fluid'
+//include 'jilibs-gas'
+//include 'jilibs-heat'
+//include 'jilibs-molten'
+//include 'jilibs-suspension'
+//include 'jilibs-emulsion'
+//include 'jilibs-pressure'
+//include 'jilibs-pipenetwork'
+//include 'jilibs-machina'
