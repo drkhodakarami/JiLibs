@@ -114,8 +114,6 @@ def getSubprojectVersion(Project project) {
         logger.warn("Using fallback version suffix for ${project.name} because no commit hash could be determined.")
     }
 
-    logger.lifecycle(project.name + " Version: " + version + "+" + shortHash + DigestUtils.sha256Hex(project.rootProject.minecraft_version).substring(0, 2))
-
     return version + "+" + shortHash + DigestUtils.sha256Hex(project.rootProject.minecraft_version).substring(0, 2)
 }
 
@@ -162,6 +160,8 @@ def moduleDependencies(project, List<String> depNames) {
     }
 }
 
+import org.gradle.api.logging.LogLevel
+
 //======================================================================================== SETTING UP ALL PROJECTS
 allprojects {
     group = "dev.jiraiyah.jilibs"
@@ -194,9 +194,21 @@ allprojects {
         return
     }
 
+    def silenceApply(Closure cl) {
+        def prev = logging.level
+        try {
+            logging.level = LogLevel.QUIET
+            cl.call()
+        } finally {
+            logging.level = prev
+        }
+    }
+
     apply plugin: "java-library"
     apply plugin: "checkstyle"
-    apply plugin: "fabric-loom"
+    silenceApply {
+        apply plugin: "fabric-loom"
+    }
     apply plugin: "com.diffplug.spotless"
 
     tasks.withType(JavaCompile).configureEach {
@@ -450,6 +462,9 @@ subprojects {
 
     def projectName = it.name
     def projectVersion = getSubprojectVersion(it)
+
+    // Log the computed version once per subproject
+    logger.lifecycle("${projectName} Version: ${projectVersion}")
 
     // Skip publishing if the artifact already exists on the maven server
     tasks.withType(PublishToMavenRepository).configureEach {
