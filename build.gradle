@@ -74,6 +74,18 @@ import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 
+import org.gradle.api.logging.LogLevel
+
+def silenceApply(Closure cl) {
+    def prev = logging.level
+    try {
+        logging.level = LogLevel.QUIET
+        cl.call()
+    } finally {
+        logging.level = prev
+    }
+}
+
 //======================================================================================== GETTING SUBPROJECT VERSIONS
 // 11.0.0+a2b5c9f2ef
 def getSubprojectVersion(Project project) {
@@ -160,8 +172,6 @@ def moduleDependencies(project, List<String> depNames) {
     }
 }
 
-import org.gradle.api.logging.LogLevel
-
 //======================================================================================== SETTING UP ALL PROJECTS
 allprojects {
     group = "dev.jiraiyah.jilibs"
@@ -192,16 +202,6 @@ allprojects {
 
     if (metaProjects.contains(it.name)) {
         return
-    }
-
-    def silenceApply(Closure cl) {
-        def prev = logging.level
-        try {
-            logging.level = LogLevel.QUIET
-            cl.call()
-        } finally {
-            logging.level = prev
-        }
     }
 
     apply plugin: "java-library"
