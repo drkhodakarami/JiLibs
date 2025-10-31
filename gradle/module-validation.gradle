@@ -1,0 +1,84 @@
+import groovy.json.JsonSlurper
+
+/*
+ * This buildscript contains tasks related to the validation of each module in fabric api.
+ *
+ * Right now this task verifies each Fabric API module has a module lifecycle specified.
+ * More functionality will probably be added in the future.
+ */
+
+subprojects {
+    if (it.name == "jilibs-bom" || it.name == "jilibs-catalog") {
+        return
+    }
+
+    // Create the task
+    def validateModules = tasks.register("validateModules", ValidateModuleTask)
+    tasks.check.dependsOn(validateModules)
+}
+
+/**
+ * Verifies that each module has the required custom values for module lifecycle in it's FMJ.
+ *
+ * <p>Example:
+ * <pre>{@code
+ * "custom": {
+ *   "fabric-api:module-lifecycle": "stable"
+ * }
+ *}</pre>
+ */
+abstract class ValidateModuleTask extends DefaultTask {
+    @InputFile
+    abstract RegularFileProperty getFmj()
+
+    @Input
+    abstract Property<String> getProjectName()
+
+    @Input
+    abstract Property<String> getProjectPath()
+
+    @Input
+    abstract Property<String> getLoaderVersion()
+
+    @Input
+    abstract Property<String> getMinecraftVersion()
+
+    ValidateModuleTask() {
+        group = "verification"
+
+        // No outputs
+        outputs.upToDateWhen { true }
+
+        def file = project.file("src/main/resources/fabric.mod.json")
+
+        if (!file.exists()) {
+            file = project.file("src/client/resources/fabric.mod.json")
+        }
+
+        fmj.set(file)
+
+        projectName.set(project.name)
+        projectPath.set(project.path)
+        loaderVersion.set(project.loader_version)
+        minecraftVersion.set(project.minecraft_version)
+    }
+
+    @TaskAction
+    void validate() {
+        def file = fmj.get().asFile
+
+        def json = new JsonSlurper().parse(file)
+
+        if (json.depends == null) {
+            throw new GradleException("Module ${projectName.get()} does not have a depends value!")
+        }
+
+        if (json.depends.fabricloader != ">=${loaderVersion.get()}") {
+            throw new GradleException("Module ${projectName.get()} does not have a valid fabricloader value! Got \"${json.depends.fabricloader}\" but expected \">=${project.loader_version}\"")
+        }
+
+        if (json.depends.minecraft != "~${minecraftVersion.get()}") {
+            throw new GradleException("Module ${projectName.get()} does not have a valid minecraft version value! Got \"${json.depends.minecraft}\" but expected \">=${project.minecraft_version}\"")
+        }
+    }
+}

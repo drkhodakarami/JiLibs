@@ -8,6 +8,32 @@ plugins {
     id "me.modmuss50.mod-publish-plugin" version "0.8.4"
 }
 
+//======================================================================================== READ LOCAL PROPERTIES
+//============================================================== REPSY MAVEN
+def ENV = System.getenv()
+def systemRepsyURL = ENV.REPSY_URL
+def systemRepsyUsername = ENV.REPSY_USERNAME
+def systemRepsyPassword = ENV.REPSY_PASSWORD
+
+Properties properties = new Properties()
+def propertiesFile = project.rootProject.file('local.properties')
+if (propertiesFile.exists())
+    properties.load(propertiesFile.newDataInputStream())
+
+project.ext {
+    localRepsyUrl = properties.getProperty('REPSY_URL')
+    localRepsyUsername = properties.getProperty('REPSY_USERNAME')
+    localRepsyPassword = properties.getProperty('REPSY_PASSWORD')
+}
+
+def repsyUrl = project.ext.localRepsyUrl ?: systemRepsyURL
+def repsyUsername = project.ext.localRepsyUsername ?: systemRepsyUsername
+def repsyPassword = project.ext.localRepsyPassword ?: systemRepsyPassword
+//============================================================== CURSEFORGE
+//============================================================== MODRINTH
+//============================================================== GITHUB
+
+//======================================================================================== SETUP BASICS
 def isCi = providers.environmentVariable("CI").present || project.hasProperty("ci")
 
 def branchProvider = providers.of(GitBranchValueSource.class) {}
@@ -21,5 +47,367 @@ def getBranchSafe = {
     }
 }
 
-version = project.version + "+MC-${minecraft_version}" + (isCi ? getBranchSafe() : "local")
+version = project.version + "+MC-${minecraft_version}-" + (isCi ? getBranchSafe() : "local")
 logger.lifecycle("Building Ji Libs: " + version)
+
+def metaProjects = [
+        'jilibs-bom',
+        'jilibs-catalog'
+]
+
+def debugArgs = [
+        "-enableassertions",
+        "-Dmixin.debug.verify=true",
+        //"-Dmixin.debug.strict=true",
+        "-Dmixin.debug.countInjections=true",
+]
+
+
+import com.diffplug.spotless.LineEnding
+import groovy.json.JsonSlurper
+import net.fabricmc.loom.task.AbstractRemapJarTask
+import net.fabricmc.loom.task.ValidateMixinNameTask
+import org.apache.commons.codec.digest.DigestUtils
+import net.fabricmc.fabric.impl.build.CommitHashValueSource
+import net.fabricmc.fabric.impl.build.GitBranchValueSource
+import java.net.http.HttpClient
+import java.net.http.HttpRequest
+import java.net.http.HttpResponse
+
+//======================================================================================== GETTING SUBPROJECT VERSIONS
+// 11.0.0+a2b5c9f2ef
+def getSubprojectVersion(Project project) {
+    // Get the version from the gradle.properties file
+    def version = project.properties["${project.name}-version"]
+
+    if (!version) {
+        throw new NullPointerException("Could not find version for " + project.name)
+    }
+
+    def isCi = providers.environmentVariable("CI").present || project.hasProperty("ci")
+
+    if (!isCi) {
+        return version + "+local"
+    }
+
+    def hashProvider = project.providers.of(CommitHashValueSource.class) {
+        parameters.directory = project.name
+    }
+
+
+    return version + "+" + hashProvider.get().substring(0, 8) + DigestUtils.sha256Hex(project.rootProject.minecraft_version).substring(0, 2)
+}
+
+//======================================================================================== SETTING UP MODULE DEPENDENCIES
+def moduleDependencies(project, List<String> depNames) {
+    def deps = depNames.iterator().collect { project.dependencies.project(path: ":$it", configuration: 'namedElements') }
+    def clientOutputs = depNames.iterator().collect { findProject(":$it").sourceSets.client.output }
+
+    project.dependencies {
+        deps.each {
+            api it
+        }
+
+        clientOutputs.each {
+            clientImplementation it
+        }
+    }
+
+    def depNodes = deps.collect {
+        [
+                groupId   : it.group,
+                artifactId: it.name,
+                version   : getSubprojectVersion(project.project(":" + it.name)),
+                scope     : "compile"
+        ]
+    }
+
+    project.publishing {
+        publications {
+            mavenJava(MavenPublication) {
+                pom.withXml {
+                    def depsNode = asNode().appendNode("dependencies")
+
+                    for (def depNode in depNodes) {
+                        def node = depsNode.appendNode("dependency")
+
+                        for (def entry in depNode) {
+                            node.appendNode(entry.key, entry.value)
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+//======================================================================================== SETTING UP ALL PROJECTS
+allprojects {
+    group = "dev.jiraiyah.jilibs"
+
+    apply plugin: "maven-publish"
+    //apply plugin: "me.modmuss50.remotesign"
+
+    tasks.withType(GenerateModuleMetadata).configureEach {
+        enabled = false
+    }
+
+    //remoteSign {
+    //    requestUrl = providers.environmentVariable("SIGNING_SERVER")
+    //    pgpAuthKey = providers.environmentVariable("SIGNING_PGP_KEY")
+    //    jarAuthKey = providers.environmentVariable("SIGNING_JAR_KEY")
+
+    //    useDummyForTesting = !providers.environmentVariable("SIGNING_SERVER").present
+
+    //    afterEvaluate {
+    // PGP sign all maven publications.
+    //        sign publishing.publications.mavenJava
+    //    }
+    //}
+
+    publishing {
+        setupRepositories(repositories, repsyUrl, repsyUsername, repsyPassword)
+    }
+
+    if (metaProjects.contains(it.name)) {
+        return
+    }
+
+    apply plugin: "java-library"
+    apply plugin: "checkstyle"
+    apply plugin: "fabric-loom"
+    apply plugin: "com.diffplug.spotless"
+
+    tasks.withType(JavaCompile).configureEach {
+        it.options.release = 21
+    }
+
+    java {
+        // Must be added before the split source sets are setup.
+        withSourcesJar()
+    }
+
+    loom {
+        splitEnvironmentSourceSets()
+        mixin {
+            useLegacyMixinAp = false
+        }
+
+        runtimeOnlyLog4j = true
+    }
+
+    loom.runs.configureEach {
+        vmArgs(debugArgs)
+    }
+
+    allprojects.each { p ->
+        if (metaProjects.contains(p.name)) {
+            return
+        }
+
+        loom.mods.register(p.name) {
+            sourceSet p.sourceSets.main
+            sourceSet p.sourceSets.client
+        }
+    }
+
+    dependencies {
+        minecraft "com.mojang:minecraft:$rootProject.minecraft_version"
+        mappings "net.fabricmc:yarn:${rootProject.minecraft_version}+${rootProject.yarn_version}:v2"
+        modApi "net.fabricmc:fabric-loader:${rootProject.loader_version}"
+        modImplementation "net.fabricmc.fabric-api:fabric-api:${rootProject.fabric_version}+${rootProject.minecraft_version}"
+    }
+
+    tasks.withType(ProcessResources).configureEach {
+        inputs.property "version", project.version
+        inputs.property "loader_ver", rootProject.loader_version
+        inputs.property "game_ver", rootProject.minecraft_version
+        inputs.property "java_ver", rootProject.java_version
+
+        filesMatching("fabric.mod.json") {
+            expand "version": inputs.properties.version,
+                    "loader_ver": inputs.properties.loader_version,
+                    "game_ver": inputs.properties.game_version,
+                    "java_ver": inputs.properties.java_version
+        }
+    }
+
+    spotless {
+        lineEndings = LineEnding.UNIX
+
+        java {
+            licenseHeaderFile(rootProject.file("HEADER"))
+            removeUnusedImports()
+            importOrder('java', 'javax', '', 'net.minecraft', 'net.fabricmc', 'dev.jiraiyah')
+            leadingSpacesToTabs()
+            trimTrailingWhitespace()
+        }
+
+        // Sort the en_us translation files
+        json {
+            target 'src/**/lang/en_us.json'
+            targetExclude 'src/**/generated/**'
+            gson().indentWithSpaces(2).sortByKeys()
+        }
+    }
+
+    checkstyle {
+        configFile = rootProject.file("checkstyle.xml")
+        toolVersion = "10.20.2"
+    }
+
+    tasks.withType(AbstractArchiveTask).configureEach {
+        preserveFileTimestamps = false
+        reproducibleFileOrder = true
+    }
+
+    //remoteSign {
+    //    sign remapJar
+    //}
+
+    String archivesName = project.base.archivesName.get()
+    [jar, sourcesJar].each {
+        it.from(rootProject.file("LICENSE")) {
+            rename { "${it}-${archivesName}" }
+        }
+    }
+
+    if (file("src/client").exists() && !file("src/main").exists()) {
+        tasks.named("remapJar", AbstractRemapJarTask) {
+            additionalClientOnlyEntries.add("LICENSE-${archivesName}".toString())
+        }
+
+        remapSourcesJar {
+            additionalClientOnlyEntries.add("LICENSE-${archivesName}".toString())
+        }
+    }
+
+    tasks.register('validateMixinNames', ValidateMixinNameTask) {
+        source(sourceSets.main.output)
+        source(sourceSets.client.output)
+
+        outputs.upToDateWhen { true } // Task has no outputs
+    }
+    check.dependsOn "validateMixinNames"
+
+    // Apply to each valid subproject.
+    apply from: rootProject.file('gradle/package-info.gradle')
+    apply from: rootProject.file('gradle/validate-annotations.gradle')
+}
+
+// Apply auxiliary buildscripts to submodules
+// This must be done after all plugins are applied to subprojects
+apply from: "gradle/module-validation.gradle"
+apply from: "gradle/module-versioning.gradle"
+
+//======================================================================================== SETTING UP JAVA DOCS
+loom {
+    accessWidenerPath = file("gradle/javadoc.accesswidener")
+}
+
+javadoc {
+    options {
+        source = "21"
+        encoding = "UTF-8"
+        charSet = "UTF-8"
+        memberLevel = JavadocMemberLevel.PACKAGE
+        links(
+                "https://maven.fabricmc.net/docs/yarn-${rootProject.minecraft_version}+${project.yarn_version}/"
+        )
+        // Disable the crazy super-strict doclint tool in Java 8
+        addStringOption("Xdoclint:none", "-quiet")
+
+        tags(
+                'apiNote:a:API Note:',
+                'implSpec:a:Implementation Requirements:',
+                'implNote:a:Implementation Note:'
+        )
+    }
+
+    allprojects.each {
+        if (metaProjects.contains(it.name)) {
+            return
+        }
+
+        source(it.sourceSets.main.allJava)
+        source(it.sourceSets.client.allJava)
+    }
+
+    classpath = files(sourceSets.main.compileClasspath, sourceSets.client.compileClasspath)
+    include("**/api/**")
+    failOnError = true
+}
+
+tasks.register('javadocJar', Jar) {
+    dependsOn javadoc
+    from javadoc.destinationDir
+    //Set as `fatjavadoc` to prevent an ide form trying to use this javadoc, over using the modules javadoc
+    archiveClassifier = "fatjavadoc"
+}
+
+build.dependsOn javadocJar
+
+//======================================================================================== SETUP PRODUCTION MODS
+
+configurations {
+    productionMods {
+        transitive = false
+    }
+}
+
+def productionMods = project.files(configurations.productionMods, remapJar.archiveFile)
+
+//======================================================================================== POM MOD METADATA INFORMATION
+def addPomMetadataInformation(Project project, MavenPom pom) {
+    def modJsonFile = project.file("src/main/resources/fabric.mod.json")
+
+    if (!modJsonFile.exists()) {
+        modJsonFile = project.file("src/client/resources/fabric.mod.json")
+    }
+
+    def modJson = new JsonSlurper().parse(modJsonFile)
+    pom.name = modJson.name
+    pom.url = "https://github.com/drkhodakarami/JiLibs/tree/HEAD/${project.rootDir.relativePath(project.projectDir)}"
+    pom.description = modJson.description
+    pom.licenses {
+        license {
+            name = "MIT"
+            url = "https://opensource.org/license/mit"
+        }
+    }
+    pom.developers {
+        developer {
+            name = "TheMentor"
+            url = "https://www.youtube.com/@TheMentorCodeLab"
+        }
+    }
+    pom.scm {
+        connection = "scm:git:https://github.com/drkhodakarami/JiLibs.git"
+        url = "https://github.com/drkhodakarami/JiLibs"
+        developerConnection = "scm:git:git@github.com:drkhodakarami/JiLibs.git"
+    }
+    pom.issueManagement {
+        system = "GitHub"
+        url = "https://github.com/drkhodakarami/JiLibs/issues"
+    }
+}
+
+//======================================================================================== SETUP SUB PROJECTS
+
+subprojects {
+
+}
+
+//======================================================================================== SETTING UP PUBLISHING REPOSITORY
+void setupRepositories(RepositoryHandler repositories, String repsyUrl, String repsyUsername, String repsyPassword) {
+    repositories.mavenLocal() // uncomment for testing
+    if (repsyUrl) {
+        repositories.maven {
+            url = repsyUrl
+            credentials {
+                username = repsyUsername
+                password = repsyPassword
+            }
+        }
+    }
+}

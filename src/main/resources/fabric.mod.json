@@ -16,9 +16,9 @@
   "icon": "assets/jilibs/icon.png",
   "environment": "*",
   "depends": {
-    "fabricloader": ">=0.17.3",
-    "minecraft": "~1.21.10",
-    "java": ">=21",
+    "fabricloader": ">=${loader_version}",
+    "minecraft": "~${game_version}",
+    "java": ">=${java_version}",
     "fabric-api": "*"
   }
 }
