@@ -1,15 +1,15 @@
 {
   "schemaVersion": 1,
-  "id": "jilibs-logger",
-  "name": "Ji Libs Logger",
-  "description": "Contains the essential API for handling logging.",
+  "id": "jilibs-molten",
+  "name": "Ji Libs Molten",
+  "description": "Contains the essential API for any material that has physical heat and viscosity properties (molten).",
   "version": "${version}",
   "environment": "*",
   "mixins": [
-    "jilibs-logger.mixins.json"
+    "jilibs-molten.mixins.json"
   ],
   "license": "MIT",
-  "icon": "assets/jilibs-logger/icon.png",
+  "icon": "assets/jilibs-molten/icon.png",
   "contact": {
     "homepage": "https://www.youtube.com/@TheMentorCodeLab",
     "issues": "https://github.com/drkhodakarami/JiLibs/issues",

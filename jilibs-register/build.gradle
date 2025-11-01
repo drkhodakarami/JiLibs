@@ -1,0 +1,9 @@
+version = getSubprojectVersion(project)
+
+loom {
+    accessWidenerPath = file('src/main/resources/jilibs-register.accesswidener')
+}
+
+//moduleDependencies(project, [
+//        'jilibs-'
+//])

@@ -1,15 +1,15 @@
 {
   "schemaVersion": 1,
-  "id": "jilibs-logger",
-  "name": "Ji Libs Logger",
-  "description": "Contains the essential API for handling logging.",
+  "id": "jilibs-register",
+  "name": "Ji Libs Register",
+  "description": "Contains the essential API for registry system usage and registering into it.",
   "version": "${version}",
   "environment": "*",
   "mixins": [
-    "jilibs-logger.mixins.json"
+    "jilibs-register.mixins.json"
   ],
   "license": "MIT",
-  "icon": "assets/jilibs-logger/icon.png",
+  "icon": "assets/jilibs-register/icon.png",
   "contact": {
     "homepage": "https://www.youtube.com/@TheMentorCodeLab",
     "issues": "https://github.com/drkhodakarami/JiLibs/issues",

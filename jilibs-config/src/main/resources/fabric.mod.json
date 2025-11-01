@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "jilibs-config",
   "name": "Ji Libs Config",
-  "description": "Contains the essential shared API for other modules in Ji Libs System.",
+  "description": "Contains the essential API for a complete server side config using INI files.",
   "version": "${version}",
   "environment": "*",
   "mixins": [

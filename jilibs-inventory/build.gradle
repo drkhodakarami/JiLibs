@@ -1,0 +1,10 @@
+version = getSubprojectVersion(project)
+
+loom {
+    accessWidenerPath = file('src/main/resources/jilibs-inventory.accesswidener')
+}
+
+moduleDependencies(project, [
+        'jilibs-base',
+        'jilibs-gui'
+])

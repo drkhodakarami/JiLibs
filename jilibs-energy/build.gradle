@@ -1,0 +1,25 @@
+version = getSubprojectVersion(project)
+
+repositories {
+    maven {
+        url = "https://cursemaven.com"
+        content {
+            includeGroup "curse.maven"
+        }
+    }
+}
+
+loom {
+    accessWidenerPath = file('src/main/resources/jilibs-energy.accesswidener')
+}
+
+moduleDependencies(project, [
+        'jilibs-base'
+])
+
+dependencies{
+    // Energy API Handling Dependency ================================================================================================================
+    include modApi("teamreborn:energy:${rootProject.energy_version}") {
+        exclude(group: "net.fabricmc.fabric-api")
+    }
+}

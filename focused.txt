@@ -1,0 +1,3 @@
+jilibs-shared
+jilibs-logger
+jilibs-config

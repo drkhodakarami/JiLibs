@@ -1,15 +1,15 @@
 {
   "schemaVersion": 1,
-  "id": "jilibs-logger",
-  "name": "Ji Libs Logger",
-  "description": "Contains the essential API for handling logging.",
+  "id": "jilibs-reference",
+  "name": "Ji Libs Reference",
+  "description": "Contains the essential API to be used as reference in other mods (like identifier, and some basic default values).",
   "version": "${version}",
   "environment": "*",
   "mixins": [
-    "jilibs-logger.mixins.json"
+    "jilibs-reference.mixins.json"
   ],
   "license": "MIT",
-  "icon": "assets/jilibs-logger/icon.png",
+  "icon": "assets/jilibs-reference/icon.png",
   "contact": {
     "homepage": "https://www.youtube.com/@TheMentorCodeLab",
     "issues": "https://github.com/drkhodakarami/JiLibs/issues",

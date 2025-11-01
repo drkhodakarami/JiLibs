@@ -1,15 +1,15 @@
 {
   "schemaVersion": 1,
-  "id": "jilibs-logger",
-  "name": "Ji Libs Logger",
-  "description": "Contains the essential API for handling logging.",
+  "id": "jilibs-pressure",
+  "name": "Ji Libs Pressure",
+  "description": "Contains the essential API for handling pressure.",
   "version": "${version}",
   "environment": "*",
   "mixins": [
-    "jilibs-logger.mixins.json"
+    "jilibs-pressure.mixins.json"
   ],
   "license": "MIT",
-  "icon": "assets/jilibs-logger/icon.png",
+  "icon": "assets/jilibs-pressure/icon.png",
   "contact": {
     "homepage": "https://www.youtube.com/@TheMentorCodeLab",
     "issues": "https://github.com/drkhodakarami/JiLibs/issues",

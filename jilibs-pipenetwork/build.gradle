@@ -1,0 +1,17 @@
+version = getSubprojectVersion(project)
+
+loom {
+    accessWidenerPath = file('src/main/resources/jilibs-pipenetwork.accesswidener')
+}
+
+moduleDependencies(project, [
+        'jilibs-inventory',
+        'jilibs-fluid',
+        'jilibs-energy',
+        'jilibs-gas',
+        'jilibs-pressure',
+        'jilibs-molten',
+        'jilibs-heat',
+        'jilibs-emulsion',
+        'jilibs-suspension',
+])
