@@ -48,7 +48,7 @@ def getBranchSafe = {
 }
 
 version = project.version + "+MC-${minecraft_version}-" + (isCi ? getBranchSafe() : "local")
-logger.lifecycle("Building Ji Libs: " + version)
+logger.lifecycle(">>> >>> >>> >>> >>> >>> Building Ji Libs: " + version)
 
 def metaProjects = [
         'jilibs-bom',
@@ -73,18 +73,6 @@ import net.fabricmc.fabric.impl.build.GitBranchValueSource
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
-
-import org.gradle.api.logging.LogLevel
-
-def silenceApply(Closure cl) {
-    def prev = logging.level
-    try {
-        logging.level = LogLevel.QUIET
-        cl.call()
-    } finally {
-        logging.level = prev
-    }
-}
 
 //======================================================================================== GETTING SUBPROJECT VERSIONS
 // 11.0.0+a2b5c9f2ef
@@ -206,9 +194,7 @@ allprojects {
 
     apply plugin: "java-library"
     apply plugin: "checkstyle"
-    silenceApply {
-        apply plugin: "fabric-loom"
-    }
+    apply plugin: "fabric-loom"
     apply plugin: "com.diffplug.spotless"
 
     tasks.withType(JavaCompile).configureEach {
@@ -464,7 +450,7 @@ subprojects {
     def projectVersion = getSubprojectVersion(it)
 
     // Log the computed version once per subproject
-    logger.lifecycle("${projectName} Version: ${projectVersion}")
+    logger.lifecycle(">>> >>> >>> >>> >>> >>> ${projectName} Version: ${projectVersion}")
 
     // Skip publishing if the artifact already exists on the maven server
     tasks.withType(PublishToMavenRepository).configureEach {
