@@ -275,23 +275,6 @@ allprojects {
             // ensure this uses the project-local processResources
             validateTask.dependsOn tasks.named('processResources')
         }
-
-        // Optional: helpful debug logging (temporary)
-// prints which file validateModules will check; remove after debugging
-        tasks.matching { it.name == 'validateModules' }.configureEach { validateTask ->
-            validateTask.doFirst {
-                def expanded = file("$buildDir/resources/main/fabric.mod.json")
-                def source = file("src/main/resources/fabric.mod.json")
-                logger.lifecycle("validateModules: expanded exists=${expanded.exists()} -> ${expanded.path}")
-                if (expanded.exists()) {
-                    logger.lifecycle("expanded content (first lines):\n" + expanded.text.readLines().take(10).join("\n"))
-                } else if (source.exists()) {
-                    logger.lifecycle("source template (first lines):\n" + source.text.readLines().take(10).join("\n"))
-                } else {
-                    logger.lifecycle("No fabric.mod.json found in source or build resources for ${project.path}")
-                }
-            }
-        }
     }
 
     checkstyle {
