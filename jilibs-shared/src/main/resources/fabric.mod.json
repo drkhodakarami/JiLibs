@@ -1,12 +1,15 @@
 {
   "schemaVersion": 1,
-  "id": "jilibs-api-core",
-  "name": "Ji Libs Core",
-  "description": "Contains the essentials for Fabric API modules.",
+  "id": "jilibs-shared",
+  "name": "Ji Libs Shared",
+  "description": "Contains the essential shared API for other modules in Ji Libs System.",
   "version": "${version}",
   "environment": "*",
+  "mixins": [
+    "jilibs-shared.mixins.json"
+  ],
   "license": "MIT",
-  "icon": "assets/jilibs-api-core/icon.png",
+  "icon": "assets/jilibs-shared/icon.png",
   "contact": {
     "homepage": "https://www.youtube.com/@TheMentorCodeLab",
     "issues": "https://github.com/drkhodakarami/JiLibs/issues",

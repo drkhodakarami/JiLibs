@@ -55,7 +55,7 @@ public class Focus {
 		}
 
 		// All modules depend on the following modules:
-		readDependencies("jilibs-core", dependencies);
+		readDependencies("jilibs-shared", dependencies);
 
 		System.out.println("Focusing on:\n" + String.join("\n", dependencies));
 

@@ -24,10 +24,10 @@ if (focus.exists()) {
     return // Skip the rest of the includes
 }
 
-//include 'jilibs-core'
-//include 'jilibs-logger'
+include 'jilibs-shared'
+include 'jilibs-logger'
 //include 'jilibs-reference'
-//include 'jilibs-config'
+include 'jilibs-config'
 //include 'jilibs-register'
 //include 'jilibs-ticklogic'
 //include 'jilibs-base'

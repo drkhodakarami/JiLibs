@@ -48,7 +48,9 @@ def getBranchSafe = {
 }
 
 version = project.version + "+MC-${minecraft_version}-" + (isCi ? getBranchSafe() : "local")
+logger.lifecycle("======================================================================")
 logger.lifecycle(">>> >>> >>> >>> >>> >>> Building Ji Libs: " + version)
+logger.lifecycle("======================================================================")
 
 def metaProjects = [
         'jilibs-bom',
@@ -239,15 +241,15 @@ allprojects {
 
     tasks.withType(ProcessResources).configureEach {
         inputs.property "version", project.version
-        inputs.property "loader_ver", rootProject.loader_version
-        inputs.property "game_ver", rootProject.minecraft_version
-        inputs.property "java_ver", rootProject.java_version
+        inputs.property "loader_version", rootProject.loader_version
+        inputs.property "game_version", rootProject.minecraft_version
+        inputs.property "java_version", rootProject.java_version
 
         filesMatching("fabric.mod.json") {
             expand "version": inputs.properties.version,
-                    "loader_ver": inputs.properties.loader_version,
-                    "game_ver": inputs.properties.game_version,
-                    "java_ver": inputs.properties.java_version
+                    "loader_version": inputs.properties.loader_version,
+                    "game_version": inputs.properties.game_version,
+                    "java_version": inputs.properties.java_version
         }
     }
 
@@ -267,6 +269,28 @@ allprojects {
             target 'src/**/lang/en_us.json'
             targetExclude 'src/**/generated/**'
             gson().indentWithSpaces(2).sortByKeys()
+        }
+
+        tasks.matching { it.name == 'validateModules' }.configureEach { validateTask ->
+            // ensure this uses the project-local processResources
+            validateTask.dependsOn tasks.named('processResources')
+        }
+
+        // Optional: helpful debug logging (temporary)
+// prints which file validateModules will check; remove after debugging
+        tasks.matching { it.name == 'validateModules' }.configureEach { validateTask ->
+            validateTask.doFirst {
+                def expanded = file("$buildDir/resources/main/fabric.mod.json")
+                def source = file("src/main/resources/fabric.mod.json")
+                logger.lifecycle("validateModules: expanded exists=${expanded.exists()} -> ${expanded.path}")
+                if (expanded.exists()) {
+                    logger.lifecycle("expanded content (first lines):\n" + expanded.text.readLines().take(10).join("\n"))
+                } else if (source.exists()) {
+                    logger.lifecycle("source template (first lines):\n" + source.text.readLines().take(10).join("\n"))
+                } else {
+                    logger.lifecycle("No fabric.mod.json found in source or build resources for ${project.path}")
+                }
+            }
         }
     }
 
@@ -313,6 +337,8 @@ allprojects {
     apply from: rootProject.file('gradle/package-info.gradle')
     apply from: rootProject.file('gradle/validate-annotations.gradle')
 }
+
+logger.lifecycle("======================================================================")
 
 // Apply auxiliary buildscripts to submodules
 // This must be done after all plugins are applied to subprojects
@@ -423,9 +449,9 @@ subprojects {
     }
 
     dependencies {
-        // Make all modules depend on the core api
-        if (project.name != "jilibs-core") {
-           modImplementation project(path: ':jilibs-core', configuration: 'namedElements')
+        // Make all modules depend on the shared api
+        if (project.name != "jilibs-shared") {
+           implementation project(path: ':jilibs-shared', configuration: 'namedElements')
         }
     }
 
@@ -489,6 +515,8 @@ subprojects {
     javadoc.enabled = false
 }
 
+logger.lifecycle("======================================================================")
+
 //======================================================================================== SETTING UP PUBLISHING TO MAVEN
 
 publishing {
@@ -546,6 +574,7 @@ loom.disableDeprecatedPomGeneration(publishing.publications.mavenJava)
 
 //======================================================================================== SETTING UP PUBLISHING REPOSITORY
 void setupRepositories(RepositoryHandler repositories, String repsyUrl, String repsyUsername, String repsyPassword) {
+    //===================================================== >>> LOCAL MAVEN <<<
     repositories.mavenLocal() // uncomment for testing
     if (repsyUrl) {
         repositories.maven {

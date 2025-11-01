@@ -1,0 +1,9 @@
+version = getSubprojectVersion(project)
+
+loom {
+    accessWidenerPath = file('src/main/resources/jilibs-config.accesswidener')
+}
+
+moduleDependencies(project, [
+        'jilibs-logger'
+])
