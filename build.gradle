@@ -45,7 +45,7 @@ def getBranchSafe = {
     }
 }
 
-version = project.version + "+MC-${minecraft_version}-" + (isCi ? getBranchSafe() : "local")
+version = project.version + "+MC-${minecraft_version}"//-" + (isCi ? getBranchSafe() : "local")
 logger.lifecycle("==============================================================================")
 logger.lifecycle(">>> >>> >>> >>> >>> >>> Building Ji Libs: " + version)
 logger.lifecycle("==============================================================================")
@@ -120,7 +120,7 @@ def getSubprojectVersion(Project project) {
         mcVersion = "unknownMC"
     }
 
-    return version + "+MC-${mcVersion}-" + shortHash
+    return version + "+MC-${mcVersion}"//-" + shortHash
 }
 
 //======================================================================================== SETTING UP MODULE DEPENDENCIES
@@ -356,6 +356,11 @@ allprojects {
 
     tasks.named('jar').configure {
         finalizedBy(copySourceJars, copyModJars)
+    }
+
+    tasks.withType(JavaCompile) {
+        options.compilerArgs << '-Xlint:unchecked' // show unchecked warnings
+        options.compilerArgs << '-Xlint:deprecation' // (optional) also see deprecated warnings
     }
 }
 

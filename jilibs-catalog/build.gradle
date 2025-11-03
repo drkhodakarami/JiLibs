@@ -25,13 +25,25 @@ tasks.named('generateCatalogAsToml') {
 }
 
 def doConfigureCatalog() {
+    def prefix = 'jilibs-'
+
     for (proj in rootProject.allprojects) {
         if (proj == project) { // the catalog itself
             continue
         }
 
-        String catalogName = proj.name
-        catalogName = catalogName.substring('jilibs-'.length())
+        String catalogName
+        if(proj.name?.startsWith(prefix)){
+            catalogName = proj.name.substring(prefix.length())
+        }else{
+            catalogName = proj.name?: 'root'
+        }
+
+        if(!catalogName){
+            catalogName = 'root'
+        }
+
+        logger.lifecycle(">>> >>> >>> >>> >>> >>> Creating Catalog: ${catalogName}")
 
         catalog {
             versionCatalog {
