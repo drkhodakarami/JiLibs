@@ -14,7 +14,8 @@ loom {
 }
 
 moduleDependencies(project, [
-        'jilibs-base'
+        'jilibs-base',
+        'jilibs-inventory',
 ])
 
 dependencies{

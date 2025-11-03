@@ -35,7 +35,7 @@ def doConfigureCatalog() {
 
         catalog {
             versionCatalog {
-                library(catalogName, "dev.jiraiyah.jilibs:${proj.name}:${proj.version}")
+                library(catalogName, "dev.TheMentor.jilibs:${proj.name}:${proj.version}")
             }
         }
     }

@@ -3,8 +3,6 @@ plugins {
     id "eclipse"
     id "maven-publish"
     id "fabric-loom" version "${loom_version}" apply false
-    id "com.diffplug.spotless" version "7.2.1"
-    //id "me.modmuss50.remotesign" version "0.5.0" apply false
     id "me.modmuss50.mod-publish-plugin" version "0.8.4"
 }
 
@@ -48,9 +46,9 @@ def getBranchSafe = {
 }
 
 version = project.version + "+MC-${minecraft_version}-" + (isCi ? getBranchSafe() : "local")
-logger.lifecycle("======================================================================")
+logger.lifecycle("==============================================================================")
 logger.lifecycle(">>> >>> >>> >>> >>> >>> Building Ji Libs: " + version)
-logger.lifecycle("======================================================================")
+logger.lifecycle("==============================================================================")
 
 def metaProjects = [
         'jilibs-bom',
@@ -65,11 +63,9 @@ def debugArgs = [
 ]
 
 
-import com.diffplug.spotless.LineEnding
 import groovy.json.JsonSlurper
 import net.fabricmc.loom.task.AbstractRemapJarTask
 import net.fabricmc.loom.task.ValidateMixinNameTask
-import org.apache.commons.codec.digest.DigestUtils
 import net.fabricmc.fabric.impl.build.CommitHashValueSource
 import net.fabricmc.fabric.impl.build.GitBranchValueSource
 import java.net.http.HttpClient
@@ -116,7 +112,15 @@ def getSubprojectVersion(Project project) {
         logger.warn("Using fallback version suffix for ${project.name} because no commit hash could be determined.")
     }
 
-    return version + "+" + shortHash + DigestUtils.sha256Hex(project.rootProject.minecraft_version).substring(0, 2)
+    def mcVersion = project.rootProject.properties['minecraft_version']
+
+    if(!mcVersion)
+    {
+        logger.error("FATAL: 'minecraft_version' property not found on the root project")
+        mcVersion = "unknownMC"
+    }
+
+    return version + "+MC-${mcVersion}-" + shortHash
 }
 
 //======================================================================================== SETTING UP MODULE DEPENDENCIES
@@ -164,27 +168,13 @@ def moduleDependencies(project, List<String> depNames) {
 
 //======================================================================================== SETTING UP ALL PROJECTS
 allprojects {
-    group = "dev.jiraiyah.jilibs"
+    group = "dev.TheMentor.jilibs"
 
     apply plugin: "maven-publish"
-    //apply plugin: "me.modmuss50.remotesign"
 
     tasks.withType(GenerateModuleMetadata).configureEach {
         enabled = false
     }
-
-    //remoteSign {
-    //    requestUrl = providers.environmentVariable("SIGNING_SERVER")
-    //    pgpAuthKey = providers.environmentVariable("SIGNING_PGP_KEY")
-    //    jarAuthKey = providers.environmentVariable("SIGNING_JAR_KEY")
-
-    //    useDummyForTesting = !providers.environmentVariable("SIGNING_SERVER").present
-
-    //    afterEvaluate {
-    // PGP sign all maven publications.
-    //        sign publishing.publications.mavenJava
-    //    }
-    //}
 
     publishing {
         setupRepositories(repositories, repsyUrl, repsyUsername, repsyPassword)
@@ -195,9 +185,7 @@ allprojects {
     }
 
     apply plugin: "java-library"
-    apply plugin: "checkstyle"
     apply plugin: "fabric-loom"
-    apply plugin: "com.diffplug.spotless"
 
     tasks.withType(JavaCompile).configureEach {
         it.options.release = 21
@@ -253,43 +241,10 @@ allprojects {
         }
     }
 
-    spotless {
-        lineEndings = LineEnding.UNIX
-
-        java {
-            licenseHeaderFile(rootProject.file("HEADER"))
-            removeUnusedImports()
-            importOrder('java', 'javax', '', 'net.minecraft', 'net.fabricmc', 'dev.jiraiyah')
-            leadingSpacesToTabs()
-            trimTrailingWhitespace()
-        }
-
-        // Sort the en_us translation files
-        json {
-            target 'src/**/lang/en_us.json'
-            targetExclude 'src/**/generated/**'
-            gson().indentWithSpaces(2).sortByKeys()
-        }
-
-        tasks.matching { it.name == 'validateModules' }.configureEach { validateTask ->
-            // ensure this uses the project-local processResources
-            validateTask.dependsOn tasks.named('processResources')
-        }
-    }
-
-    checkstyle {
-        configFile = rootProject.file("checkstyle.xml")
-        toolVersion = "10.20.2"
-    }
-
     tasks.withType(AbstractArchiveTask).configureEach {
         preserveFileTimestamps = false
         reproducibleFileOrder = true
     }
-
-    //remoteSign {
-    //    sign remapJar
-    //}
 
     String archivesName = project.base.archivesName.get()
     [jar, sourcesJar].each {
@@ -319,13 +274,95 @@ allprojects {
     // Apply to each valid subproject.
     apply from: rootProject.file('gradle/package-info.gradle')
     apply from: rootProject.file('gradle/validate-annotations.gradle')
+
+    //======================================================================================== CUSTOM TASKS
+
+    def destinationDir = layout.buildDirectory.dir("output-sources").get().asFile
+
+    clean.doFirst {
+        def versionPattern = version
+        def projectSrcDir = file("${rootProject.file("./")}/_BUILDS_/${project.name}/SRC")
+        def projectModDir = file("${rootProject.file("./")}/_BUILDS_/${project.name}/MOD")
+        def projectDocDir = file("${rootProject.file("./")}/_BUILDS_/${project.name}/DOC")
+
+        println ">>> Starting clean task"
+        println ">>> Version To Clean: ${versionPattern}"
+
+        def safeDelete = { File dir ->
+            if (dir.exists() && dir.isDirectory()) {
+                dir.eachFileRecurse { file ->
+                    if (file.isFile()) {
+                        if (file.name.contains(versionPattern) && file.name.contains(project.base.archivesName.get())) {
+                            file.delete()
+                            println ">>> Deleted file: ${file.name}"
+                        }
+                    }
+                }
+            } else {
+                println ">>> Skipping non-existent or non-directory path: ${dir}"
+            }
+        }
+
+        safeDelete(projectSrcDir)
+        safeDelete(projectModDir)
+        safeDelete(projectDocDir)
+    }
+
+    tasks.register('copySourceJars', Copy) {
+        description = "Copies source JARs from libs to a top-level directory."
+
+        dependsOn remapSourcesJar  // Explicit dependency declaration
+
+        def buildSrcDir = file("${rootProject.file("./")}/_BUILDS_/${project.name}/SRC")
+
+        doFirst {
+            // Create the destination directory if it doesn't exist
+            if (!buildSrcDir.exists()) {
+                buildSrcDir.mkdirs()
+            }
+
+            println("${it.name} >>> Moving source jar")
+        }
+
+        from(layout.buildDirectory.dir("libs").get().asFile){
+            include '*-sources.jar'
+        }
+        into(buildSrcDir)
+    }
+
+    tasks.register('copyModJars', Copy) {
+        description = "Copies main JARs from libs to a top-level directory."
+
+        dependsOn remapJar  // Explicit dependency declaration
+
+        def buildModDir = file("${rootProject.file("./")}/_BUILDS_/${project.name}/MOD")
+
+        doFirst {
+            // Create the destination directory if it doesn't exist
+            if (!buildModDir.exists()) {
+                buildModDir.mkdirs()
+            }
+
+            println("${project.name} >>> Moving mod jar")
+        }
+
+        from(layout.buildDirectory.dir("libs").get().asFile) {
+            include '*.jar'
+            exclude '*-sources.jar'
+            exclude '*-fatjavadoc.jar'
+        }
+        into(buildModDir)
+    }
+
+    tasks.named('jar').configure {
+        finalizedBy(copySourceJars, copyModJars)
+    }
 }
 
-logger.lifecycle("======================================================================")
+logger.lifecycle("==============================================================================")
 
 // Apply auxiliary buildscripts to submodules
 // This must be done after all plugins are applied to subprojects
-apply from: "gradle/module-validation.gradle"
 apply from: "gradle/module-versioning.gradle"
 
 //======================================================================================== SETTING UP JAVA DOCS
@@ -374,6 +411,32 @@ tasks.register('javadocJar', Jar) {
 }
 
 build.dependsOn javadocJar
+
+tasks.register('copyDocJars', Copy) {
+    description = "Copies source JARs from libs to a top-level directory."
+
+    dependsOn javadocJar  // Explicit dependency declaration
+
+    def buildSrcDir = file("${rootProject.file("./")}/_BUILDS_/${project.name}/DOC")
+
+    doFirst {
+        // Create the destination directory if it doesn't exist
+        if (!buildSrcDir.exists()) {
+            buildSrcDir.mkdirs()
+        }
+
+        println("${it.name} >>> Moving source jar")
+    }
+
+    from(layout.buildDirectory.dir("libs").get().asFile){
+        include '*-fatjavadoc.jar'
+    }
+    into(buildSrcDir)
+}
+
+tasks.named('jar').configure {
+    finalizedBy(copyDocJars)
+}
 
 //======================================================================================== SETUP PRODUCTION MODS
 
@@ -469,7 +532,7 @@ subprojects {
                 return true
             }
 
-            //https://repo.repsy.io/mvn/jiraiyah/jilibs
+            //https://repo.repsy.io/mvn/TheMentor/jilibs
             def artifactPath = repsyUrl + "/${projectName}/${projectVersion}/${projectName}-${projectVersion}.pom"
 
             boolean exists = HttpClient.newHttpClient().withCloseable { client ->
@@ -498,7 +561,7 @@ subprojects {
     javadoc.enabled = false
 }
 
-logger.lifecycle("======================================================================")
+logger.lifecycle("==============================================================================")
 
 //======================================================================================== SETTING UP PUBLISHING TO MAVEN
 

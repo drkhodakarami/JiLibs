@@ -1,5 +1,14 @@
 version = getSubprojectVersion(project)
 
+repositories {
+    maven {
+        url = "https://cursemaven.com"
+        content {
+            includeGroup "curse.maven"
+        }
+    }
+}
+
 loom {
     accessWidenerPath = file('src/main/resources/jilibs-machina.accesswidener')
 }
@@ -8,7 +17,8 @@ moduleDependencies(project, [
         'jilibs-base',
         'jilibs-gui',
         'jilibs-inventory',
-        'jilibs-fluid'//,
+        'jilibs-fluid',
+        'jilibs-energy'//,
         //'jilibs-gas',
         //'jilibs-heat',
         //'jilibs-pressure',
@@ -18,3 +28,10 @@ moduleDependencies(project, [
         //'jilibs-suspension',
         //'jilibs-multiblock',
 ])
+
+dependencies{
+    // Energy API Handling Dependency ================================================================================================================
+    include modApi("teamreborn:energy:${rootProject.energy_version}") {
+        exclude(group: "net.fabricmc.fabric-api")
+    }
+}

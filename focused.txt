@@ -1,3 +1,23 @@
 jilibs-shared
 jilibs-logger
+jilibs-reference
 jilibs-config
+jilibs-register
+jilibs-ticklogic
+jilibs-base
+jilibs-gui
+jilibs-energy
+jilibs-inventory
+jilibs-fluid
+==jilibs-gas
+==jilibs-heat
+==jilibs-molten
+==jilibs-suspension
+==jilibs-emulsion
+==jilibs-pressure
+==jilibs-pipenetwork
+==jilibs-multiblock
+jilibs-machina
+
+==FIX MOD IDS IN ALL MODULES
+==FIX JAVA DOC ISSUES IN ALL MODULES

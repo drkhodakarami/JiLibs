@@ -17,11 +17,19 @@ include 'jilibs-catalog'
 def focus = new File('focused.txt')
 
 if (focus.exists()) {
-    focus.eachLine {
-        include it
-    }
+    def lines = focus.readLines().findAll { line ->
+        def trimmedLine = line.trim()
 
-    return // Skip the rest of the includes
+        return !trimmedLine.isEmpty() && !trimmedLine.startsWith('==')
+    } // keep only non-empty trimmed lines
+
+    if (!lines.isEmpty()) {
+        lines.each {
+            include it
+        }
+
+        return // skip the rest only if there are actual entries
+    }
 }
 
 include 'jilibs-shared'
