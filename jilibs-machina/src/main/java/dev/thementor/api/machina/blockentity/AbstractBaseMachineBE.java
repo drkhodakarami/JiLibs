@@ -16,17 +16,18 @@
 
 package dev.thementor.api.machina.blockentity;
 
-import dev.thementor.api.energy.interfaces.IEnergySpreader;
-import dev.thementor.api.shared.records.LongPayload;
-import dev.thementor.api.shared.records.lists.LongList;
-import net.minecraft.core.component.DataComponentGetter;
-import net.minecraft.core.component.DataComponentMap;
-import net.minecraft.core.component.DataComponentType;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.jetbrains.annotations.Nullable;
 import team.reborn.energy.api.EnergyStorage;
+import team.reborn.energy.api.base.SimpleEnergyStorage;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponentGetter;
+import net.minecraft.core.component.DataComponentMap;
+import net.minecraft.core.component.DataComponentType;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -38,14 +39,13 @@ import net.fabricmc.fabric.api.transfer.v1.fluid.base.SingleFluidStorage;
 
 import dev.thementor.api.energy.base.EnergyConnector;
 import dev.thementor.api.energy.interfaces.IEnergyConnector;
+import dev.thementor.api.energy.interfaces.IEnergySpreader;
 import dev.thementor.api.energy.interfaces.IEnergyStorageProvider;
 import dev.thementor.api.fluid.be.AbstractBaseFluidBE;
 import dev.thementor.api.shared.enumerations.MappedDirection;
+import dev.thementor.api.shared.records.LongPayload;
+import dev.thementor.api.shared.records.lists.LongList;
 import dev.thementor.api.shared.utils.DirectionHelper;
-import team.reborn.energy.api.base.SimpleEnergyStorage;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @SuppressWarnings("unused")
 public abstract class AbstractBaseMachineBE<T extends AbstractBaseMachineBE<T, B, C, D>,

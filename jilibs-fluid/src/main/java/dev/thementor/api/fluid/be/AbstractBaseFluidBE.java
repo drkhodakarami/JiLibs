@@ -16,13 +16,16 @@
 
 package dev.thementor.api.fluid.be;
 
-import net.minecraft.core.component.DataComponentGetter;
-import net.minecraft.core.component.DataComponentMap;
-import net.minecraft.core.component.DataComponentType;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponentGetter;
+import net.minecraft.core.component.DataComponentMap;
+import net.minecraft.core.component.DataComponentType;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -36,16 +39,13 @@ import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 
 import dev.thementor.api.fluid.base.FluidConnector;
 import dev.thementor.api.fluid.interfaces.IFluidConnector;
+import dev.thementor.api.fluid.interfaces.IFluidSpreader;
 import dev.thementor.api.fluid.interfaces.IFluidStorageProvider;
 import dev.thementor.api.inventory.be.AbstractBaseInventoryBE;
 import dev.thementor.api.shared.enumerations.MappedDirection;
-import dev.thementor.api.shared.utils.DirectionHelper;
-import dev.thementor.api.fluid.interfaces.IFluidSpreader;
 import dev.thementor.api.shared.records.FluidStackPayload;
 import dev.thementor.api.shared.records.lists.FluidStackList;
-
-import java.util.ArrayList;
-import java.util.List;
+import dev.thementor.api.shared.utils.DirectionHelper;
 
 @SuppressWarnings("unused")
 public abstract class AbstractBaseFluidBE<T extends AbstractBaseFluidBE<T, B, C>, B extends SimpleContainer, C extends SingleFluidStorage> extends AbstractBaseInventoryBE<T, B>

@@ -16,13 +16,13 @@
 
 package dev.thementor.api.energy.storage;
 
-import dev.thementor.api.shared.interfaces.IUpdatable;
 import team.reborn.energy.api.base.SimpleEnergyStorage;
 
 import net.minecraft.world.level.block.entity.BlockEntity;
 
 import dev.thementor.api.base.blockentity.AbstractBaseBE;
 import dev.thementor.api.shared.interfaces.ISyncable;
+import dev.thementor.api.shared.interfaces.IUpdatable;
 
 @SuppressWarnings("unused")
 public class SyncedEnergyStorage extends SimpleEnergyStorage implements ISyncable

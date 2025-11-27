@@ -23,10 +23,6 @@ import java.util.function.Supplier;
 
 import com.google.common.collect.ImmutableSet;
 
-import dev.thementor.api.register.BlockItemRegisterer;
-import dev.thementor.api.register.BlockRegisterer;
-import dev.thementor.api.register.EntityRegisterer;
-import dev.thementor.api.register.ItemRegisterer;
 import net.minecraft.core.dispenser.BoatDispenseItemBehavior;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.BlockFamily;
@@ -67,6 +63,10 @@ import net.fabricmc.fabric.api.object.builder.v1.block.type.WoodTypeBuilder;
 import net.fabricmc.fabric.api.registry.FlammableBlockRegistry;
 import net.fabricmc.fabric.api.registry.StrippableBlockRegistry;
 
+import dev.thementor.api.register.BlockItemRegisterer;
+import dev.thementor.api.register.BlockRegisterer;
+import dev.thementor.api.register.EntityRegisterer;
+import dev.thementor.api.register.ItemRegisterer;
 import dev.thementor.api.shared.annotations.*;
 import dev.thementor.api.shared.utils.BaseHelper;
 

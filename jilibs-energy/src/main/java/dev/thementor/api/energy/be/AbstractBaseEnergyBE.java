@@ -15,16 +15,18 @@
  */
 
 package dev.thementor.api.energy.be;
-import dev.thementor.api.energy.interfaces.IEnergySpreader;
-import dev.thementor.api.shared.records.LongPayload;
-import net.minecraft.core.component.DataComponentGetter;
-import net.minecraft.core.component.DataComponentMap;
-import net.minecraft.core.component.DataComponentType;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.jetbrains.annotations.Nullable;
 import team.reborn.energy.api.EnergyStorage;
+import team.reborn.energy.api.base.SimpleEnergyStorage;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponentGetter;
+import net.minecraft.core.component.DataComponentMap;
+import net.minecraft.core.component.DataComponentType;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -34,15 +36,13 @@ import net.minecraft.world.level.storage.ValueOutput;
 
 import dev.thementor.api.energy.base.EnergyConnector;
 import dev.thementor.api.energy.interfaces.IEnergyConnector;
+import dev.thementor.api.energy.interfaces.IEnergySpreader;
 import dev.thementor.api.energy.interfaces.IEnergyStorageProvider;
 import dev.thementor.api.inventory.be.AbstractBaseInventoryBE;
 import dev.thementor.api.shared.enumerations.MappedDirection;
-import dev.thementor.api.shared.utils.DirectionHelper;
+import dev.thementor.api.shared.records.LongPayload;
 import dev.thementor.api.shared.records.lists.LongList;
-import team.reborn.energy.api.base.SimpleEnergyStorage;
-
-import java.util.ArrayList;
-import java.util.List;
+import dev.thementor.api.shared.utils.DirectionHelper;
 
 @SuppressWarnings("UnusedReturnValue")
 public abstract class AbstractBaseEnergyBE<T extends AbstractBaseEnergyBE<T, B, C>, B extends SimpleContainer, C extends EnergyStorage> extends AbstractBaseInventoryBE<T, B>

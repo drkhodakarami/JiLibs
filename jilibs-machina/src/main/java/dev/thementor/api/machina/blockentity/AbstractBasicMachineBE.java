@@ -16,13 +16,16 @@
 
 package dev.thementor.api.machina.blockentity;
 
-import net.minecraft.world.Containers;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
+import java.util.ArrayList;
+import java.util.List;
+
 import team.reborn.energy.api.base.SimpleEnergyStorage;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.Containers;
 import net.minecraft.world.inventory.ContainerData;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluids;
@@ -38,9 +41,6 @@ import dev.thementor.api.inventory.storage.OutputInventory;
 import dev.thementor.api.inventory.storage.SyncedInventory;
 import dev.thementor.api.shared.enumerations.MappedDirection;
 import dev.thementor.api.shared.interfaces.IContainerDataProvider;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @SuppressWarnings("unused")
 public abstract class AbstractBasicMachineBE<T extends AbstractBasicMachineBE<T>>

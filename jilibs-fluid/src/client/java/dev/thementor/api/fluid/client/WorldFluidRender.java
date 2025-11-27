@@ -17,20 +17,6 @@
 package dev.thementor.api.fluid.client;
 
 /*import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.math.Axis;
-import org.jetbrains.annotations.Nullable;
-
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.Level;
-
-import net.fabricmc.fabric.api.transfer.v1.client.fluid.FluidVariantRendering;
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariantAttributes;
-import net.fabricmc.fabric.api.transfer.v1.fluid.base.SingleFluidStorage;
 
 import dev.thementor.api.shared.enumerations.ColorMode;*/
 

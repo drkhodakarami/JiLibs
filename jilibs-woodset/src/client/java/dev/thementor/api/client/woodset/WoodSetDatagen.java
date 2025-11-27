@@ -42,10 +42,10 @@ import net.fabricmc.fabric.api.datagen.v1.provider.FabricBlockLootTableProvider;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricLanguageProvider;
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
 
-import dev.thementor.api.woodset.WoodSet;
 import dev.thementor.api.shared.annotations.*;
 import dev.thementor.api.shared.utils.BaseHelper;
 import dev.thementor.api.shared.utils.StringHelper;
+import dev.thementor.api.woodset.WoodSet;
 
 /**
  * Generates data for wood-related items and blocks.

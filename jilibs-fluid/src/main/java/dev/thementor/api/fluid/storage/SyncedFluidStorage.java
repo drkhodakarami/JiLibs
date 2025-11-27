@@ -16,7 +16,6 @@
 
 package dev.thementor.api.fluid.storage;
 
-import dev.thementor.api.shared.interfaces.IUpdatable;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -26,6 +25,7 @@ import net.fabricmc.fabric.api.transfer.v1.fluid.base.SingleFluidStorage;
 
 import dev.thementor.api.base.blockentity.AbstractBaseBE;
 import dev.thementor.api.shared.interfaces.ISyncable;
+import dev.thementor.api.shared.interfaces.IUpdatable;
 import dev.thementor.api.shared.records.FluidStackPayload;
 
 public class SyncedFluidStorage extends SingleFluidStorage implements ISyncable
