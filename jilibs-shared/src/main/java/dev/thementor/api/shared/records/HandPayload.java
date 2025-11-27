@@ -1,40 +1,37 @@
-/***********************************************************************************
- * Copyright (c) 2025 Alireza Khodakarami (TheMentor)                               *
- * ------------------------------------------------------------------------------- *
- * MIT License                                                                     *
- * =============================================================================== *
- * Permission is hereby granted, free of charge, to any person obtaining a copy    *
- * of this software and associated documentation files (the "Software"), to deal   *
- * in the Software without restriction, including without limitation the rights    *
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell       *
- * copies of the Software, and to permit persons to whom the Software is           *
- * furnished to do so, subject to the following conditions:                        *
- * ------------------------------------------------------------------------------- *
- * The above copyright notice and this permission notice shall be included in all  *
- * copies or substantial portions of the Software.                                 *
- * ------------------------------------------------------------------------------- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR      *
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,        *
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE     *
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER          *
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,   *
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE   *
- * SOFTWARE.                                                                       *
- ***********************************************************************************/
+/*
+ * Copyright (c) 2025 Alireza Khodakarami
+ *
+ * Licensed under the MIT, (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://opensource.org/license/mit
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package dev.thementor.api.shared.records;
 
+import java.util.List;
+import java.util.Objects;
+
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import dev.thementor.api.shared.annotations.*;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.network.packet.CustomPayload;
-import net.minecraft.util.Hand;
-import net.minecraft.util.Identifier;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.Objects;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.InteractionHand;
+
+import dev.thementor.api.shared.annotations.*;
+
 /**
  * Represents a custom payload containing a player hand (e.g., main hand, off hand).
  */
@@ -46,28 +43,30 @@ import java.util.Objects;
 @Discord("https://discord.turtywurty.dev/")
 @Youtube("https://www.youtube.com/@TurtyWurty")
 
-public record HandPayload(Hand hand) implements CustomPayload
+public record HandPayload(InteractionHand hand) implements CustomPacketPayload
 {
     /**
      * The unique identifier for this custom payload.
      */
-    public static final Id<HandPayload> ID = new Id<>(Identifier.of("jiralib", "hand_payload"));
+    public static final Type<HandPayload> ID = new Type<>(ResourceLocation.fromNamespaceAndPath("jilibs_shared", "hand_payload"));
 
     /**
      * The codec used to serialize and deserialize the HandPayload.
      */
     public static final Codec<HandPayload> CODEC = RecordCodecBuilder.create(inst -> inst.group(
-            Codec.STRING.xmap(str -> Objects.requireNonNull(Hand.valueOf(str)), Hand::name)
+            Codec.STRING.xmap(str -> Objects.requireNonNull(InteractionHand.valueOf(str)), InteractionHand::name)
                         .fieldOf("hand").forGetter(HandPayload::hand)
     ).apply(inst, HandPayload::new));
 
     /**
      * The packet codec used to send and receive the HandPayload.
      */
-    public static final PacketCodec<RegistryByteBuf, HandPayload> PACKET_CODEC =
-            PacketCodec.tuple(PacketCodecs.STRING,
+    public static final StreamCodec<RegistryFriendlyByteBuf, HandPayload> STREAM_CODEC =
+            StreamCodec.composite(ByteBufCodecs.STRING_UTF8,
                               payload -> payload.hand().name(),
-                              handStr -> new HandPayload(Hand.valueOf(handStr)));
+                              handStr -> new HandPayload(InteractionHand.valueOf(handStr)));
+
+    public static final Codec<List<HandPayload>> LIST_CODEC = CODEC.listOf();
 
     /**
      * Retrieves the unique identifier for this custom payload.
@@ -75,7 +74,7 @@ public record HandPayload(Hand hand) implements CustomPayload
      * @return the unique identifier
      */
     @Override
-    public Id<? extends CustomPayload> getId()
+    public @NotNull Type<? extends CustomPacketPayload> type()
     {
         return ID;
     }

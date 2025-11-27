@@ -1,49 +1,42 @@
-/***********************************************************************************
- * Copyright (c) 2025 Alireza Khodakarami (Jiraiyah)                               *
- * ------------------------------------------------------------------------------- *
- * MIT License                                                                     *
- * =============================================================================== *
- * Permission is hereby granted, free of charge, to any person obtaining a copy    *
- * of this software and associated documentation files (the "Software"), to deal   *
- * in the Software without restriction, including without limitation the rights    *
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell       *
- * copies of the Software, and to permit persons to whom the Software is           *
- * furnished to do so, subject to the following conditions:                        *
- * ------------------------------------------------------------------------------- *
- * The above copyright notice and this permission notice shall be included in all  *
- * copies or substantial portions of the Software.                                 *
- * ------------------------------------------------------------------------------- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR      *
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,        *
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE     *
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER          *
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,   *
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE   *
- * SOFTWARE.                                                                       *
- ***********************************************************************************/
+/*
+ * Copyright (c) 2025 Alireza Khodakarami
+ *
+ * Licensed under the MIT, (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://opensource.org/license/mit
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package dev.thementor.api.register;
 
+import java.util.EnumMap;
+
+import net.minecraft.Util;
+import net.minecraft.core.Holder;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.equipment.ArmorMaterial;
+import net.minecraft.world.item.equipment.ArmorType;
+import net.minecraft.world.item.equipment.EquipmentAsset;
+import net.minecraft.world.item.equipment.EquipmentAssets;
+
 import dev.thementor.api.shared.annotations.*;
 import dev.thementor.api.shared.utils.BaseHelper;
-import net.minecraft.item.Item;
-import net.minecraft.item.equipment.ArmorMaterial;
-import net.minecraft.item.equipment.EquipmentAsset;
-import net.minecraft.item.equipment.EquipmentAssetKeys;
-import net.minecraft.item.equipment.EquipmentType;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.registry.tag.TagKey;
-import net.minecraft.sound.SoundEvent;
-import net.minecraft.util.Util;
-
-import java.util.EnumMap;
 
 /**
  * Provides utility methods for managing armor-related data.
  */
 @SuppressWarnings("unused")
-@Developer("Jiraiyah")
+@Developer("The Mentor")
 @CreatedAt("2025-04-18")
 @Repository("https://github.com/drkhodakarami/___PROJECTS___")
 @Discord("https://discord.gg/pmM4emCbuH")
@@ -70,19 +63,19 @@ public class ArmorHelper
      * @return A new ArmorMaterial instance.
      */
     public static ArmorMaterial getArmorMaterial(String modID, String name, int durability, int bootDefence, int leggingsDefence, int chestplateDefence, int helmetDefence,
-                                                 int bodyDefence, int enchantmentValue, RegistryEntry<SoundEvent> equipSound, float toughness,
+                                                 int bodyDefence, int enchantmentValue, Holder<SoundEvent> equipSound, float toughness,
                                                  float knockbackResistance, TagKey<Item> repairIngredient)
     {
-        RegistryKey<EquipmentAsset> key = RegistryKey.of(EquipmentAssetKeys.REGISTRY_KEY, BaseHelper.identifier(modID, name));
+        ResourceKey<EquipmentAsset> key = ResourceKey.create(EquipmentAssets.ROOT_ID, BaseHelper.id(modID, name));
         return new ArmorMaterial(durability,
-                                 Util.make(new EnumMap<>(EquipmentType.class),
+                                 Util.make(new EnumMap<>(ArmorType.class),
                                             (map) ->
                                                            {
-                                                               map.put(EquipmentType.BOOTS, bootDefence);
-                                                               map.put(EquipmentType.LEGGINGS, leggingsDefence);
-                                                               map.put(EquipmentType.CHESTPLATE, chestplateDefence);
-                                                               map.put(EquipmentType.HELMET, helmetDefence);
-                                                               map.put(EquipmentType.BODY, bodyDefence);
+                                                               map.put(ArmorType.BOOTS, bootDefence);
+                                                               map.put(ArmorType.LEGGINGS, leggingsDefence);
+                                                               map.put(ArmorType.CHESTPLATE, chestplateDefence);
+                                                               map.put(ArmorType.HELMET, helmetDefence);
+                                                               map.put(ArmorType.BODY, bodyDefence);
                                                            }),
                                  enchantmentValue, equipSound,
                                  toughness, knockbackResistance, repairIngredient,

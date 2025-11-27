@@ -1,32 +1,37 @@
-/***********************************************************************************
- * Copyright (c) 2025 Alireza Khodakarami (Jiraiyah)                               *
- * ------------------------------------------------------------------------------- *
- * MIT License                                                                     *
- * =============================================================================== *
- * Permission is hereby granted, free of charge, to any person obtaining a copy    *
- * of this software and associated documentation files (the "Software"), to deal   *
- * in the Software without restriction, including without limitation the rights    *
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell       *
- * copies of the Software, and to permit persons to whom the Software is           *
- * furnished to do so, subject to the following conditions:                        *
- * ------------------------------------------------------------------------------- *
- * The above copyright notice and this permission notice shall be included in all  *
- * copies or substantial portions of the Software.                                 *
- * ------------------------------------------------------------------------------- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR      *
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,        *
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE     *
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER          *
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,   *
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE   *
- * SOFTWARE.                                                                       *
- ***********************************************************************************/
+/*
+ * Copyright (c) 2025 Alireza Khodakarami
+ *
+ * Licensed under the MIT, (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://opensource.org/license/mit
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package dev.thementor.api.fluid.utils;
 
-import dev.thementor.api.base.blockentity.JiBlockEntity;
-import dev.thementor.api.shared.enumerations.MappedDirection;
-import dev.thementor.api.shared.records.FluidStackPayload;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.Container;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+
 import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
 import net.fabricmc.fabric.api.transfer.v1.fluid.*;
 import net.fabricmc.fabric.api.transfer.v1.fluid.base.SingleFluidStorage;
@@ -34,22 +39,12 @@ import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleVariantStorage;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvent;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import dev.thementor.api.base.blockentity.AbstractBaseBE;
+import dev.thementor.api.shared.enumerations.MappedDirection;
+import dev.thementor.api.shared.records.FluidStackPayload;
 
+@SuppressWarnings({"unused", "UnusedReturnValue"})
 public class FluidHelper
 {
     public static boolean isEmpty(SingleFluidStorage storage)
@@ -71,8 +66,8 @@ public class FluidHelper
         return true;
     }
 
-    public static boolean handleStorageTransfer(World world, BlockPos pos, SingleFluidStorage storage,
-                                                Inventory inputInventory,
+    public static boolean handleStorageTransfer(Level world, BlockPos pos, SingleFluidStorage storage,
+                                                Container inputInventory,
                                                 int inputSlot,
                                                 boolean fullTransfer)
     {
@@ -81,8 +76,8 @@ public class FluidHelper
         return transferFromStorage(world, pos, storage, inputInventory, inputSlot, fullTransfer);
     }
 
-    public static boolean handleStorageTransfer(World world, BlockPos pos, SingleVariantStorage<FluidVariant> storage,
-                                                Inventory inputInventory,
+    public static boolean handleStorageTransfer(Level world, BlockPos pos, SingleVariantStorage<FluidVariant> storage,
+                                                Container inputInventory,
                                                 int inputSlot,
                                                 boolean fullTransfer)
     {
@@ -91,8 +86,8 @@ public class FluidHelper
         return transferFromStorage(world, pos, storage, inputInventory, inputSlot, fullTransfer);
     }
 
-    public static boolean handleStorageTransfer(World world, BlockPos pos, Storage<FluidVariant> storage,
-                                                Inventory inputInventory,
+    public static boolean handleStorageTransfer(Level world, BlockPos pos, Storage<FluidVariant> storage,
+                                                Container inputInventory,
                                                 int inputSlot,
                                                 boolean fullTransfer)
     {
@@ -101,9 +96,9 @@ public class FluidHelper
         return transferFromStorage(world, pos, storage, inputInventory, inputSlot, fullTransfer);
     }
 
-    private static boolean transferFromStorage(World world, BlockPos pos, Storage<FluidVariant> storage, Inventory inputInventory, int inputSlot, boolean fullTransfer)
+    private static boolean transferFromStorage(Level world, BlockPos pos, Storage<FluidVariant> storage, Container inputInventory, int inputSlot, boolean fullTransfer)
     {
-        Storage<FluidVariant> slotStorage = ContainerItemContext.withConstant(inputInventory.getStack(inputSlot)).find(FluidStorage.ITEM);
+        Storage<FluidVariant> slotStorage = ContainerItemContext.withConstant(inputInventory.getItem(inputSlot)).find(FluidStorage.ITEM);
 
         if (slotStorage == null)
             return false;
@@ -133,7 +128,7 @@ public class FluidHelper
 
                         transaction.commit();
                         SoundEvent sound = FluidVariantAttributes.getFillSound(variant);
-                        world.playSound(null, pos, sound, SoundCategory.BLOCKS, 1.0F, 1.0F);
+                        world.playSound(null, pos, sound, SoundSource.BLOCKS, 1.0F, 1.0F);
                         return true;
                     }
                 }
@@ -143,9 +138,9 @@ public class FluidHelper
         return false;
     }
 
-    private static boolean transferToStorage(World world, BlockPos pos, Storage<FluidVariant> storage, Inventory inputInventory, int inputSlot, boolean fullTransfer)
+    private static boolean transferToStorage(Level world, BlockPos pos, Storage<FluidVariant> storage, Container inputInventory, int inputSlot, boolean fullTransfer)
     {
-        Storage<FluidVariant> slotStorage = ContainerItemContext.withConstant(inputInventory.getStack(inputSlot)).find(FluidStorage.ITEM);
+        Storage<FluidVariant> slotStorage = ContainerItemContext.withConstant(inputInventory.getItem(inputSlot)).find(FluidStorage.ITEM);
 
         if(slotStorage == null)
             return false;
@@ -175,7 +170,7 @@ public class FluidHelper
 
                     transaction.commit();
                     SoundEvent sound = FluidVariantAttributes.getEmptySound(variant);
-                    world.playSound(null, pos, sound, SoundCategory.BLOCKS, 1.0F, 1.0F);
+                    world.playSound(null, pos, sound, SoundSource.BLOCKS, 1.0F, 1.0F);
                     return true;
                 }
             }
@@ -185,7 +180,7 @@ public class FluidHelper
     }
 
 
-    public static boolean interactWithBlock(World world, BlockPos pos, PlayerEntity player, Hand hand)
+    public static boolean interactWithBlock(Level world, BlockPos pos, Player player, InteractionHand hand)
     {
         Storage<FluidVariant> storage;
         for (MappedDirection direction : MappedDirection.values())
@@ -200,10 +195,10 @@ public class FluidHelper
         return false;
     }
 
-    public static boolean isValidSlot(Inventory inventory, int slot, ItemStack itemStack)
+    public static boolean isValidSlot(Container inventory, int slot, ItemStack itemStack)
     {
         // EMPTY BUCKET
-        ItemStack slotStack = inventory.getStack(slot);
+        ItemStack slotStack = inventory.getItem(slot);
 
         if(itemStack.isEmpty())
             return false;
@@ -211,10 +206,10 @@ public class FluidHelper
         if(slotStack.isEmpty())
             return true;
 
-        if(!slotStack.isOf(itemStack.getItem()))
+        if(!slotStack.is(itemStack.getItem()))
             return false;
 
-        if(slotStack.getCount() + itemStack.getCount() > slotStack.getMaxCount())
+        if(slotStack.getCount() + itemStack.getCount() > slotStack.getMaxStackSize())
             return false;
 
         Storage<FluidVariant> itemStorage = ContainerItemContext.withConstant(itemStack).find(FluidStorage.ITEM);
@@ -245,9 +240,9 @@ public class FluidHelper
         return variantFlag && itemFlag;
     }
 
-    public static boolean isEmptyBucket(Inventory inventory, int slot)
+    public static boolean isEmptyBucket(Container inventory, int slot)
     {
-        return inventory.getStack(slot).isOf(Items.BUCKET);
+        return inventory.getItem(slot).is(Items.BUCKET);
     }
 
     public static long simulateInsertion(Storage<FluidVariant> storage, FluidVariant variant, Transaction outer)
@@ -294,9 +289,9 @@ public class FluidHelper
         return amount;
     }
 
-    public static boolean sameFluidInStorage(Inventory inventory, int slot, Storage<FluidVariant> storage)
+    public static boolean sameFluidInStorage(Container inventory, int slot, Storage<FluidVariant> storage)
     {
-        ItemStack slotStack = inventory.getStack(slot);
+        ItemStack slotStack = inventory.getItem(slot);
 
         if(slotStack.isEmpty())
             return false;
@@ -360,21 +355,21 @@ public class FluidHelper
         }
     }
 
-    public static Storage<FluidVariant> getStorage(World world, BlockPos pos, Direction direction, Set<BlockPos> blacklist)
+    public static Storage<FluidVariant> getStorage(Level world, BlockPos pos, Direction direction, Set<BlockPos> blacklist)
     {
-        BlockPos adjacentPos = pos.offset(direction);
+        BlockPos adjacentPos = pos.relative(direction);
         if(blacklist != null && blacklist.contains(adjacentPos))
             return null;
 
         return FluidStorage.SIDED.find(world, adjacentPos, direction.getOpposite());
     }
 
-    public static List<Storage<FluidVariant>> getAllStorages(World world, BlockPos pos, Set<BlockPos> blacklist)
+    public static List<Storage<FluidVariant>> getAllStorages(Level world, BlockPos pos, Set<BlockPos> blacklist)
     {
         List<Storage<FluidVariant>> storages = new ArrayList<>();
         for (Direction direction : Direction.values())
         {
-            BlockPos adjacentPos = pos.offset(direction);
+            BlockPos adjacentPos = pos.relative(direction);
             if(blacklist != null && blacklist.contains(adjacentPos))
                 continue;
 
@@ -387,11 +382,11 @@ public class FluidHelper
         return storages;
     }
 
-    public void spread(BlockEntity blockEntity, Storage<FluidVariant> storage, boolean equalAmount,Set<BlockPos> blacklist)
+    public static void spread(BlockEntity blockEntity, Storage<FluidVariant> storage, boolean equalAmount,Set<BlockPos> blacklist)
     {
         BlockPos adjacentPos;
 
-        List<Storage<FluidVariant>> adjacentStorages = getAllStorages(blockEntity.getWorld(), blockEntity.getPos(), blacklist);
+        List<Storage<FluidVariant>> adjacentStorages = getAllStorages(blockEntity.getLevel(), blockEntity.getBlockPos(), blacklist);
 
         if(adjacentStorages.isEmpty())
             return;
@@ -410,13 +405,11 @@ public class FluidHelper
                 try(Transaction transaction = Transaction.openOuter())
                 {
                     long inserted = adjacentStorage.insert(variant, finalAmount, transaction);
+
                     if(inserted == finalAmount)
-                    {
-                        transaction.commit();
                         totalInserted += inserted;
-                    }
-                    else
-                        transaction.abort();
+
+                    transaction.commit();
                 }
             }
 
@@ -431,25 +424,25 @@ public class FluidHelper
 
             if(currentAmount != storageView.getAmount())
             {
-                if (blockEntity instanceof JiBlockEntity<?> be)
+                if (blockEntity instanceof AbstractBaseBE<?> be)
                     be.update();
                 else
-                    blockEntity.markDirty();
+                    blockEntity.setChanged();
             }
         }
     }
 
-    public void spread(BlockEntity blockEntity, Storage<FluidVariant> storage,Set<BlockPos> blacklist)
+    public static void spread(BlockEntity blockEntity, Storage<FluidVariant> storage,Set<BlockPos> blacklist)
     {
         spread(blockEntity, storage, true, blacklist);
     }
 
-    public void spread(BlockEntity blockEntity, Storage<FluidVariant> storage, boolean equalAmount)
+    public static void spread(BlockEntity blockEntity, Storage<FluidVariant> storage, boolean equalAmount)
     {
         spread(blockEntity, storage, equalAmount, null);
     }
 
-    public void spread(BlockEntity blockEntity, Storage<FluidVariant> storage)
+    public static void spread(BlockEntity blockEntity, Storage<FluidVariant> storage)
     {
         spread(blockEntity, storage, true, null);
     }

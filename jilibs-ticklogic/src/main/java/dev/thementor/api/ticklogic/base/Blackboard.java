@@ -1,38 +1,31 @@
-/***********************************************************************************
- * Copyright (c) 2025 Alireza Khodakarami (Jiraiyah)                               *
- * ------------------------------------------------------------------------------- *
- * MIT License                                                                     *
- * =============================================================================== *
- * Permission is hereby granted, free of charge, to any person obtaining a copy    *
- * of this software and associated documentation files (the "Software"), to deal   *
- * in the Software without restriction, including without limitation the rights    *
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell       *
- * copies of the Software, and to permit persons to whom the Software is           *
- * furnished to do so, subject to the following conditions:                        *
- * ------------------------------------------------------------------------------- *
- * The above copyright notice and this permission notice shall be included in all  *
- * copies or substantial portions of the Software.                                 *
- * ------------------------------------------------------------------------------- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR      *
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,        *
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE     *
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER          *
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,   *
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE   *
- * SOFTWARE.                                                                       *
- ***********************************************************************************/
+/*
+ * Copyright (c) 2025 Alireza Khodakarami
+ *
+ * Licensed under the MIT, (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://opensource.org/license/mit
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package dev.thementor.api.ticklogic.base;
-
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec2f;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3i;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.jetbrains.annotations.Nullable;
+
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Vec3i;
+import net.minecraft.world.phys.Vec2;
+import net.minecraft.world.phys.Vec3;
 
 /**
  * A blackboard used to store and retrieve data in a key-value format.
@@ -174,10 +167,10 @@ public class Blackboard
      * @param key   the key for the value
      * @return the Vec3d value, or Vec3d.ZERO if not found
      */
-    public Vec3d getVec3d(String key)
+    public Vec3 getVec3(String key)
     {
-        var value = get(key, Vec3d.class);
-        return value == null ? Vec3d.ZERO : value;
+        var value = get(key, Vec3.class);
+        return value == null ? Vec3.ZERO : value;
     }
 
     /**
@@ -198,10 +191,10 @@ public class Blackboard
      * @param key   the key for the value
      * @return the Vec2f value, or Vec2f.ZERO if not found
      */
-    public Vec2f getVec2f(String key)
+    public Vec2 getVec2(String key)
     {
-        var value = get(key, Vec2f.class);
-        return value == null ? Vec2f.ZERO : value;
+        var value = get(key, Vec2.class);
+        return value == null ? Vec2.ZERO : value;
     }
 
     /**

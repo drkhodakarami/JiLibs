@@ -1,52 +1,48 @@
-/***********************************************************************************
- * Copyright (c) 2025 Alireza Khodakarami (TheMentor)                               *
- * ------------------------------------------------------------------------------- *
- * MIT License                                                                     *
- * =============================================================================== *
- * Permission is hereby granted, free of charge, to any person obtaining a copy    *
- * of this software and associated documentation files (the "Software"), to deal   *
- * in the Software without restriction, including without limitation the rights    *
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell       *
- * copies of the Software, and to permit persons to whom the Software is           *
- * furnished to do so, subject to the following conditions:                        *
- * ------------------------------------------------------------------------------- *
- * The above copyright notice and this permission notice shall be included in all  *
- * copies or substantial portions of the Software.                                 *
- * ------------------------------------------------------------------------------- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR      *
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,        *
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE     *
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER          *
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,   *
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE   *
- * SOFTWARE.                                                                       *
- ***********************************************************************************/
+/*
+ * Copyright (c) 2025 Alireza Khodakarami
+ *
+ * Licensed under the MIT, (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://opensource.org/license/mit
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package dev.thementor.api.shared.records;
 
-import com.mojang.serialization.MapCodec;
+import java.util.List;
+import java.util.stream.IntStream;
+
+import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import org.jetbrains.annotations.NotNull;
+
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.RandomSource;
+import net.minecraft.util.valueproviders.ConstantFloat;
+import net.minecraft.util.valueproviders.ConstantInt;
+import net.minecraft.util.valueproviders.FloatProvider;
+import net.minecraft.util.valueproviders.FloatProviderType;
+import net.minecraft.util.valueproviders.IntProvider;
+import net.minecraft.util.valueproviders.IntProviderType;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.display.SlotDisplay;
+
 import dev.thementor.api.shared.annotations.*;
 import dev.thementor.api.shared.network.ExtraPacketCodecs;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.packet.CustomPayload;
-import net.minecraft.recipe.display.SlotDisplay;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.floatprovider.ConstantFloatProvider;
-import net.minecraft.util.math.floatprovider.FloatProvider;
-import net.minecraft.util.math.floatprovider.FloatProviderType;
-import net.minecraft.util.math.intprovider.ConstantIntProvider;
-import net.minecraft.util.math.intprovider.IntProvider;
-import net.minecraft.util.math.intprovider.IntProviderType;
-import net.minecraft.util.math.random.Random;
-
-import java.util.stream.IntStream;
 
 /**
  * Represents a custom payload containing output information for an item stack, including the item, count provider, and chance.
@@ -59,17 +55,17 @@ import java.util.stream.IntStream;
 @Discord("https://discord.turtywurty.dev/")
 @Youtube("https://www.youtube.com/@TurtyWurty")
 
-public record OutputItemStackPayload(Item output, IntProvider count, FloatProvider chance) implements CustomPayload
+public record OutputItemStackPayload(Item output, IntProvider count, FloatProvider chance) implements CustomPacketPayload
 {
     /**
      * The unique identifier for this custom payload.
      */
-    public static final Id<BlockPosPayload> ID = new Id<>(Identifier.of("jiralib", "output_item_stack_payload"));
+    public static final Type<BlockPosPayload> ID = new Type<>(ResourceLocation.fromNamespaceAndPath("jilibs_shared", "output_item_stack_payload"));
 
     /**
      * The default chance value (1.0f).
      */
-    public static final ConstantFloatProvider DEFAULT_CHANCE = ConstantFloatProvider.create(1.0f);
+    public static final ConstantFloat DEFAULT_CHANCE = ConstantFloat.of(1.0f);
 
     /**
      * An empty instance of OutputItemStackPayload.
@@ -79,17 +75,19 @@ public record OutputItemStackPayload(Item output, IntProvider count, FloatProvid
     /**
      * The codec used to serialize and deserialize the OutputItemStackPayload.
      */
-    public static final MapCodec<OutputItemStackPayload> CODEC = RecordCodecBuilder.mapCodec(inst -> inst.group(
-            Registries.ITEM.getCodec().fieldOf("output").forGetter(OutputItemStackPayload::output),
-            IntProvider.VALUE_CODEC.fieldOf("count").forGetter(OutputItemStackPayload::count),
-            FloatProvider.VALUE_CODEC.fieldOf("chance").forGetter(OutputItemStackPayload::chance)
+    public static final Codec<OutputItemStackPayload> CODEC = RecordCodecBuilder.create(inst -> inst.group(
+            BuiltInRegistries.ITEM.byNameCodec().fieldOf("output").forGetter(OutputItemStackPayload::output),
+            IntProvider.CODEC.fieldOf("count").forGetter(OutputItemStackPayload::count),
+            FloatProvider.CODEC.fieldOf("chance").forGetter(OutputItemStackPayload::chance)
     ).apply(inst, OutputItemStackPayload::new));
 
     /**
      * The packet codec used to send and receive the OutputItemStackPayload.
      */
-    public static final PacketCodec<RegistryByteBuf, OutputItemStackPayload> PACKET_CODEC =
-            PacketCodec.ofStatic(OutputItemStackPayload::encode, OutputItemStackPayload::decode);
+    public static final StreamCodec<RegistryFriendlyByteBuf, OutputItemStackPayload> STREAM_CODEC =
+            StreamCodec.of(OutputItemStackPayload::encode, OutputItemStackPayload::decode);
+
+    public static final Codec<List<OutputItemStackPayload>> LIST_CODEC = CODEC.listOf();
 
     /**
      * Constructs a new {@link OutputItemStackPayload} and performs necessary validations.
@@ -115,7 +113,7 @@ public record OutputItemStackPayload(Item output, IntProvider count, FloatProvid
      */
     public OutputItemStackPayload(Item output, int count, float chance)
     {
-        this(output, ConstantIntProvider.create(count), ConstantFloatProvider.create(chance));
+        this(output, ConstantInt.of(count), ConstantFloat.of(chance));
     }
 
     /**
@@ -126,7 +124,7 @@ public record OutputItemStackPayload(Item output, IntProvider count, FloatProvid
      */
     public OutputItemStackPayload(ItemStack stack)
     {
-        this(stack.getItem(), ConstantIntProvider.create(stack.getCount()), DEFAULT_CHANCE);
+        this(stack.getItem(), ConstantInt.of(stack.getCount()), DEFAULT_CHANCE);
     }
 
     /**
@@ -138,7 +136,7 @@ public record OutputItemStackPayload(Item output, IntProvider count, FloatProvid
      */
     public OutputItemStackPayload(Item output, IntProvider count, float chance)
     {
-        this(output, count, ConstantFloatProvider.create(chance));
+        this(output, count, ConstantFloat.of(chance));
     }
 
     /**
@@ -150,7 +148,7 @@ public record OutputItemStackPayload(Item output, IntProvider count, FloatProvid
      */
     public OutputItemStackPayload(Item output, int count, FloatProvider chance)
     {
-        this(output, ConstantIntProvider.create(count), chance);
+        this(output, ConstantInt.of(count), chance);
     }
 
     /**
@@ -161,7 +159,7 @@ public record OutputItemStackPayload(Item output, IntProvider count, FloatProvid
      */
     public OutputItemStackPayload(Item output, int count)
     {
-        this(output, ConstantIntProvider.create(count), DEFAULT_CHANCE);
+        this(output, ConstantInt.of(count), DEFAULT_CHANCE);
     }
 
     /**
@@ -183,7 +181,7 @@ public record OutputItemStackPayload(Item output, IntProvider count, FloatProvid
      */
     public OutputItemStackPayload(Item output, float chance)
     {
-        this(output, ConstantIntProvider.create(1), ConstantFloatProvider.create(chance));
+        this(output, ConstantInt.of(1), ConstantFloat.of(chance));
     }
 
     /**
@@ -194,7 +192,7 @@ public record OutputItemStackPayload(Item output, IntProvider count, FloatProvid
      */
     public OutputItemStackPayload(Item output, FloatProvider chance)
     {
-        this(output, ConstantIntProvider.create(1), chance);
+        this(output, ConstantInt.of(1), chance);
     }
 
     /**
@@ -204,7 +202,7 @@ public record OutputItemStackPayload(Item output, IntProvider count, FloatProvid
      */
     public OutputItemStackPayload(Item output)
     {
-        this(output, ConstantIntProvider.create(1), DEFAULT_CHANCE);
+        this(output, ConstantInt.of(1), DEFAULT_CHANCE);
     }
 
     /**
@@ -215,7 +213,7 @@ public record OutputItemStackPayload(Item output, IntProvider count, FloatProvid
      */
     public OutputItemStackPayload(ItemStack stack, float chance)
     {
-        this(stack.getItem(), ConstantIntProvider.create(stack.getCount()), ConstantFloatProvider.create(chance));
+        this(stack.getItem(), ConstantInt.of(stack.getCount()), ConstantFloat.of(chance));
     }
 
     /**
@@ -226,17 +224,17 @@ public record OutputItemStackPayload(Item output, IntProvider count, FloatProvid
      */
     public OutputItemStackPayload(ItemStack stack, FloatProvider chance)
     {
-        this(stack.getItem(), ConstantIntProvider.create(stack.getCount()), chance);
+        this(stack.getItem(), ConstantInt.of(stack.getCount()), chance);
     }
 
     /**
      * Represents a payload for an output item stack with configurable properties.
      */
-    public ItemStack createStack(Random random)
+    public ItemStack createStack(RandomSource random)
     {
-        return this.chance.get(random) < random.nextFloat()
+        return this.chance.sample(random) < random.nextFloat()
                ? ItemStack.EMPTY
-               : new ItemStack(this.output, this.count.get(random));
+               : new ItemStack(this.output, this.count.sample(random));
     }
 
     /**
@@ -246,10 +244,10 @@ public record OutputItemStackPayload(Item output, IntProvider count, FloatProvid
      */
     public SlotDisplay toDisplay()
     {
-        return new SlotDisplay.CompositeSlotDisplay(
-                IntStream.range(this.count.getMin(), this.count.getMax() + 1)
+        return new SlotDisplay.Composite(
+                IntStream.range(this.count.getMinValue(), this.count.getMaxValue() + 1)
                         .mapToObj(c -> new ItemStack(this.output, c))
-                        .map(SlotDisplay.StackSlotDisplay::new)
+                        .map(SlotDisplay.ItemStackSlotDisplay::new)
                         .map(SlotDisplay.class::cast)
                         .toList()
         );
@@ -261,14 +259,14 @@ public record OutputItemStackPayload(Item output, IntProvider count, FloatProvid
      * @param buf The registry byte buffer to encode the payload into.
      * @param stackPayload The payload to encode.
      */
-    private static void encode(RegistryByteBuf buf, OutputItemStackPayload stackPayload)
+    private static void encode(RegistryFriendlyByteBuf buf, OutputItemStackPayload stackPayload)
     {
-        buf.writeRegistryKey(Registries.ITEM.getKey(stackPayload.output()).orElseThrow());
+        buf.writeResourceKey(BuiltInRegistries.ITEM.getResourceKey(stackPayload.output()).orElseThrow());
 
-        Registries.INT_PROVIDER_TYPE.getKey(stackPayload.count().getType()).ifPresent(buf::writeRegistryKey);
+        BuiltInRegistries.INT_PROVIDER_TYPE.getResourceKey(stackPayload.count().getType()).ifPresent(buf::writeResourceKey);
         ExtraPacketCodecs.encode(buf, stackPayload.count());
 
-        Registries.FLOAT_PROVIDER_TYPE.getKey(stackPayload.chance().getType()).ifPresent(buf::writeRegistryKey);
+        BuiltInRegistries.FLOAT_PROVIDER_TYPE.getResourceKey(stackPayload.chance().getType()).ifPresent(buf::writeResourceKey);
         ExtraPacketCodecs.encode(buf, stackPayload.chance());
     }
 
@@ -278,16 +276,16 @@ public record OutputItemStackPayload(Item output, IntProvider count, FloatProvid
      * @param buf The registry byte buffer to decode the payload from.
      * @return The decoded {@link OutputItemStackPayload}.
      */
-    private static OutputItemStackPayload decode(RegistryByteBuf buf)
+    private static OutputItemStackPayload decode(RegistryFriendlyByteBuf buf)
     {
-        Item item = Registries.ITEM.get(buf.readRegistryKey(RegistryKeys.ITEM));
+        Item item = BuiltInRegistries.ITEM.getValue(buf.readResourceKey(Registries.ITEM));
 
-        RegistryKey<IntProviderType<?>> countType = buf.readRegistryKey(RegistryKeys.INT_PROVIDER_TYPE);
-        IntProviderType<?> countTypeInstance = Registries.INT_PROVIDER_TYPE.get(countType);
+        ResourceKey<IntProviderType<?>> countType = buf.readResourceKey(Registries.INT_PROVIDER_TYPE);
+        IntProviderType<?> countTypeInstance = BuiltInRegistries.INT_PROVIDER_TYPE.getValue(countType);
         IntProvider count = ExtraPacketCodecs.decode(buf, countTypeInstance);
 
-        RegistryKey<FloatProviderType<?>> chanceType = buf.readRegistryKey(RegistryKeys.FLOAT_PROVIDER_TYPE);
-        FloatProviderType<?> chanceTypeInstance = Registries.FLOAT_PROVIDER_TYPE.get(chanceType);
+        ResourceKey<FloatProviderType<?>> chanceType = buf.readResourceKey(Registries.FLOAT_PROVIDER_TYPE);
+        FloatProviderType<?> chanceTypeInstance = BuiltInRegistries.FLOAT_PROVIDER_TYPE.getValue(chanceType);
         FloatProvider chance = ExtraPacketCodecs.decode(buf, chanceTypeInstance);
 
         return new OutputItemStackPayload(item, count, chance);
@@ -299,7 +297,7 @@ public record OutputItemStackPayload(Item output, IntProvider count, FloatProvid
      * @return the unique identifier
      */
     @Override
-    public Id<? extends CustomPayload> getId()
+    public @NotNull Type<? extends CustomPacketPayload> type()
     {
         return ID;
     }

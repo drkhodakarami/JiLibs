@@ -1,43 +1,36 @@
-/***********************************************************************************
- * Copyright (c) 2025 Alireza Khodakarami (TheMentor)                               *
- * ------------------------------------------------------------------------------- *
- * MIT License                                                                     *
- * =============================================================================== *
- * Permission is hereby granted, free of charge, to any person obtaining a copy    *
- * of this software and associated documentation files (the "Software"), to deal   *
- * in the Software without restriction, including without limitation the rights    *
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell       *
- * copies of the Software, and to permit persons to whom the Software is           *
- * furnished to do so, subject to the following conditions:                        *
- * ------------------------------------------------------------------------------- *
- * The above copyright notice and this permission notice shall be included in all  *
- * copies or substantial portions of the Software.                                 *
- * ------------------------------------------------------------------------------- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR      *
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,        *
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE     *
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER          *
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,   *
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE   *
- * SOFTWARE.                                                                       *
- ***********************************************************************************/
+/*
+ * Copyright (c) 2025 Alireza Khodakarami
+ *
+ * Licensed under the MIT, (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://opensource.org/license/mit
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package dev.thementor.api.shared.utils;
+
+import java.util.Optional;
+
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 
 import dev.thementor.api.shared.annotations.CreatedAt;
 import dev.thementor.api.shared.annotations.Developer;
 import dev.thementor.api.shared.annotations.Repository;
 import dev.thementor.api.shared.annotations.Youtube;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.EntityHitResult;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.RaycastContext;
-
-import java.util.Optional;
 
 /**
  * Provides utility methods for physics-related operations in Minecraft.
@@ -55,16 +48,16 @@ public class PhysicsHelper
      * @param player The player entity to get the hit result for.
      * @return The block hit result.
      */
-    public static BlockHitResult getHitResult(PlayerEntity player)
+    public static BlockHitResult getHitResult(Player player)
     {
-        var playerLook = new Vec3d(player.getX(), player.getY() + player.getEyeY(), player.getZ());
-        var lookVec = player.getCameraPosVec(1.0F);
-        var reach = player.getBlockInteractionRange();
+        var playerLook = new Vec3(player.getX(), player.getY() + player.getEyeY(), player.getZ());
+        var lookVec = player.getEyePosition(1.0F);
+        var reach = player.blockInteractionRange();
         var endLook = playerLook.add(lookVec.x * reach, lookVec.y * reach, lookVec.z * reach);
-        return player.getEntityWorld()
-                     .raycast(new RaycastContext(playerLook, endLook,
-                                                 RaycastContext.ShapeType.COLLIDER,
-                                             RaycastContext.FluidHandling.NONE,
+        return player.level()
+                     .clip(new ClipContext(playerLook, endLook,
+                                                 ClipContext.Block.COLLIDER,
+                                             ClipContext.Fluid.NONE,
                                                     player));
     }
 
@@ -75,26 +68,26 @@ public class PhysicsHelper
      * @param maxDistance The maximum distance to check for entities.
      * @return The entity being looked at, or null if no entity is found.
      */
-    public static Entity getEntityLookedAt(PlayerEntity player, double maxDistance)
+    public static Entity getEntityLookedAt(Player player, double maxDistance)
     {
-        Vec3d eyePosition = player.getCameraPosVec(1.0F);
-        Vec3d lookVector = player.getRotationVec(1.0F).multiply(maxDistance);
-        Vec3d endPosition = eyePosition.add(lookVector);
+        Vec3 eyePosition = player.getEyePosition(1.0F);
+        Vec3 lookVector = player.getViewVector(1.0F).scale(maxDistance);
+        Vec3 endPosition = eyePosition.add(lookVector);
 
         // Perform ray trace for entities
-        HitResult hitResult = player.getEntityWorld()
-                                    .raycast(new RaycastContext(eyePosition, endPosition,
-                                         RaycastContext.ShapeType.OUTLINE,
-                                     RaycastContext.FluidHandling.NONE,
+        HitResult hitResult = player.level()
+                                    .clip(new ClipContext(eyePosition, endPosition,
+                                         ClipContext.Block.OUTLINE,
+                                     ClipContext.Fluid.NONE,
                                             player));
 
         if (hitResult.getType() != HitResult.Type.MISS)
-            endPosition = hitResult.getPos();
+            endPosition = hitResult.getLocation();
 
         EntityHitResult entityHitResult = rayTraceEntities(player, eyePosition, endPosition,
                                                            player.getBoundingBox()
-                                                                   .stretch(lookVector)
-                                                                   .expand(1.0D, 1.0D, 1.0D), maxDistance);
+                                                                   .expandTowards(lookVector)
+                                                                   .inflate(1.0D, 1.0D, 1.0D), maxDistance);
 
         if (entityHitResult != null)
             return entityHitResult.getEntity();
@@ -112,16 +105,16 @@ public class PhysicsHelper
      * @param maxDistance The maximum distance to check for entities.
      * @return The closest entity hit by the ray, or null if no entity is found.
      */
-    private static EntityHitResult rayTraceEntities(PlayerEntity player, Vec3d start, Vec3d end, Box boundingBox, double maxDistance)
+    private static EntityHitResult rayTraceEntities(Player player, Vec3 start, Vec3 end, AABB boundingBox, double maxDistance)
     {
         double closestDistance = maxDistance;
         Entity closestEntity = null;
-        Vec3d hitLocation = null;
+        Vec3 hitLocation = null;
 
-        for (Entity entity : player.getEntityWorld().getOtherEntities(player, boundingBox, e -> e != player && e.canHit()))
+        for (Entity entity : player.level().getEntities(player, boundingBox, e -> e != player && e.isPickable()))
         {
-            Box entityBoundingBox = entity.getBoundingBox().expand(entity.getTargetingMargin());
-            Optional<Vec3d> optHitVec = entityBoundingBox.raycast(start, end);
+            AABB entityBoundingBox = entity.getBoundingBox().inflate(entity.getPickRadius());
+            Optional<Vec3> optHitVec = entityBoundingBox.clip(start, end);
 
             if (entityBoundingBox.contains(start))
             {
@@ -134,7 +127,7 @@ public class PhysicsHelper
             }
             else if (optHitVec.isPresent())
             {
-                Vec3d hitVec = optHitVec.get();
+                Vec3 hitVec = optHitVec.get();
                 double distanceToHitVec = start.distanceTo(hitVec);
 
                 if (distanceToHitVec < closestDistance || closestDistance == 0.0D)

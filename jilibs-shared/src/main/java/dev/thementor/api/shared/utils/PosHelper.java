@@ -1,32 +1,29 @@
-/***********************************************************************************
- * Copyright (c) 2025 Alireza Khodakarami (TheMentor)                               *
- * ------------------------------------------------------------------------------- *
- * MIT License                                                                     *
- * =============================================================================== *
- * Permission is hereby granted, free of charge, to any person obtaining a copy    *
- * of this software and associated documentation files (the "Software"), to deal   *
- * in the Software without restriction, including without limitation the rights    *
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell       *
- * copies of the Software, and to permit persons to whom the Software is           *
- * furnished to do so, subject to the following conditions:                        *
- * ------------------------------------------------------------------------------- *
- * The above copyright notice and this permission notice shall be included in all  *
- * copies or substantial portions of the Software.                                 *
- * ------------------------------------------------------------------------------- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR      *
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,        *
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE     *
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER          *
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,   *
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE   *
- * SOFTWARE.                                                                       *
- ***********************************************************************************/
+/*
+ * Copyright (c) 2025 Alireza Khodakarami
+ *
+ * Licensed under the MIT, (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://opensource.org/license/mit
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package dev.thementor.api.shared.utils;
 
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Vec3i;
+import net.minecraft.world.phys.Vec2;
+import net.minecraft.world.phys.Vec3;
+
 import dev.thementor.api.shared.annotations.*;
 import dev.thementor.api.shared.exceptions.Exceptions;
-import net.minecraft.util.math.*;
 
 /**
  * Provides utility methods for position-related operations in Minecraft.
@@ -54,9 +51,9 @@ public class PosHelper
      * @param pos The base block position.
      * @return An array of adjacent block positions.
      */
-    public static BlockPos[] positionNextTo(BlockPos pos)
+    public static BlockPos[] neighbours(BlockPos pos)
     {
-        return new BlockPos[]{pos.up(), pos.down(), pos.east(), pos.west(), pos.north(), pos.south()};
+        return new BlockPos[]{pos.above(), pos.below(), pos.east(), pos.west(), pos.north(), pos.south()};
     }
 
     /**
@@ -65,7 +62,7 @@ public class PosHelper
      * @param pos The base block position.
      * @return An array of adjacent block positions.
      */
-    public static BlockPos[] positionSideTo(BlockPos pos)
+    public static BlockPos[] sides(BlockPos pos)
     {
         return new BlockPos[]{pos.east(), pos.west(), pos.north(), pos.south()};
     }
@@ -76,9 +73,9 @@ public class PosHelper
      * @param pos The base block position.
      * @return An array of adjacent block positions.
      */
-    public static BlockPos[] positionSideBottom(BlockPos pos)
+    public static BlockPos[] sidesBottom(BlockPos pos)
     {
-        return new BlockPos[]{pos.down(), pos.east(), pos.west(), pos.north(), pos.south()};
+        return new BlockPos[]{pos.below(), pos.east(), pos.west(), pos.north(), pos.south()};
     }
 
     /**
@@ -87,9 +84,9 @@ public class PosHelper
      * @param pos The base block position.
      * @return An array of adjacent block positions.
      */
-    public static BlockPos[] positionSideTop(BlockPos pos)
+    public static BlockPos[] sidesTop(BlockPos pos)
     {
-        return new BlockPos[]{pos.up(), pos.east(), pos.west(), pos.north(), pos.south()};
+        return new BlockPos[]{pos.above(), pos.east(), pos.west(), pos.north(), pos.south()};
     }
 
     /**
@@ -98,9 +95,9 @@ public class PosHelper
      * @param pos The base block position.
      * @return An array of adjacent block positions.
      */
-    public static BlockPos[] positionTopBottom(BlockPos pos)
+    public static BlockPos[] topBottom(BlockPos pos)
     {
-        return new BlockPos[]{pos.up(), pos.down()};
+        return new BlockPos[]{pos.above(), pos.below()};
     }
 
     /**
@@ -184,7 +181,7 @@ public class PosHelper
      */
     public static BlockPos left(BlockPos pos, Direction facing)
     {
-        return pos.offset(left(facing));
+        return pos.relative(left(facing));
     }
 
     /**
@@ -196,7 +193,7 @@ public class PosHelper
      */
     public static BlockPos right(BlockPos pos, Direction facing)
     {
-        return pos.offset(right(facing));
+        return pos.relative(right(facing));
     }
 
     /**
@@ -208,7 +205,7 @@ public class PosHelper
      */
     public static BlockPos front(BlockPos pos, Direction facing)
     {
-        return pos.offset(front(facing));
+        return pos.relative(front(facing));
     }
 
     /**
@@ -220,7 +217,7 @@ public class PosHelper
      */
     public static BlockPos back(BlockPos pos, Direction facing)
     {
-        return pos.offset(back(facing));
+        return pos.relative(back(facing));
     }
 
     /**
@@ -231,7 +228,7 @@ public class PosHelper
      */
     public static BlockPos top(BlockPos pos)
     {
-        return pos.up();
+        return pos.above();
     }
 
     /**
@@ -242,7 +239,7 @@ public class PosHelper
      */
     public static BlockPos bottom(BlockPos pos)
     {
-        return pos.down();
+        return pos.below();
     }
 
     /**
@@ -252,7 +249,7 @@ public class PosHelper
      * @param origin The starting block position.
      * @return The distance between the two positions.
      */
-    public static double getDistance(BlockPos pos, BlockPos origin)
+    public static double distance(BlockPos pos, BlockPos origin)
     {
         return Math.sqrt(Math.pow(pos.getX() - origin.getX(), 2) + Math.pow(pos.getY() - origin.getY(), 2) + Math.pow(pos.getZ() - origin.getZ(), 2));
     }
@@ -268,7 +265,7 @@ public class PosHelper
      * @param z2 The z-coordinate of the second point.
      * @return The distance between the two points.
      */
-    public static double getDistance(int x1, int y1, int z1 , int x2, int y2, int z2)
+    public static double distance(int x1, int y1, int z1 , int x2, int y2, int z2)
     {
         return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2) + Math.pow(z1 - z2, 2));
     }
@@ -282,7 +279,7 @@ public class PosHelper
      * @param y2 The y-coordinate of the second point.
      * @return The distance between the two points.
      */
-    public static double getDistance(int x1, int y1 , int x2, int y2)
+    public static double distance(int x1, int y1 , int x2, int y2)
     {
         return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
     }
@@ -298,7 +295,7 @@ public class PosHelper
      * @param z2 The z-coordinate of the second point.
      * @return The distance between the two points.
      */
-    public static double getDistance(float x1, float y1, float z1 , float x2, float y2, float z2)
+    public static double distance(float x1, float y1, float z1 , float x2, float y2, float z2)
     {
         return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2) + Math.pow(z1 - z2, 2));
     }
@@ -312,7 +309,7 @@ public class PosHelper
      * @param y2 The y-coordinate of the second point.
      * @return The distance between the two points.
      */
-    public static double getDistance(float x1, float y1 , float x2, float y2)
+    public static double distance(float x1, float y1 , float x2, float y2)
     {
         return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
     }
@@ -328,7 +325,7 @@ public class PosHelper
      * @param z2 The z-coordinate of the second point.
      * @return The distance between the two points.
      */
-    public static double getDistance(double x1, double y1, double z1 , double x2, double y2, double z2)
+    public static double distance(double x1, double y1, double z1 , double x2, double y2, double z2)
     {
         return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2) + Math.pow(z1 - z2, 2));
     }
@@ -342,21 +339,21 @@ public class PosHelper
      * @param y2 The y-coordinate of the second point.
      * @return The distance between the two points.
      */
-    public static double getDistance(double x1, double y1 , double x2, double y2)
+    public static double distance(double x1, double y1 , double x2, double y2)
     {
         return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
     }
 
     /**
-     * Calculates the Euclidean distance between two 2D points represented by {@link Vec2f}.
+     * Calculates the Euclidean distance between two 2D points represented by {@link Vec2}.
      *
      * @param point1 The first point.
      * @param point2 The second point.
      * @return The distance between the two points.
      */
-    public static double getDistance(Vec2f point1, Vec2f point2)
+    public static double distance(Vec2 point1, Vec2 point2)
     {
-        return getDistance(point1.x, point1.y, point2.x, point2.y);
+        return distance(point1.x, point1.y, point2.x, point2.y);
     }
 
     /**
@@ -366,20 +363,20 @@ public class PosHelper
      * @param point2 The second point.
      * @return The distance between the two points.
      */
-    public static double getDistance(Vec3i point1, Vec3i point2)
+    public static double distance(Vec3i point1, Vec3i point2)
     {
-        return getDistance(point1.getX(), point1.getY(), point1.getZ(), point2.getX(), point2.getY(), point2.getZ());
+        return distance(point1.getX(), point1.getY(), point1.getZ(), point2.getX(), point2.getY(), point2.getZ());
     }
 
     /**
-     * Calculates the Euclidean distance between two 3D points represented by {@link Vec3d}.
+     * Calculates the Euclidean distance between two 3D points represented by {@link Vec3}.
      *
      * @param point1 The first point.
      * @param point2 The second point.
      * @return The distance between the two points.
      */
-    public static double getDistance(Vec3d point1, Vec3d point2)
+    public static double distance(Vec3 point1, Vec3 point2)
     {
-        return getDistance(point1.getX(), point1.getY(), point1.getZ(), point2.getX(), point2.getY(), point2.getZ());
+        return distance(point1.x(), point1.y(), point1.z(), point2.x(), point2.y(), point2.z());
     }
 }

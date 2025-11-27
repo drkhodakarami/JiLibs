@@ -1,37 +1,31 @@
-/***********************************************************************************
- * Copyright (c) 2025 Alireza Khodakarami (TheMentor)                               *
- * ------------------------------------------------------------------------------- *
- * MIT License                                                                     *
- * =============================================================================== *
- * Permission is hereby granted, free of charge, to any person obtaining a copy    *
- * of this software and associated documentation files (the "Software"), to deal   *
- * in the Software without restriction, including without limitation the rights    *
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell       *
- * copies of the Software, and to permit persons to whom the Software is           *
- * furnished to do so, subject to the following conditions:                        *
- * ------------------------------------------------------------------------------- *
- * The above copyright notice and this permission notice shall be included in all  *
- * copies or substantial portions of the Software.                                 *
- * ------------------------------------------------------------------------------- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR      *
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,        *
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE     *
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER          *
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,   *
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE   *
- * SOFTWARE.                                                                       *
- ***********************************************************************************/
+/*
+ * Copyright (c) 2025 Alireza Khodakarami
+ *
+ * Licensed under the MIT, (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://opensource.org/license/mit
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package dev.thementor.api.shared.utils;
+
+import org.jetbrains.annotations.Nullable;
+
+import net.minecraft.core.Direction;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.phys.Vec3;
 
 import dev.thementor.api.shared.annotations.CreatedAt;
 import dev.thementor.api.shared.annotations.Developer;
 import dev.thementor.api.shared.annotations.Repository;
 import dev.thementor.api.shared.annotations.Youtube;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * Provides utility methods for working with directions in Minecraft.
@@ -50,7 +44,7 @@ public class DirectionHelper
      * @return The primary direction.
      */
     @Developer("Direwolf20")
-    public static Direction getPrimaryDirection(Vec3d vec)
+    public static Direction primaryDirection(Vec3 vec)
     {
         double absX = Math.abs(vec.x);
         double absY = Math.abs(vec.y);
@@ -71,13 +65,13 @@ public class DirectionHelper
      * @return The facing direction.
      */
     @Developer("Direwolf20")
-    public static Direction getFacingDirection(PlayerEntity player)
+    public static Direction facingDirection(Player player)
     {
-        float yaw = player.getYaw();
-        float pitch = player.getPitch();
+        float yaw = player.getYRot();
+        float pitch = player.getXRot();
 
         // Convert yaw to horizontal direction
-        Direction horizontalDirection = Direction.fromHorizontalDegrees(yaw);
+        Direction horizontalDirection = Direction.fromYRot(yaw);
 
         // Adjust for vertical direction if necessary (e.g., UP or DOWN)
         if (pitch < -45)
@@ -94,7 +88,7 @@ public class DirectionHelper
      * @param facing The current facing direction.
      * @return The relative direction, or null if either parameter is null.
      */
-    @Developer("The Mentor")
+    @Developer("TheMentor")
     public static Direction relativeDirection(@Nullable Direction direction, @Nullable Direction facing)
     {
         if(direction == null)
@@ -114,21 +108,21 @@ public class DirectionHelper
         // Handle vertical facings
         if (facing == Direction.UP)
             // When looking up, rotate once counterclockwise
-            return direction.rotateYCounterclockwise();
+            return direction.getCounterClockWise();
         if (facing == Direction.DOWN)
             // When looking down, rotate once clockwise
-            return direction.rotateYClockwise();
+            return direction.getClockWise();
 
         // Calculate rotations based on facing direction
         switch (facing) {
             case SOUTH: // 180 degrees from north, need 2 rotations
-                relative = relative.rotateYClockwise().rotateYClockwise();
+                relative = relative.getClockWise().getClockWise();
                 break;
             case EAST:  // 270 degrees from north, need 1 rotation counterclockwise
-                relative = relative.rotateYCounterclockwise();
+                relative = relative.getCounterClockWise();
                 break;
             case WEST:  // 90 degrees from north, need 1 rotation clockwise
-                relative = relative.rotateYClockwise();
+                relative = relative.getClockWise();
                 break;
             case NORTH: // no rotation needed
             default:

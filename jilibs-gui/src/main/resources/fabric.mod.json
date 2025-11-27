@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "id": "jilibs_gui",
+  "name": "Ji Libs GUI",
+  "description": "Contains the essential API for handling gui.",
+  "version": "${version}",
+  "environment": "*",
+  "accessWidener" : "jilibs_gui.accesswidener",
+  "mixins": [
+	"jilibs_gui.mixins.json",
+    {
+      "config": "jilibs_gui.client.mixins.json",
+      "environment": "client"
+    }
+  ],
+  "license": "MIT",
+  "icon": "assets/jilibs_gui/icon.png",
+  "contact": {
+    "homepage": "https://www.youtube.com/@TheMentorCodeLab",
+    "issues": "https://github.com/drkhodakarami/JiLibs/issues",
+    "sources": "https://github.com/drkhodakarami/JiLibs"
+  },
+  "authors": [
+    "The Mentor"
+  ],
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "minecraft": "~${game_version}",
+    "java": ">=${java_version}",
+    "fabric-api": "*"
+  },
+  "custom": {
+    "modmenu": {
+      "links": {
+        "modmenu.discord": "https://discord.gg/pmM4emCbuH"
+      },
+      "badges": ["library"],
+      "parent": {
+        "id": "jilibs",
+        "name": "Ji Libs",
+        "description": "Contains API for handling GUI with helpers and more",
+        "icon": "assets/jilibs/icon.png",
+        "badges": [ "library" ]
+      },
+      "update_checker": true
+    }
+  },
+  "mcb": [
+    {
+      "name": "Storage",
+      "labelColor": -1842205,
+      "fillColor": -10388178,
+      "outlineColor": -8212404
+    },
+    {
+      "name": "Tech.",
+      "labelColor": -1842205,
+      "fillColor": -10932611,
+      "outlineColor": -6402896
+    }
+  ]
+}

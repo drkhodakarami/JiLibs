@@ -1,58 +1,51 @@
-/***********************************************************************************
- * Copyright (c) 2025 Alireza Khodakarami (TheMentor)                               *
- * ------------------------------------------------------------------------------- *
- * MIT License                                                                     *
- * =============================================================================== *
- * Permission is hereby granted, free of charge, to any person obtaining a copy    *
- * of this software and associated documentation files (the "Software"), to deal   *
- * in the Software without restriction, including without limitation the rights    *
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell       *
- * copies of the Software, and to permit persons to whom the Software is           *
- * furnished to do so, subject to the following conditions:                        *
- * ------------------------------------------------------------------------------- *
- * The above copyright notice and this permission notice shall be included in all  *
- * copies or substantial portions of the Software.                                 *
- * ------------------------------------------------------------------------------- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR      *
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,        *
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE     *
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER          *
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,   *
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE   *
- * SOFTWARE.                                                                       *
- ***********************************************************************************/
+/*
+ * Copyright (c) 2025 Alireza Khodakarami
+ *
+ * Licensed under the MIT, (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://opensource.org/license/mit
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package dev.thementor.api.shared.properties;
-
-import com.mojang.datafixers.util.Function4;
-import dev.thementor.api.shared.interfaces.IBEFactory;
-import dev.thementor.api.shared.interfaces.IBETickerFactory;
-import dev.thementor.api.shared.interfaces.IShapeFactory;
-import dev.thementor.api.shared.annotations.*;
-import dev.thementor.api.shared.interfaces.ITick;
-import net.minecraft.block.BlockRenderType;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.state.property.EnumProperty;
-import net.minecraft.state.property.Properties;
-import net.minecraft.state.property.Property;
-import net.minecraft.util.StringIdentifiable;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.util.shape.VoxelShapes;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldView;
-import org.apache.commons.lang3.function.TriFunction;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiPredicate;
 import java.util.function.Supplier;
+
+import com.mojang.datafixers.util.Function4;
+
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.util.StringRepresentable;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.level.block.state.properties.Property;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
+
+import dev.thementor.api.shared.annotations.*;
+import dev.thementor.api.shared.interfaces.IBEFactory;
+import dev.thementor.api.shared.interfaces.IBETickerFactory;
+import dev.thementor.api.shared.interfaces.IShapeFactory;
+import dev.thementor.api.shared.interfaces.ITick;
 
 /**
  * Represents properties and settings for a Minecraft block, including its behavior, render type, and state properties.
@@ -82,12 +75,12 @@ public class BlockProperties<T extends BlockEntity>
     /**
      * The function to calculate the comparator output of the block.
      */
-    private Function4<BlockState, World, BlockPos, Direction, Integer> comparatorOutput;
+    private Function4<BlockState, Level, BlockPos, Direction, Integer> comparatorOutput;
 
     /**
      * The render type of the block.
      */
-    private BlockRenderType renderType;
+    private RenderShape renderType;
 
     /**
      * The factory for creating voxel shapes of the block.
@@ -102,7 +95,7 @@ public class BlockProperties<T extends BlockEntity>
     /**
      * Predicate to determine if the block can exist at a given position in the world.
      */
-    private BiPredicate<WorldView, BlockPos> canExistAt;
+    private BiPredicate<LevelReader, BlockPos> canExistAt;
 
     /**
      * Cache for direction-specific voxel shapes.
@@ -156,9 +149,9 @@ public class BlockProperties<T extends BlockEntity>
     {
         placeFacingOpposite = true;
         hasComparatorOutput = false;
-        comparatorOutput = (state, world, pos, direction) -> ScreenHandler.calculateComparatorOutput(world.getBlockEntity(pos));
-        renderType = BlockRenderType.MODEL;
-        shapeFactory = (state, world, pos, context) -> VoxelShapes.fullCube();
+        comparatorOutput = (state, world, pos, direction) -> AbstractContainerMenu.getRedstoneSignalFromBlockEntity(world.getBlockEntity(pos));
+        renderType = RenderShape.MODEL;
+        shapeFactory = (state, world, pos, context) -> Shapes.block();
         stateProperties = new StateProperties();
         canExistAt = (world, pos) -> true;
         cachedDirectionalShapes = new HashMap<>();
@@ -168,7 +161,7 @@ public class BlockProperties<T extends BlockEntity>
         rightClickToOpenGui = false;
         dropContentsOnBreak = false;
 
-        this.blockEntityFactory = (pos, state) -> this.getBEType().instantiate(pos, state);
+        this.blockEntityFactory = (pos, state) -> this.getBEType().create(pos, state);
         this.blockEntityTicker = (world, state, type) -> ITick.createTicker(world);
     }
 
@@ -193,7 +186,7 @@ public class BlockProperties<T extends BlockEntity>
      */
     public boolean hasHorizontalFacing()
     {
-        return this.stateProperties.containsProperty(Properties.HORIZONTAL_FACING);
+        return this.stateProperties.containsProperty(BlockStateProperties.HORIZONTAL_FACING);
     }
 
     /**
@@ -203,7 +196,7 @@ public class BlockProperties<T extends BlockEntity>
      */
     public boolean hasFacing()
     {
-        return this.stateProperties.containsProperty(Properties.FACING);
+        return this.stateProperties.containsProperty(BlockStateProperties.FACING);
     }
 
     /**
@@ -213,7 +206,7 @@ public class BlockProperties<T extends BlockEntity>
      */
     public boolean hasAxisProperty()
     {
-        return this.stateProperties.containsProperty(Properties.AXIS);
+        return this.stateProperties.containsProperty(BlockStateProperties.AXIS);
     }
 
     /**
@@ -223,7 +216,7 @@ public class BlockProperties<T extends BlockEntity>
      */
     public boolean hasEnabledProperty()
     {
-        return this.stateProperties.containsProperty(Properties.ENABLED);
+        return this.stateProperties.containsProperty(BlockStateProperties.ENABLED);
     }
 
     /**
@@ -233,7 +226,7 @@ public class BlockProperties<T extends BlockEntity>
      */
     public boolean hasLockedProperty()
     {
-        return this.stateProperties.containsProperty(Properties.LOCKED);
+        return this.stateProperties.containsProperty(BlockStateProperties.LOCKED);
     }
 
     /**
@@ -243,7 +236,7 @@ public class BlockProperties<T extends BlockEntity>
      */
     public boolean hasPoweredProperty()
     {
-        return this.stateProperties.containsProperty(Properties.POWERED);
+        return this.stateProperties.containsProperty(BlockStateProperties.POWERED);
     }
 
     /**
@@ -253,7 +246,7 @@ public class BlockProperties<T extends BlockEntity>
      */
     public boolean hasUnstableProperty()
     {
-        return this.stateProperties.containsProperty(Properties.UNSTABLE);
+        return this.stateProperties.containsProperty(BlockStateProperties.UNSTABLE);
     }
 
     /**
@@ -263,7 +256,7 @@ public class BlockProperties<T extends BlockEntity>
      */
     public boolean hasLitProperty()
     {
-        return this.stateProperties.containsProperty(Properties.LIT);
+        return this.stateProperties.containsProperty(BlockStateProperties.LIT);
     }
 
     /**
@@ -273,7 +266,7 @@ public class BlockProperties<T extends BlockEntity>
      */
     public boolean hasWaterloggedProperty()
     {
-        return this.stateProperties.containsProperty(Properties.WATERLOGGED);
+        return this.stateProperties.containsProperty(BlockStateProperties.WATERLOGGED);
     }
 
     /**
@@ -291,7 +284,7 @@ public class BlockProperties<T extends BlockEntity>
      *
      * @return the comparator output function
      */
-    public Function4<BlockState, World, BlockPos, Direction, Integer> getComparatorOutput()
+    public Function4<BlockState, Level, BlockPos, Direction, Integer> getComparatorOutput()
     {
         return this.comparatorOutput;
     }
@@ -301,7 +294,7 @@ public class BlockProperties<T extends BlockEntity>
      *
      * @return the render type
      */
-    public BlockRenderType getRenderType()
+    public RenderShape getRenderShape()
     {
         return this.renderType;
     }
@@ -341,7 +334,7 @@ public class BlockProperties<T extends BlockEntity>
      *
      * @return the existence check predicate
      */
-    public BiPredicate<WorldView, BlockPos> canExistAt()
+    public BiPredicate<LevelReader, BlockPos> canExistAt()
     {
         return this.canExistAt;
     }
@@ -448,7 +441,7 @@ public class BlockProperties<T extends BlockEntity>
      */
     public BlockProperties<T> setHorizontalFacing(boolean flag)
     {
-        if(stateProperties.containsProperty(Properties.FACING))
+        if(stateProperties.containsProperty(BlockStateProperties.FACING))
             throw new IllegalArgumentException("Cannot add horizontal facing property when facing property is already present");
         if (flag)
             this.stateProperties.addHorizontalFacing();
@@ -486,7 +479,7 @@ public class BlockProperties<T extends BlockEntity>
      */
     public BlockProperties<T> setFacing(boolean flag)
     {
-        if(stateProperties.containsProperty(Properties.HORIZONTAL_FACING))
+        if(stateProperties.containsProperty(BlockStateProperties.HORIZONTAL_FACING))
             throw new IllegalArgumentException("Cannot add facing property when horizontal facing property is already present");
         if (flag)
             this.stateProperties.addFacing();
@@ -805,7 +798,7 @@ public class BlockProperties<T extends BlockEntity>
      * @param comparatorOutput the custom comparator output function
      * @return the current instance of BlockProperties for method chaining
      */
-    public BlockProperties<T> setComparatorOutput(Function4<BlockState, World, BlockPos, Direction, Integer> comparatorOutput)
+    public BlockProperties<T> setComparatorOutput(Function4<BlockState, Level, BlockPos, Direction, Integer> comparatorOutput)
     {
         this.comparatorOutput = comparatorOutput;
         return this;
@@ -829,7 +822,7 @@ public class BlockProperties<T extends BlockEntity>
      */
     public BlockProperties<T> setInvisibleRenderer(boolean flag)
     {
-        return flag ? setRenderType(BlockRenderType.INVISIBLE) : setRenderType(BlockRenderType.MODEL);
+        return flag ? setRenderType(RenderShape.INVISIBLE) : setRenderType(RenderShape.MODEL);
     }
 
     /**
@@ -838,7 +831,7 @@ public class BlockProperties<T extends BlockEntity>
      * @param renderType the render type
      * @return the current instance of BlockProperties for method chaining
      */
-    public BlockProperties<T> setRenderType(BlockRenderType renderType)
+    public BlockProperties<T> setRenderType(RenderShape renderType)
     {
         this.renderType = renderType;
         return this;
@@ -850,7 +843,7 @@ public class BlockProperties<T extends BlockEntity>
      * @return the current instance of BlockProperties for method chaining
      */
     public BlockProperties<T> addEmptyShape() {
-        return setConstantShape(VoxelShapes.empty());
+        return setConstantShape(Shapes.empty());
     }
 
     /**
@@ -884,13 +877,13 @@ public class BlockProperties<T extends BlockEntity>
      */
     public BlockProperties<T> addRotatedShapes(VoxelShape shape)
     {
-        if(!this.stateProperties.containsProperty(Properties.HORIZONTAL_FACING))
+        if(!this.stateProperties.containsProperty(BlockStateProperties.HORIZONTAL_FACING))
             addHorizontalFacing();
 
         if(this.cachedDirectionalShapes.isEmpty())
             runShapeCalculation(this.cachedDirectionalShapes, shape);
 
-        return setShapeFactory((state, world, pos, context) -> this.cachedDirectionalShapes.get(state.get(Properties.HORIZONTAL_FACING)));
+        return setShapeFactory((state, world, pos, context) -> this.cachedDirectionalShapes.get(state.getValue(BlockStateProperties.HORIZONTAL_FACING)));
     }
 
     /**
@@ -899,7 +892,7 @@ public class BlockProperties<T extends BlockEntity>
      * @param canExistAt the predicate for checking block existence
      * @return the current instance of BlockProperties for method chaining
      */
-    public BlockProperties<T> canExistAt(BiPredicate<WorldView, BlockPos> canExistAt)
+    public BlockProperties<T> canExistAt(BiPredicate<LevelReader, BlockPos> canExistAt)
     {
         this.canExistAt = canExistAt;
         return this;
@@ -1003,22 +996,22 @@ public class BlockProperties<T extends BlockEntity>
     public static VoxelShape calculateShape(Direction to, VoxelShape shape)
     {
         // Create an array of two VoxelShapes: one for the current shape and one for building the rotated shape.
-        final VoxelShape[] buffer = {shape, VoxelShapes.empty()};
+        final VoxelShape[] buffer = {shape, Shapes.empty()};
 
         // Calculate the number of 90-degree rotations needed to align the given 'to' direction with NORTH.
         // This uses the horizontal quarter-turns difference between the 'to' direction and NORTH.
-        final int times = (to.getHorizontalQuarterTurns() - Direction.NORTH.getHorizontalQuarterTurns() + 4) % 4;
+        final int times = (to.get2DDataValue() - Direction.NORTH.get2DDataValue() + 4) % 4;
         // Loop to rotate the shape the required number of times (calculated above).
         for (int i = 0; i < times; i++) {
             // Iterate through each box (cuboid) in the current shape.
-            buffer[0].forEachBox((minX, minY, minZ, maxX, maxY, maxZ) ->
+            buffer[0].forAllBoxes((minX, minY, minZ, maxX, maxY, maxZ) ->
                                          // For each box, calculate its rotated position and add it to the second shape (buffer[1]).
-                                         buffer[1] = VoxelShapes.union(buffer[1],
-                                                                       VoxelShapes.cuboid(1 - maxZ, minY, minX, 1 - minZ, maxY, maxX)));
+                                         buffer[1] = Shapes.or(buffer[1],
+                                                                       Shapes.box(1 - maxZ, minY, minX, 1 - minZ, maxY, maxX)));
             // After processing all boxes, update buffer[0] to be the newly rotated shape.
             buffer[0] = buffer[1];
             // Reset buffer[1] to an empty shape for the next rotation iteration.
-            buffer[1] = VoxelShapes.empty();
+            buffer[1] = Shapes.empty();
         }
         // Return the final rotated shape after the loop.
         return buffer[0];
@@ -1047,7 +1040,7 @@ public class BlockProperties<T extends BlockEntity>
      */
     public BlockProperties<T> addBooleanStateProperty(String name, boolean defaultValue)
     {
-        this.stateProperties.addProperty(new StateProperty<>(BooleanProperty.of(name), defaultValue));
+        this.stateProperties.addProperty(new StateProperty<>(BooleanProperty.create(name), defaultValue));
         return this;
     }
 
@@ -1060,9 +1053,9 @@ public class BlockProperties<T extends BlockEntity>
      * @param defaultValue the default value for the state property
      * @return the current instance of BlockProperties for method chaining
      */
-    public <U extends Enum<U> & StringIdentifiable> BlockProperties<T> addEnumStateProperty(String name, Class<U> clazz, U defaultValue)
+    public <U extends Enum<U> & StringRepresentable> BlockProperties<T> addEnumStateProperty(String name, Class<U> clazz, U defaultValue)
     {
-        this.stateProperties.addProperty(new StateProperty<>(EnumProperty.of(name, clazz), defaultValue));
+        this.stateProperties.addProperty(new StateProperty<>(EnumProperty.create(name, clazz), defaultValue));
         return this;
     }
 
@@ -1076,9 +1069,9 @@ public class BlockProperties<T extends BlockEntity>
      * @param values       the list of values for the enum property
      * @return the current instance of BlockProperties for method chaining
      */
-    public <U extends Enum<U> & StringIdentifiable> BlockProperties<T> addEnumStateProperty(String name, Class<U> clazz, U defaultValue, List<U> values)
+    public <U extends Enum<U> & StringRepresentable> BlockProperties<T> addEnumStateProperty(String name, Class<U> clazz, U defaultValue, List<U> values)
     {
-        this.stateProperties.addProperty(new StateProperty<>(EnumProperty.of(name, clazz, values), defaultValue));
+        this.stateProperties.addProperty(new StateProperty<>(EnumProperty.create(name, clazz, values), defaultValue));
         return this;
     }
     //endregion

@@ -72,14 +72,14 @@ abstract class GenerateImplPackageInfos extends DefaultTask {
                     target.resolve('package-info.java').withWriter {
                         def packageName = relativePath.toString().replace(File.separator, '.')
                         it.write("""$headerText
-						|/**
-						| * Implementation code for ${projectName.get()}.
-						| */
-						|@ApiStatus.Internal
-						|package $packageName;
-						|
-						|import org.jetbrains.annotations.ApiStatus;
-						|""".stripMargin())
+                        |/**
+                        | * Implementation code for ${projectName.get()}.
+                        | */
+                        |@ApiStatus.Internal
+                        |package $packageName;
+                        |
+                        |import org.jetbrains.annotations.ApiStatus;
+                        |""".stripMargin())
                     }
                 }
             }

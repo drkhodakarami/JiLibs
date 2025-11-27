@@ -1,40 +1,34 @@
-/***********************************************************************************
- * Copyright (c) 2025 Alireza Khodakarami (TheMentor)                               *
- * ------------------------------------------------------------------------------- *
- * MIT License                                                                     *
- * =============================================================================== *
- * Permission is hereby granted, free of charge, to any person obtaining a copy    *
- * of this software and associated documentation files (the "Software"), to deal   *
- * in the Software without restriction, including without limitation the rights    *
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell       *
- * copies of the Software, and to permit persons to whom the Software is           *
- * furnished to do so, subject to the following conditions:                        *
- * ------------------------------------------------------------------------------- *
- * The above copyright notice and this permission notice shall be included in all  *
- * copies or substantial portions of the Software.                                 *
- * ------------------------------------------------------------------------------- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR      *
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,        *
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE     *
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER          *
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,   *
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE   *
- * SOFTWARE.                                                                       *
- ***********************************************************************************/
+/*
+ * Copyright (c) 2025 Alireza Khodakarami
+ *
+ * Licensed under the MIT, (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://opensource.org/license/mit
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package dev.thementor.api.shared.properties;
 
-import dev.thementor.api.shared.annotations.*;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.Properties;
-import net.minecraft.state.property.Property;
-import net.minecraft.util.math.Direction;
-import org.jetbrains.annotations.Nullable;
-
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import org.jetbrains.annotations.Nullable;
+
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.Property;
+
+import dev.thementor.api.shared.annotations.*;
 
 /**
  * Manages state properties for a block, providing methods to add, retrieve, and apply these properties.
@@ -60,7 +54,7 @@ public class StateProperties
      */
     public void addHorizontalFacing()
     {
-        addProperty(new StateProperty<>(Properties.HORIZONTAL_FACING, Direction.NORTH));
+        addProperty(new StateProperty<>(BlockStateProperties.HORIZONTAL_FACING, Direction.NORTH));
     }
 
     /**
@@ -68,7 +62,7 @@ public class StateProperties
      */
     public void addFacing()
     {
-        addProperty(new StateProperty<>(Properties.FACING, Direction.NORTH));
+        addProperty(new StateProperty<>(BlockStateProperties.FACING, Direction.NORTH));
     }
 
     /**
@@ -76,7 +70,7 @@ public class StateProperties
      */
     public void addAxis()
     {
-        addProperty(new StateProperty<>(Properties.AXIS, Direction.Axis.Y));
+        addProperty(new StateProperty<>(BlockStateProperties.AXIS, Direction.Axis.Y));
     }
     //endregion
 
@@ -86,7 +80,7 @@ public class StateProperties
      */
     public void addEnabled()
     {
-        addProperty(new StateProperty<>(Properties.ENABLED, true));
+        addProperty(new StateProperty<>(BlockStateProperties.ENABLED, true));
     }
 
     /**
@@ -94,7 +88,7 @@ public class StateProperties
      */
     public void addLocked()
     {
-        addProperty(new StateProperty<>(Properties.LOCKED, false));
+        addProperty(new StateProperty<>(BlockStateProperties.LOCKED, false));
     }
 
     /**
@@ -102,7 +96,7 @@ public class StateProperties
      */
     public void addPowered()
     {
-        addProperty(new StateProperty<>(Properties.POWERED, false));
+        addProperty(new StateProperty<>(BlockStateProperties.POWERED, false));
     }
 
     /**
@@ -110,7 +104,7 @@ public class StateProperties
      */
     public void addLit()
     {
-        addProperty(new StateProperty<>(Properties.LIT, false));
+        addProperty(new StateProperty<>(BlockStateProperties.LIT, false));
     }
 
     /**
@@ -118,7 +112,7 @@ public class StateProperties
      */
     public void addUnstable()
     {
-        addProperty(new StateProperty<>(Properties.UNSTABLE, false));
+        addProperty(new StateProperty<>(BlockStateProperties.UNSTABLE, false));
     }
     //endregion
 
@@ -127,7 +121,7 @@ public class StateProperties
      */
     public void addWaterlogged()
     {
-        addProperty(new StateProperty<>(Properties.WATERLOGGED, false));
+        addProperty(new StateProperty<>(BlockStateProperties.WATERLOGGED, false));
     }
 
     /**
@@ -159,7 +153,7 @@ public class StateProperties
         if (stateProperty == null)
             throw new IllegalArgumentException("Property with name: " + name + " does not exist!");
 
-        if (!type.isInstance(stateProperty.delegate().getType()))
+        if (!type.isInstance(stateProperty.delegate().getValueClass()))
             throw new IllegalArgumentException("Property with name: " + name + " is not of the correct type: " + type.getSimpleName());
 
         try
@@ -181,7 +175,7 @@ public class StateProperties
     public <T extends Comparable<T>> Property<T> getProperty(Property<T> property)
     {
         String name = property.getName();
-        return containsProperty(name) ? getProperty(name, property.getType()).delegate() : null;
+        return containsProperty(name) ? getProperty(name, property.getValueClass()).delegate() : null;
     }
 
     /**
@@ -228,7 +222,7 @@ public class StateProperties
      */
     private <T extends Comparable<T>> BlockState applyDefault(BlockState state, StateProperty<T> property)
     {
-        return state.with(property.delegate(), property.defaultValue());
+        return state.setValue(property.delegate(), property.defaultValue());
     }
 
     /**
@@ -253,7 +247,7 @@ public class StateProperties
      *
      * @param builder the StateManager.Builder to add the properties to
      */
-    public void addToBuilder(StateManager.Builder<Block, BlockState> builder)
+    public void addToBuilder(StateDefinition.Builder<Block, BlockState> builder)
     {
         for (StateProperty<?> property : this.properties.values())
             builder.add(property.delegate());

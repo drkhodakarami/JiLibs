@@ -1,28 +1,30 @@
-/***********************************************************************************
- * Copyright (c) 2025 Alireza Khodakarami (Jiraiyah)                               *
- * ------------------------------------------------------------------------------- *
- * MIT License                                                                     *
- * =============================================================================== *
- * Permission is hereby granted, free of charge, to any person obtaining a copy    *
- * of this software and associated documentation files (the "Software"), to deal   *
- * in the Software without restriction, including without limitation the rights    *
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell       *
- * copies of the Software, and to permit persons to whom the Software is           *
- * furnished to do so, subject to the following conditions:                        *
- * ------------------------------------------------------------------------------- *
- * The above copyright notice and this permission notice shall be included in all  *
- * copies or substantial portions of the Software.                                 *
- * ------------------------------------------------------------------------------- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR      *
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,        *
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE     *
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER          *
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,   *
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE   *
- * SOFTWARE.                                                                       *
- ***********************************************************************************/
+/*
+ * Copyright (c) 2025 Alireza Khodakarami
+ *
+ * Licensed under the MIT, (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://opensource.org/license/mit
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package dev.thementor.api.energy.base;
+
+import org.jetbrains.annotations.Nullable;
+import team.reborn.energy.api.EnergyStorage;
+import team.reborn.energy.api.base.SimpleEnergyStorage;
+
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+
+import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 
 import dev.thementor.api.base.StorageConnector;
 import dev.thementor.api.shared.constants.BEKeys;
@@ -30,14 +32,8 @@ import dev.thementor.api.shared.enumerations.MappedDirection;
 import dev.thementor.api.shared.interfaces.IStorageConnector;
 import dev.thementor.api.shared.interfaces.IStorageProvider;
 import dev.thementor.api.shared.utils.DirectionHelper;
-import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.math.Direction;
-import org.jetbrains.annotations.Nullable;
-import team.reborn.energy.api.EnergyStorage;
-import team.reborn.energy.api.base.SimpleEnergyStorage;
 
+@SuppressWarnings("unused")
 public class EnergyConnector<T extends EnergyStorage> extends StorageConnector<EnergyStorage>
         implements IStorageConnector<EnergyConnector<T>>, IStorageProvider<T>
 {
@@ -97,34 +93,34 @@ public class EnergyConnector<T extends EnergyStorage> extends StorageConnector<E
     }
 
     @Override
-    public void writeData(WriteView writeView)
+    public void saveAdditional(ValueOutput writeView)
     {
-        WriteView.ListView list = writeView.getList("energy" + BEKeys.HAS_ENERGY);
+        ValueOutput.ValueOutputList list = writeView.childrenList("energy" + BEKeys.HAS_ENERGY);
         for(EnergyStorage storage : storages)
         {
-            WriteView energyView = list.add();
+            ValueOutput energyView = list.addChild();
             energyView.putLong("Amount", storage.getAmount());
         }
     }
 
     @Override
-    public void readData(ReadView readView)
+    public void loadAdditional(ValueInput readView)
     {
         int index = 0;
-        for (ReadView view : readView.getListReadView("energy" + BEKeys.HAS_ENERGY))
+        for (ValueInput view : readView.childrenListOrEmpty("energy" + BEKeys.HAS_ENERGY))
         {
             if(index >= storages.size())
                 break;
 
-            EnergyStorage storage = this.storages.get(index);
+            var storage = this.storages.get(index);
 
             if(storage instanceof SimpleEnergyStorage simpleEnergyStorage)
-                simpleEnergyStorage.amount = view.getLong("Amount", 0L);
+                simpleEnergyStorage.amount = view.getLongOr("Amount", 0L);
             else
             {
                 try(Transaction transaction = Transaction.openOuter())
                 {
-                    long amount = view.getLong("Amount", 0L);
+                    long amount = view.getLongOr("Amount", 0L);
                     long current = storage.getAmount();
                     if(current < amount)
                         storage.insert(amount - current, transaction);

@@ -10,7 +10,7 @@ repositories {
 }
 
 loom {
-    accessWidenerPath = file('src/main/resources/jilibs-energy.accesswidener')
+    accessWidenerPath = file('src/main/resources/jilibs_energy.accesswidener')
 }
 
 moduleDependencies(project, [
@@ -20,7 +20,7 @@ moduleDependencies(project, [
 
 dependencies{
     // Energy API Handling Dependency ================================================================================================================
-    include modApi("teamreborn:energy:${rootProject.energy_version}") {
+    modApi("teamreborn:energy:${rootProject.energy_version}") {
         exclude(group: "net.fabricmc.fabric-api")
     }
 }

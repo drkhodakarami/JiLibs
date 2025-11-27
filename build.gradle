@@ -3,8 +3,10 @@ plugins {
     id "eclipse"
     id "maven-publish"
     id "fabric-loom" version "${loom_version}" apply false
-    id "me.modmuss50.mod-publish-plugin" version "0.8.4"
+    id 'com.diffplug.spotless' version "8.0.0"
 }
+
+import com.diffplug.spotless.LineEnding
 
 //======================================================================================== READ LOCAL PROPERTIES
 //============================================================== REPSY MAVEN
@@ -64,6 +66,7 @@ def debugArgs = [
 
 
 import groovy.json.JsonSlurper
+import groovy.xml.XmlSlurper
 import net.fabricmc.loom.task.AbstractRemapJarTask
 import net.fabricmc.loom.task.ValidateMixinNameTask
 import net.fabricmc.fabric.impl.build.CommitHashValueSource
@@ -168,9 +171,10 @@ def moduleDependencies(project, List<String> depNames) {
 
 //======================================================================================== SETTING UP ALL PROJECTS
 allprojects {
-    group = "dev.TheMentor.jilibs"
+    group = "dev.thementor.jilibs"
 
     apply plugin: "maven-publish"
+    apply plugin: "com.diffplug.spotless"
 
     tasks.withType(GenerateModuleMetadata).configureEach {
         enabled = false
@@ -222,7 +226,8 @@ allprojects {
 
     dependencies {
         minecraft "com.mojang:minecraft:$rootProject.minecraft_version"
-        mappings "net.fabricmc:yarn:${rootProject.minecraft_version}+${rootProject.yarn_version}:v2"
+        //mappings "net.fabricmc:yarn:${rootProject.minecraft_version}+${rootProject.yarn_version}:v2"
+        mappings loom.officialMojangMappings()
         modApi "net.fabricmc:fabric-loader:${rootProject.loader_version}"
         modImplementation "net.fabricmc.fabric-api:fabric-api:${rootProject.fabric_version}+${rootProject.minecraft_version}"
     }
@@ -275,6 +280,34 @@ allprojects {
     apply from: rootProject.file('gradle/package-info.gradle')
     apply from: rootProject.file('gradle/validate-annotations.gradle')
 
+    spotless{
+        lineEndings = LineEnding.UNIX
+
+        java{
+            licenseHeaderFile(file("${rootDir}/HEADER"))
+            removeUnusedImports()
+            importOrder('java', 'javax', '', 'net.minecraft', 'net.fabricmc', 'dev.thementor.api', 'dev.thementor')
+            leadingTabsToSpaces(4)
+            //leadingSpacesToTabs()
+            trimTrailingWhitespace()
+        }
+
+        groovyGradle{
+            target 'src/**/*.gradle', '*.gradle', 'gradle/*.gradle'
+            leadingSpacesToTabs()
+            leadingTabsToSpaces(4)
+            trimTrailingWhitespace()
+        }
+
+        json{
+            target 'src/**/lang/en_us.json'
+            targetExclude 'src/**/generated/**'
+            gson().indentWithSpaces(2).sortByKeys()
+        }
+    }
+
+    build.dependsOn spotlessApply
+
     //======================================================================================== CUSTOM TASKS
 
     def destinationDir = layout.buildDirectory.dir("output-sources").get().asFile
@@ -292,7 +325,7 @@ allprojects {
             if (dir.exists() && dir.isDirectory()) {
                 dir.eachFileRecurse { file ->
                     if (file.isFile()) {
-                        if (file.name.contains(versionPattern) && file.name.contains(project.base.archivesName.get())) {
+                        if (file.name.contains(versionPattern as CharSequence) && file.name.contains(project.base.archivesName.get())) {
                             file.delete()
                             println ">>> Deleted file: ${file.name}"
                         }
@@ -354,13 +387,31 @@ allprojects {
         into(buildModDir)
     }
 
-    tasks.named('jar').configure {
-        finalizedBy(copySourceJars, copyModJars)
+    tasks.register('deployToExternalFolder', DefaultTask)
+    {
+        group = 'build'
+        description = "Moves built jars to the external build path."
+
+        dependsOn(copySourceJars, copyModJars)
     }
 
-    tasks.withType(JavaCompile) {
-        options.compilerArgs << '-Xlint:unchecked' // show unchecked warnings
-        options.compilerArgs << '-Xlint:deprecation' // (optional) also see deprecated warnings
+    tasks.named('jar').configure {
+        finalizedBy(deployToExternalFolder)
+
+        onlyIf{
+            !gradle.startParameter.taskNames.any { it.startsWith("publish") }
+        }
+    }
+
+    tasks.matching { it.name.startsWith("publish") }.configureEach { task ->
+        task.finalizedBy(deployToExternalFolder)
+    }
+
+    tasks.withType(JavaCompile).tap {
+        configureEach {
+            options.compilerArgs << '-Xlint:unchecked' // show unchecked warnings
+            options.compilerArgs << '-Xlint:deprecation' // (optional) also see deprecated warnings
+        }
     }
 }
 
@@ -382,7 +433,7 @@ javadoc {
         charSet = "UTF-8"
         memberLevel = JavadocMemberLevel.PACKAGE
         links(
-                "https://maven.fabricmc.net/docs/yarn-${rootProject.minecraft_version}+${project.yarn_version}/"
+        //        "https://maven.fabricmc.net/docs/yarn-${rootProject.minecraft_version}+${project.yarn_version}/"
         )
         // Disable the crazy super-strict doclint tool in Java 8
         addStringOption("Xdoclint:none", "-quiet")
@@ -502,7 +553,7 @@ subprojects {
     dependencies {
         // Make all modules depend on the shared api
         if (project.name != "jilibs-shared") {
-           implementation project(path: ':jilibs-shared', configuration: 'namedElements')
+        implementation project(path: ':jilibs-shared', configuration: 'namedElements')
         }
     }
 
@@ -731,14 +782,14 @@ check.dependsOn "checkNoDuplicateFiles"
 
 //======================================================================================== NOT USED
 
-import java.util.stream.Collectors
+//import java.util.stream.Collectors
 
 //======================================================================================== RELEASE VERSION SANITY CHECK
 // A task to ensure that the version being released has not already been released.
 tasks.register('checkVersion') {
     doFirst {
         def xml = new URL(repsyUrl + "/jilibs/maven-metadata.xml").text
-        def metadata = new groovy.xml.XmlSlurper().parseText(xml)
+        def metadata = new XmlSlurper().parseText(xml)
         def versions = metadata.versioning.versions.version*.text();
         if (versions.contains(version)) {
             throw new RuntimeException("${version} has already been released!")

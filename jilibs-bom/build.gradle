@@ -10,11 +10,6 @@ publishing.publications {
     }
 }
 
-//tasks.withType(GenerateModuleMetadata) {
-    // todo: RemoteSignJar fails when this is false (as set by parent build script)
-//    enabled = true
-//}
-
 dependencies {
     constraints {
         for (proj in rootProject.allprojects) {

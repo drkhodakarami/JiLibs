@@ -1,28 +1,48 @@
-/***********************************************************************************
- * Copyright (c) 2025 Alireza Khodakarami (Jiraiyah)                               *
- * ------------------------------------------------------------------------------- *
- * MIT License                                                                     *
- * =============================================================================== *
- * Permission is hereby granted, free of charge, to any person obtaining a copy    *
- * of this software and associated documentation files (the "Software"), to deal   *
- * in the Software without restriction, including without limitation the rights    *
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell       *
- * copies of the Software, and to permit persons to whom the Software is           *
- * furnished to do so, subject to the following conditions:                        *
- * ------------------------------------------------------------------------------- *
- * The above copyright notice and this permission notice shall be included in all  *
- * copies or substantial portions of the Software.                                 *
- * ------------------------------------------------------------------------------- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR      *
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,        *
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE     *
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER          *
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,   *
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE   *
- * SOFTWARE.                                                                       *
- ***********************************************************************************/
+/*
+ * Copyright (c) 2025 Alireza Khodakarami
+ *
+ * Licensed under the MIT, (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://opensource.org/license/mit
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package dev.thementor.api.inventory.base;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.BiFunction;
+import java.util.function.Function;
+import java.util.function.Supplier;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import oshi.util.tuples.Pair;
+
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.Container;
+import net.minecraft.world.ContainerHelper;
+import net.minecraft.world.Containers;
+import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+
+import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.base.CombinedStorage;
+import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleSlotStorage;
 
 import dev.thementor.api.base.StorageConnector;
 import dev.thementor.api.inventory.record.PredicateInventoryStorage;
@@ -33,41 +53,16 @@ import dev.thementor.api.shared.enumerations.MappedDirection;
 import dev.thementor.api.shared.interfaces.IStorageConnector;
 import dev.thementor.api.shared.interfaces.IStorageProvider;
 import dev.thementor.api.shared.utils.DirectionHelper;
-import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
-import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
-import net.fabricmc.fabric.api.transfer.v1.storage.base.CombinedStorage;
-import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleSlotStorage;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.Inventories;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.inventory.SimpleInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.ItemScatterer;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import oshi.util.tuples.Pair;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.BiFunction;
-import java.util.function.Function;
-import java.util.function.Supplier;
 
 @SuppressWarnings("unused")
 @Developer("TurtyWurty")
-@ModifiedBy("Jiraiyah")
+@ModifiedBy("The Mentor")
 @CreatedAt("2025-04-18")
 @Repository("https://github.com/DaRealTurtyWurty/Industria")
 @Discord("https://discord.turtywurty.dev/")
 @Youtube("https://www.youtube.com/@TurtyWurty")
 
-public class InventoryConnector<T extends SimpleInventory> extends StorageConnector<InventoryStorage>
+public class InventoryConnector<T extends SimpleContainer> extends StorageConnector<InventoryStorage>
     implements IStorageConnector<InventoryConnector<T>>, IStorageProvider<InventoryStorage>
 {
     private final List<T> inventories = new ArrayList<>();
@@ -278,31 +273,31 @@ public class InventoryConnector<T extends SimpleInventory> extends StorageConnec
     {
         List<ItemStack> stacks = new ArrayList<>();
         for (T inventory : this.inventories)
-            for(int i = 0; i < inventory.size(); i++)
-                stacks.add(inventory.getStack(i));
+            for(int i = 0; i < inventory.getContainerSize(); i++)
+                stacks.add(inventory.getItem(i));
         return stacks;
     }
 
     public void checkSize(int size)
     {
-        int invSize = this.inventories.stream().map(Inventory::size).reduce(0, Integer::sum);
+        int invSize = this.inventories.stream().map(Container::getContainerSize).reduce(0, Integer::sum);
         if( invSize != size)
             throw new IllegalArgumentException("Sie of inventories does not match the size provided: " + invSize + " => " + size);
     }
 
-    public void onOpen(@NotNull PlayerEntity player)
+    public void onOpen(@NotNull Player player)
     {
-        this.inventories.forEach(inventory -> inventory.onOpen(player));
+        this.inventories.forEach(inventory -> inventory.startOpen(player));
     }
 
-    public void onClose(@NotNull PlayerEntity player)
+    public void removed(@NotNull Player player)
     {
-        this.inventories.forEach(inventory -> inventory.onClose(player));
+        this.inventories.forEach(inventory -> inventory.stopOpen(player));
     }
 
-    public void dropContent(@NotNull World world, @NotNull BlockPos pos)
+    public void dropContent(@NotNull Level world, @NotNull BlockPos pos)
     {
-        this.inventories.forEach(inventory -> ItemScatterer.spawn(world, pos, inventory));
+        this.inventories.forEach(inventory -> Containers.dropContents(world, pos, inventory));
     }
 
     public RecipeInventory getRecipeInventory()
@@ -341,25 +336,25 @@ public class InventoryConnector<T extends SimpleInventory> extends StorageConnec
     }
 
     @Override
-    public void writeData(WriteView writeView)
+    public void saveAdditional(ValueOutput writeView)
     {
-        WriteView.ListView listView = writeView.getList("inventory" + BEKeys.HAS_INVENTORY);
+        ValueOutput.ValueOutputList listView = writeView.childrenList("inventory" + BEKeys.HAS_INVENTORY);
         for (T inventory : inventories)
         {
-            WriteView compoundView = listView.add();
-            Inventories.writeData(compoundView, inventory.getHeldStacks());
+            ValueOutput compoundView = listView.addChild();
+            ContainerHelper.saveAllItems(compoundView, inventory.getItems());
         }
     }
 
     @Override
-    public void readData(ReadView readView)
+    public void loadAdditional(ValueInput readView)
     {
         int index = 0;
-        for (ReadView view : readView.getListReadView("inventory" + BEKeys.HAS_INVENTORY))
+        for (ValueInput view : readView.childrenListOrEmpty("inventory" + BEKeys.HAS_INVENTORY))
         {
             if(index >= inventories.size())
                 break;
-            Inventories.readData(view, inventories.get(index).getHeldStacks());
+            ContainerHelper.loadAllItems(view, inventories.get(index).getItems());
             index++;
         }
     }

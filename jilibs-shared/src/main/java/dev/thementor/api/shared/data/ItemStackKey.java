@@ -1,39 +1,32 @@
-/***********************************************************************************
- * Copyright (c) 2025 Alireza Khodakarami (TheMentor)                               *
- * ------------------------------------------------------------------------------- *
- * MIT License                                                                     *
- * =============================================================================== *
- * Permission is hereby granted, free of charge, to any person obtaining a copy    *
- * of this software and associated documentation files (the "Software"), to deal   *
- * in the Software without restriction, including without limitation the rights    *
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell       *
- * copies of the Software, and to permit persons to whom the Software is           *
- * furnished to do so, subject to the following conditions:                        *
- * ------------------------------------------------------------------------------- *
- * The above copyright notice and this permission notice shall be included in all  *
- * copies or substantial portions of the Software.                                 *
- * ------------------------------------------------------------------------------- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR      *
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,        *
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE     *
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER          *
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,   *
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE   *
- * SOFTWARE.                                                                       *
- ***********************************************************************************/
+/*
+ * Copyright (c) 2025 Alireza Khodakarami
+ *
+ * Licensed under the MIT, (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://opensource.org/license/mit
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package dev.thementor.api.shared.data;
+
+import java.util.Objects;
+
+import net.minecraft.core.Holder;
+import net.minecraft.core.component.DataComponentPatch;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 
 import dev.thementor.api.shared.annotations.CreatedAt;
 import dev.thementor.api.shared.annotations.Developer;
 import dev.thementor.api.shared.annotations.Repository;
 import dev.thementor.api.shared.annotations.Youtube;
-import net.minecraft.component.ComponentChanges;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.registry.entry.RegistryEntry;
-
-import java.util.Objects;
 
 /**
  * Represents a key for an {@link ItemStack} that considers both the item and its data components.
@@ -48,12 +41,12 @@ public class ItemStackKey
     /**
      * The registry entry for the item.
      */
-    public final RegistryEntry<Item> item;
+    public final Holder<Item> item;
 
     /**
      * The component changes associated with the item's data.
      */
-    public final ComponentChanges dataComponents;
+    public final DataComponentPatch dataComponents;
 
     /**
      * The hash code of this key.
@@ -68,8 +61,8 @@ public class ItemStackKey
      */
     public ItemStackKey(ItemStack stack, boolean compareNBT)
     {
-        this.item = stack.getRegistryEntry();
-        this.dataComponents = compareNBT ? stack.getComponentChanges() : ComponentChanges.EMPTY;
+        this.item = stack.getItemHolder();
+        this.dataComponents = compareNBT ? stack.getComponentsPatch() : DataComponentPatch.EMPTY;
         this.hash = Objects.hash(item, dataComponents);
     }
 

@@ -1,7 +1,7 @@
 version = getSubprojectVersion(project)
 
 loom {
-    accessWidenerPath = file('src/main/resources/jilibs-fluid.accesswidener')
+    accessWidenerPath = file('src/main/resources/jilibs_fluid.accesswidener')
 }
 
 moduleDependencies(project, [

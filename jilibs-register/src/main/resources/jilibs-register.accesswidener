@@ -1,4 +1,0 @@
-accessWidener v2 named
-
-transitive-accessible field net/minecraft/client/data/BlockStateModelGenerator NORTH_DEFAULT_HORIZONTAL_ROTATION_OPERATIONS Lnet/minecraft/client/data/BlockStateVariantMap;
-transitive-accessible field net/minecraft/data/loottable/BlockLootTableGenerator SAPLING_DROP_CHANCE [F

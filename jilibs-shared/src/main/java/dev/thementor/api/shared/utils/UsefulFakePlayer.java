@@ -1,41 +1,37 @@
-/***********************************************************************************
- * Copyright (c) 2025 Alireza Khodakarami (TheMentor)                               *
- * ------------------------------------------------------------------------------- *
- * MIT License                                                                     *
- * =============================================================================== *
- * Permission is hereby granted, free of charge, to any person obtaining a copy    *
- * of this software and associated documentation files (the "Software"), to deal   *
- * in the Software without restriction, including without limitation the rights    *
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell       *
- * copies of the Software, and to permit persons to whom the Software is           *
- * furnished to do so, subject to the following conditions:                        *
- * ------------------------------------------------------------------------------- *
- * The above copyright notice and this permission notice shall be included in all  *
- * copies or substantial portions of the Software.                                 *
- * ------------------------------------------------------------------------------- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR      *
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,        *
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE     *
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER          *
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,   *
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE   *
- * SOFTWARE.                                                                       *
- ***********************************************************************************/
+/*
+ * Copyright (c) 2025 Alireza Khodakarami
+ *
+ * Licensed under the MIT, (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://opensource.org/license/mit
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package dev.thementor.api.shared.utils;
 
 import com.mojang.authlib.GameProfile;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.ItemCooldowns;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.portal.TeleportTransition;
+
+import net.fabricmc.fabric.api.entity.FakePlayer;
+
 import dev.thementor.api.shared.annotations.CreatedAt;
 import dev.thementor.api.shared.annotations.Developer;
 import dev.thementor.api.shared.annotations.Repository;
 import dev.thementor.api.shared.annotations.Youtube;
-import net.fabricmc.fabric.api.entity.FakePlayer;
-import net.minecraft.entity.player.ItemCooldownManager;
-import net.minecraft.item.ItemStack;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.world.TeleportTarget;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * Extends the Fabric API's FakePlayer to provide additional useful methods and behavior.
@@ -55,10 +51,10 @@ public class UsefulFakePlayer extends FakePlayer
     /**
      * Private constructor to prevent instantiation.
      *
-     * @param world The server world in which the fake player exists.
+     * @param world The server level in which the fake player exists.
      * @param profile The game profile for the fake player.
      */
-    protected UsefulFakePlayer(ServerWorld world, GameProfile profile)
+    protected UsefulFakePlayer(ServerLevel world, GameProfile profile)
     {
         super(world, profile);
     }
@@ -70,7 +66,7 @@ public class UsefulFakePlayer extends FakePlayer
      * @return A fixed value of 1.
      */
     @Override
-    public float getAttackCooldownProgress(float baseTime)
+    public float getAttackStrengthScale(float baseTime)
     {
         return 1; // Prevent the attack strength from always being 0.03 due to not ticking.
     }
@@ -81,9 +77,9 @@ public class UsefulFakePlayer extends FakePlayer
      * @return A new ItemCooldownManager instance.
      */
     @Override
-    public ItemCooldownManager getItemCooldownManager()
+    public @NotNull ItemCooldowns getCooldowns()
     {
-        return new ItemCooldownManager(); //Prevent item cool downs due to player not ticking
+        return new ItemCooldowns(); //Prevent item cool downs due to player not ticking
     }
 
     /**
@@ -92,7 +88,7 @@ public class UsefulFakePlayer extends FakePlayer
      * @return Always returns false.
      */
     @Override
-    public boolean isPartOfGame()
+    public boolean canBeSeenByAnyone()
     {
         return false; //Prevent them being targeted by mobs?
     }
@@ -104,19 +100,19 @@ public class UsefulFakePlayer extends FakePlayer
      */
     public void fakeUpdateUsingItem(ItemStack stack)
     {
-        this.tickItemStackUsage(stack);
+        this.updateUsingItem(stack);
     }
 
     /**
      * Overrides the teleport method to create a new fake player at the target teleport location.
      *
-     * @param teleportTarget The teleport target containing the new position and world.
+     * @param teleportTarget The teleport target containing the new position and level.
      * @return The new fake player created at the target location.
      */
     @Override
-    public @Nullable ServerPlayerEntity teleportTo(TeleportTarget teleportTarget)
+    public @Nullable ServerPlayer teleport(TeleportTransition teleportTarget)
     {
-        return createPlayer(teleportTarget.world(), this.getGameProfile());
+        return createPlayer(teleportTarget.newLevel(), this.getGameProfile());
     }
 
     /**
@@ -139,13 +135,13 @@ public class UsefulFakePlayer extends FakePlayer
     }
 
     /**
-     * Creates a new instance of UsefulFakePlayer with the given server world and game profile.
+     * Creates a new instance of UsefulFakePlayer with the given server level and game profile.
      *
-     * @param world The server world in which the fake player exists.
+     * @param world The server level in which the fake player exists.
      * @param profile The game profile for the fake player.
      * @return A new instance of UsefulFakePlayer.
      */
-    public static UsefulFakePlayer createPlayer(ServerWorld world, GameProfile profile)
+    public static UsefulFakePlayer createPlayer(ServerLevel world, GameProfile profile)
     {
         return new UsefulFakePlayer(world, profile);
     }
@@ -153,11 +149,11 @@ public class UsefulFakePlayer extends FakePlayer
     /**
      * Creates a new instance of UsefulFakePlayer with the default game profile from the Fabric API's FakePlayer.
      *
-     * @param world The server world in which the fake player exists.
+     * @param level The server level in which the fake player exists.
      * @return A new instance of UsefulFakePlayer.
      */
-    public static UsefulFakePlayer createPlayer(ServerWorld world)
+    public static UsefulFakePlayer createPlayer(ServerLevel level)
     {
-        return new UsefulFakePlayer(world, FakePlayer.get(world).getGameProfile());
+        return new UsefulFakePlayer(level, FakePlayer.get(level).getGameProfile());
     }
 }

@@ -1,15 +1,20 @@
 {
   "schemaVersion": 1,
-  "id": "jilibs-machina",
+  "id": "jilibs_machina",
   "name": "Ji Libs Machina",
   "description": "Contains the essential API for machines.",
   "version": "${version}",
   "environment": "*",
+  "accessWidener" : "jilibs_machina.accesswidener",
   "mixins": [
-    "jilibs-machina.mixins.json"
+    "jilibs_machina.mixins.json",
+    {
+      "config": "jilibs_machina.client.mixins.json",
+      "environment": "client"
+    }
   ],
   "license": "MIT",
-  "icon": "assets/jilibs-machina/icon.png",
+  "icon": "assets/jilibs_machina/icon.png",
   "contact": {
     "homepage": "https://www.youtube.com/@TheMentorCodeLab",
     "issues": "https://github.com/drkhodakarami/JiLibs/issues",
@@ -23,5 +28,35 @@
     "minecraft": "~${game_version}",
     "java": ">=${java_version}",
     "fabric-api": "*"
-  }
+  },
+  "custom": {
+    "modmenu": {
+      "links": {
+        "modmenu.discord": "https://discord.gg/pmM4emCbuH"
+      },
+      "badges": ["library"],
+      "parent": {
+        "id": "jilibs",
+        "name": "Ji Libs",
+        "description": "Contains main API for emulsion, energy, fluid, gas, heat, inventory, molten, multiblock, pipenetwork, pressure, suspension and finally machina modules.",
+        "icon": "assets/jilibs/icon.png",
+        "badges": [ "library" ]
+      },
+      "update_checker": true
+    }
+  },
+  "mcb": [
+    {
+      "name": "Storage",
+      "labelColor": -1842205,
+      "fillColor": -10388178,
+      "outlineColor": -8212404
+    },
+    {
+      "name": "Tech.",
+      "labelColor": -1842205,
+      "fillColor": -10932611,
+      "outlineColor": -6402896
+    }
+  ]
 }

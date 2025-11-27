@@ -1,64 +1,59 @@
-/***********************************************************************************
- * Copyright (c) 2025 Alireza Khodakarami (TheMentor)                               *
- * ------------------------------------------------------------------------------- *
- * MIT License                                                                     *
- * =============================================================================== *
- * Permission is hereby granted, free of charge, to any person obtaining a copy    *
- * of this software and associated documentation files (the "Software"), to deal   *
- * in the Software without restriction, including without limitation the rights    *
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell       *
- * copies of the Software, and to permit persons to whom the Software is           *
- * furnished to do so, subject to the following conditions:                        *
- * ------------------------------------------------------------------------------- *
- * The above copyright notice and this permission notice shall be included in all  *
- * copies or substantial portions of the Software.                                 *
- * ------------------------------------------------------------------------------- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR      *
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,        *
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE     *
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER          *
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,   *
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE   *
- * SOFTWARE.                                                                       *
- ***********************************************************************************/
+/*
+ * Copyright (c) 2025 Alireza Khodakarami
+ *
+ * Licensed under the MIT, (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://opensource.org/license/mit
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package dev.thementor.api.shared.utils;
 
-import dev.thementor.api.shared.annotations.*;
-import dev.thementor.api.shared.exceptions.Exceptions;
-import net.minecraft.advancement.criterion.Criterion;
-import net.minecraft.block.Block;
-import net.minecraft.block.DecoratedPotPattern;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.component.ComponentType;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.attribute.EntityAttribute;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.map.MapDecorationType;
-import net.minecraft.potion.Potion;
-import net.minecraft.recipe.RecipeSerializer;
-import net.minecraft.recipe.RecipeType;
-import net.minecraft.recipe.book.RecipeBookCategory;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.tag.TagKey;
-import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.util.math.floatprovider.FloatProviderType;
-import net.minecraft.util.math.intprovider.IntProviderType;
-import net.minecraft.village.VillagerProfession;
-import net.minecraft.village.VillagerType;
-import net.minecraft.world.World;
-import net.minecraft.world.chunk.ChunkStatus;
-import org.jetbrains.annotations.NotNull;
-import net.minecraft.util.Identifier;
-
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+
+import com.google.common.collect.ImmutableList;
+import org.jetbrains.annotations.NotNull;
+
+import net.minecraft.advancements.CriterionTrigger;
+import net.minecraft.core.Registry;
+import net.minecraft.core.component.DataComponentType;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
+import net.minecraft.util.valueproviders.FloatProviderType;
+import net.minecraft.util.valueproviders.IntProviderType;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.npc.VillagerProfession;
+import net.minecraft.world.entity.npc.VillagerType;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.alchemy.Potion;
+import net.minecraft.world.item.crafting.RecipeBookCategory;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.entity.DecoratedPotPattern;
+import net.minecraft.world.level.chunk.status.ChunkStatus;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.saveddata.maps.MapDecorationType;
+
+import dev.thementor.api.shared.annotations.*;
+import dev.thementor.api.shared.exceptions.Exceptions;
 
 /**
  * Provides utility methods for working with various Minecraft registries and identifiers.
@@ -88,9 +83,9 @@ public class BaseHelper
      * @param path  The path for the identifier.
      * @return The created Identifier.
      */
-    public static Identifier identifier(String modID, @NotNull String path)
+    public static ResourceLocation id(String modID, @NotNull String path)
     {
-        return Identifier.of(modID, path);
+        return ResourceLocation.fromNamespaceAndPath(modID, path);
     }
 
     /**
@@ -102,9 +97,14 @@ public class BaseHelper
      * @param registryKey  The registry key for the target registry.
      * @return The created RegistryKey.
      */
-    public static <T> RegistryKey<T> getKey(String modID, String name, RegistryKey<? extends Registry<T>> registryKey)
+    public static <T> ResourceKey<T> resourceKey(String modID, String name, ResourceKey<? extends Registry<T>> registryKey)
     {
-        return RegistryKey.of(registryKey, identifier(modID, name));
+        return ResourceKey.create(registryKey, id(modID, name));
+    }
+
+    public static <T> TagKey<T> tagKey(String modID, String name, ResourceKey<? extends Registry<T>> registryKey)
+    {
+        return TagKey.create(registryKey, id(modID, name));
     }
 
     /**
@@ -115,7 +115,7 @@ public class BaseHelper
      */
     public static @NotNull String hasTag(@NotNull TagKey<Item> tag)
     {
-        return "has_" + tag.id().toString();
+        return "has_" + tag.location().toString();
     }
 
     /**
@@ -124,9 +124,9 @@ public class BaseHelper
      * @param fluid The fluid to get the registry name for.
      * @return The registry name of the fluid.
      */
-    public static String getRegistryName(Fluid fluid)
+    public static String registryName(Fluid fluid)
     {
-        return Registries.FLUID.getId(fluid).getPath();
+        return BuiltInRegistries.FLUID.getKey(fluid).getPath();
     }
 
     /**
@@ -135,9 +135,9 @@ public class BaseHelper
      * @param item The item to get the registry name for.
      * @return The registry name of the item.
      */
-    public static String getRegistryName(Item item)
+    public static String registryName(Item item)
     {
-        return Registries.ITEM.getId(item).getPath();
+        return BuiltInRegistries.ITEM.getKey(item).getPath();
     }
 
     /**
@@ -146,9 +146,9 @@ public class BaseHelper
      * @param stack The item stack to get the registry name for.
      * @return The registry name of the item in the stack.
      */
-    public static String getRegistryName(ItemStack stack)
+    public static String registryName(ItemStack stack)
     {
-        return Registries.ITEM.getId(stack.getItem()).getPath();
+        return BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath();
     }
 
     /**
@@ -157,9 +157,9 @@ public class BaseHelper
      * @param block The block to get the registry name for.
      * @return The registry name of the block.
      */
-    public static String getRegistryName(Block block)
+    public static String registryName(Block block)
     {
-        return Registries.BLOCK.getId(block).getPath();
+        return BuiltInRegistries.BLOCK.getKey(block).getPath();
     }
 
     /**
@@ -168,9 +168,9 @@ public class BaseHelper
      * @param entityType The entity type to get the registry name for.
      * @return The registry name of the entity type.
      */
-    public static String getRegistryName(EntityType<?> entityType)
+    public static String registryName(EntityType<?> entityType)
     {
-        return Registries.ENTITY_TYPE.getId(entityType).getPath();
+        return BuiltInRegistries.ENTITY_TYPE.getKey(entityType).getPath();
     }
 
     /**
@@ -179,9 +179,9 @@ public class BaseHelper
      * @param potion The potion to get the registry name for.
      * @return The registry name of the potion.
      */
-    public static String getRegistryName(Potion potion)
+    public static String registryName(Potion potion)
     {
-        return Objects.requireNonNull(Registries.POTION.getId(potion)).getPath();
+        return Objects.requireNonNull(BuiltInRegistries.POTION.getKey(potion)).getPath();
     }
 
     /**
@@ -190,9 +190,9 @@ public class BaseHelper
      * @param blockEntityType The block entity type to get the registry name for.
      * @return The registry name of the block entity type.
      */
-    public static String getRegistryName(BlockEntityType<?> blockEntityType)
+    public static String registryName(BlockEntityType<?> blockEntityType)
     {
-        return Objects.requireNonNull(Registries.BLOCK_ENTITY_TYPE.getId(blockEntityType)).getPath();
+        return Objects.requireNonNull(BuiltInRegistries.BLOCK_ENTITY_TYPE.getKey(blockEntityType)).getPath();
     }
 
     /**
@@ -201,9 +201,9 @@ public class BaseHelper
      * @param identifier The custom stat identifier to get the registry name for.
      * @return The registry name of the custom stat.
      */
-    public static String getRegistryName(Identifier identifier)
+    public static String registryName(ResourceLocation identifier)
     {
-        return Objects.requireNonNull(Registries.CUSTOM_STAT.getId(identifier)).getPath();
+        return Objects.requireNonNull(BuiltInRegistries.CUSTOM_STAT.getKey(identifier)).getPath();
     }
 
     /**
@@ -212,9 +212,9 @@ public class BaseHelper
      * @param chunkStatus The chunk status to get the registry name for.
      * @return The registry name of the chunk status.
      */
-    public static String getRegistryName(ChunkStatus chunkStatus)
+    public static String registryName(ChunkStatus chunkStatus)
     {
-        return Registries.CHUNK_STATUS.getId(chunkStatus).getPath();
+        return BuiltInRegistries.CHUNK_STATUS.getKey(chunkStatus).getPath();
     }
 
     /**
@@ -223,9 +223,9 @@ public class BaseHelper
      * @param entityAttribute The entity attribute to get the registry name for.
      * @return The registry name of the entity attribute.
      */
-    public static String getRegistryName(EntityAttribute entityAttribute)
+    public static String registryName(Attribute entityAttribute)
     {
-        return Objects.requireNonNull(Registries.ATTRIBUTE.getId(entityAttribute)).getPath();
+        return Objects.requireNonNull(BuiltInRegistries.ATTRIBUTE.getKey(entityAttribute)).getPath();
     }
 
     /**
@@ -234,9 +234,9 @@ public class BaseHelper
      * @param screenHandlerType The screen handler type to get the registry name for.
      * @return The registry name of the screen handler type.
      */
-    public static String getRegistryName(ScreenHandlerType<?> screenHandlerType)
+    public static String registryName(MenuType<?> screenHandlerType)
     {
-        return Objects.requireNonNull(Registries.SCREEN_HANDLER.getId(screenHandlerType)).getPath();
+        return Objects.requireNonNull(BuiltInRegistries.MENU.getKey(screenHandlerType)).getPath();
     }
 
     /**
@@ -245,9 +245,9 @@ public class BaseHelper
      * @param recipeType The recipe type to get the registry name for.
      * @return The registry name of the recipe type.
      */
-    public static String getRegistryName(RecipeType<?> recipeType)
+    public static String registryName(RecipeType<?> recipeType)
     {
-        return Objects.requireNonNull(Registries.RECIPE_TYPE.getId(recipeType)).getPath();
+        return Objects.requireNonNull(BuiltInRegistries.RECIPE_TYPE.getKey(recipeType)).getPath();
     }
 
     /**
@@ -256,9 +256,9 @@ public class BaseHelper
      * @param recipeSerializer The recipe serializer to get the registry name for.
      * @return The registry name of the recipe serializer.
      */
-    public static String getRegistryName(RecipeSerializer<?> recipeSerializer)
+    public static String registryName(RecipeSerializer<?> recipeSerializer)
     {
-        return Objects.requireNonNull(Registries.RECIPE_SERIALIZER.getId(recipeSerializer)).getPath();
+        return Objects.requireNonNull(BuiltInRegistries.RECIPE_SERIALIZER.getKey(recipeSerializer)).getPath();
     }
 
     /**
@@ -267,9 +267,9 @@ public class BaseHelper
      * @param villagerType The villager type to get the registry name for.
      * @return The registry name of the villager type.
      */
-    public static String getRegistryName(VillagerType villagerType)
+    public static String registryName(VillagerType villagerType)
     {
-        return Registries.VILLAGER_TYPE.getId(villagerType).getPath();
+        return BuiltInRegistries.VILLAGER_TYPE.getKey(villagerType).getPath();
     }
 
     /**
@@ -278,9 +278,9 @@ public class BaseHelper
      * @param villagerProfession The villager profession to get the registry name for.
      * @return The registry name of the villager profession.
      */
-    public static String getRegistryName(VillagerProfession villagerProfession)
+    public static String registryName(VillagerProfession villagerProfession)
     {
-        return Registries.VILLAGER_PROFESSION.getId(villagerProfession).getPath();
+        return BuiltInRegistries.VILLAGER_PROFESSION.getKey(villagerProfession).getPath();
     }
 
     /**
@@ -289,9 +289,9 @@ public class BaseHelper
      * @param floatProviderType The float provider type to get the registry name for.
      * @return The registry name of the float provider type.
      */
-    public static String getRegistryName(FloatProviderType<?> floatProviderType)
+    public static String registryName(FloatProviderType<?> floatProviderType)
     {
-        return Objects.requireNonNull(Registries.FLOAT_PROVIDER_TYPE.getId(floatProviderType)).getPath();
+        return Objects.requireNonNull(BuiltInRegistries.FLOAT_PROVIDER_TYPE.getKey(floatProviderType)).getPath();
     }
 
     /**
@@ -300,9 +300,9 @@ public class BaseHelper
      * @param intProviderType The int provider type to get the registry name for.
      * @return The registry name of the int provider type.
      */
-    public static String getRegistryName(IntProviderType<?> intProviderType)
+    public static String registryName(IntProviderType<?> intProviderType)
     {
-        return Objects.requireNonNull(Registries.INT_PROVIDER_TYPE.getId(intProviderType)).getPath();
+        return Objects.requireNonNull(BuiltInRegistries.INT_PROVIDER_TYPE.getKey(intProviderType)).getPath();
     }
 
     /**
@@ -311,9 +311,9 @@ public class BaseHelper
      * @param decoratedPotPattern The decorated pot pattern to get the registry name for.
      * @return The registry name of the decorated pot pattern.
      */
-    public static String getRegistryName(DecoratedPotPattern decoratedPotPattern)
+    public static String registryName(DecoratedPotPattern decoratedPotPattern)
     {
-        return Objects.requireNonNull(Registries.DECORATED_POT_PATTERN.getId(decoratedPotPattern)).getPath();
+        return Objects.requireNonNull(BuiltInRegistries.DECORATED_POT_PATTERN.getKey(decoratedPotPattern)).getPath();
     }
 
     /**
@@ -322,9 +322,9 @@ public class BaseHelper
      * @param itemGroup The item group to get the registry name for.
      * @return The registry name of the item group.
      */
-    public static String getRegistryName(ItemGroup itemGroup)
+    public static String registryName(CreativeModeTab itemGroup)
     {
-        return Objects.requireNonNull(Registries.ITEM_GROUP.getId(itemGroup)).getPath();
+        return Objects.requireNonNull(BuiltInRegistries.CREATIVE_MODE_TAB.getKey(itemGroup)).getPath();
     }
 
     /**
@@ -333,9 +333,9 @@ public class BaseHelper
      * @param criterion The criterion to get the registry name for.
      * @return The registry name of the criterion.
      */
-    public static String getRegistryName(Criterion<?> criterion)
+    public static String registryName(CriterionTrigger<?> criterion)
     {
-        return Objects.requireNonNull(Registries.CRITERION.getId(criterion)).getPath();
+        return Objects.requireNonNull(BuiltInRegistries.TRIGGER_TYPES.getKey(criterion)).getPath();
     }
 
     /**
@@ -345,11 +345,11 @@ public class BaseHelper
      * @param isEnchantment Whether this is an enchantment effect component type.
      * @return The registry name of the component type.
      */
-    public static String getRegistryName(ComponentType<?> componentType, boolean isEnchantment)
+    public static String registryName(DataComponentType<?> componentType, boolean isEnchantment)
     {
         return isEnchantment
-               ? Objects.requireNonNull(Registries.ENCHANTMENT_EFFECT_COMPONENT_TYPE.getId(componentType)).getPath()
-               : Objects.requireNonNull(Registries.DATA_COMPONENT_TYPE.getId(componentType)).getPath();
+               ? Objects.requireNonNull(BuiltInRegistries.ENCHANTMENT_EFFECT_COMPONENT_TYPE.getKey(componentType)).getPath()
+               : Objects.requireNonNull(BuiltInRegistries.DATA_COMPONENT_TYPE.getKey(componentType)).getPath();
     }
 
     /**
@@ -358,9 +358,9 @@ public class BaseHelper
      * @param mapDecorationType The map decoration type to get the registry name for.
      * @return The registry name of the map decoration type.
      */
-    public static String getRegistryName(MapDecorationType mapDecorationType)
+    public static String registryName(MapDecorationType mapDecorationType)
     {
-        return Objects.requireNonNull(Registries.MAP_DECORATION_TYPE.getId(mapDecorationType)).getPath();
+        return Objects.requireNonNull(BuiltInRegistries.MAP_DECORATION_TYPE.getKey(mapDecorationType)).getPath();
     }
 
     /**
@@ -369,9 +369,9 @@ public class BaseHelper
      * @param recipeBookCategory The recipe book category to get the registry name for.
      * @return The registry name of the recipe book category.
      */
-    public static String getRegistryName(RecipeBookCategory recipeBookCategory)
+    public static String registryName(RecipeBookCategory recipeBookCategory)
     {
-        return Objects.requireNonNull(Registries.RECIPE_BOOK_CATEGORY.getId(recipeBookCategory)).getPath();
+        return Objects.requireNonNull(BuiltInRegistries.RECIPE_BOOK_CATEGORY.getKey(recipeBookCategory)).getPath();
     }
 
     /**
@@ -380,11 +380,12 @@ public class BaseHelper
      * @param tagKey The item tag key to get the items for.
      * @return A list of items in the tag.
      */
-    public static List<Item> getItemsWithTag(TagKey<Item> tagKey)
+    public static List<Item> itemsWithTag(TagKey<Item> tagKey)
     {
-        return Registries.ITEM.stream()
-                              .filter(item -> Registries.ITEM.getEntry(item).isIn(tagKey))
-                              .toList();
+        List<Item> list = new ArrayList<>();
+        BuiltInRegistries.ITEM.getTagOrEmpty(tagKey).forEach(
+                holder -> list.add(holder.value()));
+        return ImmutableList.copyOf(list);
     }
 
     /**
@@ -393,11 +394,12 @@ public class BaseHelper
      * @param tagKey The block tag key to get the blocks for.
      * @return A list of blocks in the tag.
      */
-    public static List<Block> getBlocksWithTag(TagKey<Block> tagKey)
+    public static List<Block> blocksWithTag(TagKey<Block> tagKey)
     {
-        return Registries.BLOCK.stream()
-                               .filter(block -> Registries.BLOCK.getEntry(block).isIn(tagKey))
-                               .toList();
+        List<Block> list = new ArrayList<>();
+        BuiltInRegistries.BLOCK.getTagOrEmpty(tagKey).forEach(
+                holder -> list.add(holder.value()));
+        return ImmutableList.copyOf(list);
     }
 
     /**
@@ -406,11 +408,12 @@ public class BaseHelper
      * @param tagKey The block entity type tag key to get the block entity types for.
      * @return A list of block entity types in the tag.
      */
-    public static List<BlockEntityType<?>> getBlockEntitiesWithTag(TagKey<BlockEntityType<?>> tagKey)
+    public static List<BlockEntityType<?>> blockEntitiesWithTag(TagKey<BlockEntityType<?>> tagKey)
     {
-        return Registries.BLOCK_ENTITY_TYPE.stream()
-                                           .filter(blockEntityType -> Registries.BLOCK_ENTITY_TYPE.getEntry(blockEntityType).isIn(tagKey))
-                                           .toList();
+        List<BlockEntityType<?>> list = new ArrayList<>();
+        BuiltInRegistries.BLOCK_ENTITY_TYPE.getTagOrEmpty(tagKey).forEach(
+                holder -> list.add(holder.value()));
+        return ImmutableList.copyOf(list);
     }
 
     /**
@@ -419,44 +422,45 @@ public class BaseHelper
      * @param tagKey The entity type tag key to get the entity types for.
      * @return A list of entity types in the tag.
      */
-    public static List<EntityType<?>> getEntitiesWithTag(TagKey<EntityType<?>> tagKey)
+    public static List<EntityType<?>> entitiesWithTag(TagKey<EntityType<?>> tagKey)
     {
-        return Registries.ENTITY_TYPE.stream()
-                                     .filter(entityType -> Registries.ENTITY_TYPE.getEntry(entityType).isIn(tagKey))
-                                     .toList();
+        List<EntityType<?>> list = new ArrayList<>();
+        BuiltInRegistries.ENTITY_TYPE.getTagOrEmpty(tagKey).forEach(
+                holder -> list.add(holder.value()));
+        return ImmutableList.copyOf(list);
     }
 
     /**
-     * Retrieves the dimension identifier for the given world.
+     * Retrieves the dimension identifier for the given level.
      *
-     * @param world The world to get the dimension identifier for.
+     * @param level The level to get the dimension identifier for.
      * @return The dimension identifier.
      */
-    public static Identifier getDimensionId(World world)
+    public static ResourceLocation dimensionId(Level level)
     {
-        return world.getRegistryKey().getValue();
+        return level.dimension().location();
     }
 
     /**
-     * Retrieves the dimension name for the given world.
+     * Retrieves the dimension name for the given level.
      *
-     * @param world The world to get the dimension name for.
+     * @param level The level to get the dimension name for.
      * @return The dimension name.
      */
-    public static String getDimensionName(World world)
+    public static String dimensionName(Level level)
     {
-        return getDimensionId(world).toString();
+        return dimensionId(level).toString();
     }
 
     /**
      * Retrieves a cleaned, readable version of the dimension name.
      *
-     * @param world The world to get the clean dimension name for.
+     * @param level The level to get the clean dimension name for.
      * @return A cleaned dimension name.
      */
-    public static String getDimensionNameClean(World world)
+    public static String dimensionNameClean(Level level)
     {
-        return getDimensionNameClean(getDimensionName(world));
+        return dimensionNameClean(dimensionName(level));
     }
 
     /**
@@ -465,33 +469,13 @@ public class BaseHelper
      * @param dimensionName The dimension name as a string.
      * @return A cleaned dimension name.
      */
-    public static String getDimensionNameClean(String dimensionName)
+    public static String dimensionNameClean(String dimensionName)
     {
         return dimensionName.substring(dimensionName.indexOf(':') + 1).replace('_', ' ');
     }
 
-    public static TagKey<Item> ItemTagOf(String modid, String id)
+    public static boolean validateResource(ResourceLocation id)
     {
-        return TagKey.of(RegistryKeys.ITEM, identifier(modid, id));
-    }
-
-    public static TagKey<Block> BlockTagOf(String modid, String id)
-    {
-        return TagKey.of(RegistryKeys.BLOCK, identifier(modid, id));
-    }
-
-    public static TagKey<BlockEntityType<?>> BlockEntityTypeTagOf(String modid, String id)
-    {
-        return TagKey.of(RegistryKeys.BLOCK_ENTITY_TYPE, identifier(modid, id));
-    }
-
-    public static TagKey<EntityType<?>> EntityTypeTagOf(String modid, String id)
-    {
-        return TagKey.of(RegistryKeys.ENTITY_TYPE, identifier(modid, id));
-    }
-
-    public static boolean validIdentifier(Identifier id)
-    {
-        return Identifier.isNamespaceValid(id.getNamespace()) && Identifier.isPathValid(id.getPath());
+        return ResourceLocation.isValidNamespace(id.getNamespace()) && ResourceLocation.isValidPath(id.getPath());
     }
 }

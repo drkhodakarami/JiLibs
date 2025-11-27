@@ -1,47 +1,44 @@
-/***********************************************************************************
- * Copyright (c) 2025 Alireza Khodakarami (Jiraiyah)                               *
- * ------------------------------------------------------------------------------- *
- * MIT License                                                                     *
- * =============================================================================== *
- * Permission is hereby granted, free of charge, to any person obtaining a copy    *
- * of this software and associated documentation files (the "Software"), to deal   *
- * in the Software without restriction, including without limitation the rights    *
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell       *
- * copies of the Software, and to permit persons to whom the Software is           *
- * furnished to do so, subject to the following conditions:                        *
- * ------------------------------------------------------------------------------- *
- * The above copyright notice and this permission notice shall be included in all  *
- * copies or substantial portions of the Software.                                 *
- * ------------------------------------------------------------------------------- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR      *
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,        *
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE     *
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER          *
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,   *
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE   *
- * SOFTWARE.                                                                       *
- ***********************************************************************************/
+/*
+ * Copyright (c) 2025 Alireza Khodakarami
+ *
+ * Licensed under the MIT, (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://opensource.org/license/mit
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package dev.thementor.api.register;
 
+import java.util.List;
+
+import net.minecraft.core.Holder;
+import net.minecraft.data.worldgen.BootstrapContext;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
+import net.minecraft.world.level.levelgen.feature.Feature;
+import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
+import net.minecraft.world.level.levelgen.placement.BiomeFilter;
+import net.minecraft.world.level.levelgen.placement.CountPlacement;
+import net.minecraft.world.level.levelgen.placement.InSquarePlacement;
+import net.minecraft.world.level.levelgen.placement.PlacedFeature;
+import net.minecraft.world.level.levelgen.placement.PlacementModifier;
+import net.minecraft.world.level.levelgen.placement.RarityFilter;
+
 import dev.thementor.api.shared.annotations.*;
 import dev.thementor.api.shared.exceptions.Exceptions;
-import net.minecraft.registry.Registerable;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.world.gen.feature.ConfiguredFeature;
-import net.minecraft.world.gen.feature.Feature;
-import net.minecraft.world.gen.feature.FeatureConfig;
-import net.minecraft.world.gen.feature.PlacedFeature;
-import net.minecraft.world.gen.placementmodifier.*;
-
-import java.util.List;
 
 /**
  * Provides utility methods for registering world generation features and placed features.
  */
 @SuppressWarnings("unused")
-@Developer("Jiraiyah")
+@Developer("The Mentor")
 @CreatedAt("2025-04-18")
 @Repository("https://github.com/drkhodakarami/___PROJECTS___")
 @Discord("https://discord.gg/pmM4emCbuH")
@@ -65,9 +62,9 @@ public class WorldGenHelper
      * @param configuration the configured feature to place
      * @param modifiers     the placement modifiers to apply
      */
-    public static void registerPlacedFeature(Registerable<PlacedFeature> context,
-                                             RegistryKey<PlacedFeature> key,
-                                             RegistryEntry<ConfiguredFeature<?, ?>> configuration,
+    public static void registerPlacedFeature(BootstrapContext<PlacedFeature> context,
+                                             ResourceKey<PlacedFeature> key,
+                                             Holder<ConfiguredFeature<?, ?>> configuration,
                                              List<PlacementModifier> modifiers)
     {
         context.register(key, new PlacedFeature(configuration, List.copyOf(modifiers)));
@@ -81,9 +78,9 @@ public class WorldGenHelper
      * @param configuration the configured feature to place
      * @param modifiers     the placement modifiers to apply
      */
-    public static void registerPlacedFeature(Registerable<PlacedFeature> context,
-                                             RegistryKey<PlacedFeature> key,
-                                             RegistryEntry<ConfiguredFeature<?, ?>> configuration,
+    public static void registerPlacedFeature(BootstrapContext<PlacedFeature> context,
+                                             ResourceKey<PlacedFeature> key,
+                                             Holder<ConfiguredFeature<?, ?>> configuration,
                                              PlacementModifier... modifiers)
     {
         registerPlacedFeature(context, key, configuration, List.of(modifiers));
@@ -97,8 +94,8 @@ public class WorldGenHelper
      * @param feature       the feature to configure
      * @param configuration the configuration for the feature
      */
-    public static <FC extends FeatureConfig, F extends Feature<FC>> void registerConfiguredFeature(Registerable<ConfiguredFeature<?, ?>> context,
-                                                                                                   RegistryKey<ConfiguredFeature<?, ?>> key,
+    public static <FC extends FeatureConfiguration, F extends Feature<FC>> void registerConfiguredFeature(BootstrapContext<ConfiguredFeature<?, ?>> context,
+                                                                                                   ResourceKey<ConfiguredFeature<?, ?>> key,
                                                                                                    F feature, FC configuration)
     {
         context.register(key, new ConfiguredFeature<>(feature, configuration));
@@ -113,7 +110,7 @@ public class WorldGenHelper
      */
     public static List<PlacementModifier> modifiers(PlacementModifier countModifier, PlacementModifier heightModifier)
     {
-        return List.of(countModifier, SquarePlacementModifier.of(), heightModifier, BiomePlacementModifier.of());
+        return List.of(countModifier, InSquarePlacement.spread(), heightModifier, BiomeFilter.biome());
     }
 
     /**
@@ -125,7 +122,7 @@ public class WorldGenHelper
      */
     public static List<PlacementModifier> modifiersWithCount(int count, PlacementModifier heightModifier)
     {
-        return modifiers(CountPlacementModifier.of(count), heightModifier);
+        return modifiers(CountPlacement.of(count), heightModifier);
     }
 
     /**
@@ -137,6 +134,6 @@ public class WorldGenHelper
      */
     public static List<PlacementModifier> modifiersWithRarity(int chance, PlacementModifier heightModifier)
     {
-        return modifiers(RarityFilterPlacementModifier.of(chance), heightModifier);
+        return modifiers(RarityFilter.onAverageOnceEvery(chance), heightModifier);
     }
 }

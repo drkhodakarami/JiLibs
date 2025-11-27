@@ -1,42 +1,48 @@
-/***********************************************************************************
- * Copyright (c) 2025 Alireza Khodakarami (TheMentor)                               *
- * ------------------------------------------------------------------------------- *
- * MIT License                                                                     *
- * =============================================================================== *
- * Permission is hereby granted, free of charge, to any person obtaining a copy    *
- * of this software and associated documentation files (the "Software"), to deal   *
- * in the Software without restriction, including without limitation the rights    *
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell       *
- * copies of the Software, and to permit persons to whom the Software is           *
- * furnished to do so, subject to the following conditions:                        *
- * ------------------------------------------------------------------------------- *
- * The above copyright notice and this permission notice shall be included in all  *
- * copies or substantial portions of the Software.                                 *
- * ------------------------------------------------------------------------------- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR      *
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,        *
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE     *
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER          *
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,   *
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE   *
- * SOFTWARE.                                                                       *
- ***********************************************************************************/
+/*
+ * Copyright (c) 2025 Alireza Khodakarami
+ *
+ * Licensed under the MIT, (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://opensource.org/license/mit
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package dev.thementor.api.shared.network;
 
-import dev.thementor.api.shared.annotations.*;
-import io.netty.buffer.ByteBuf;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.registry.Registries;
-import net.minecraft.util.collection.Weighted;
-import net.minecraft.util.math.floatprovider.*;
-import net.minecraft.util.math.intprovider.*;
-import net.minecraft.util.collection.Pool;
-
 import java.util.HashMap;
 import java.util.Map;
+
+import io.netty.buffer.ByteBuf;
+
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.util.random.Weighted;
+import net.minecraft.util.random.WeightedList;
+import net.minecraft.util.valueproviders.BiasedToBottomInt;
+import net.minecraft.util.valueproviders.ClampedInt;
+import net.minecraft.util.valueproviders.ClampedNormalFloat;
+import net.minecraft.util.valueproviders.ClampedNormalInt;
+import net.minecraft.util.valueproviders.ConstantFloat;
+import net.minecraft.util.valueproviders.ConstantInt;
+import net.minecraft.util.valueproviders.FloatProvider;
+import net.minecraft.util.valueproviders.FloatProviderType;
+import net.minecraft.util.valueproviders.IntProvider;
+import net.minecraft.util.valueproviders.IntProviderType;
+import net.minecraft.util.valueproviders.TrapezoidFloat;
+import net.minecraft.util.valueproviders.UniformFloat;
+import net.minecraft.util.valueproviders.UniformInt;
+import net.minecraft.util.valueproviders.WeightedListInt;
+
+import dev.thementor.api.shared.annotations.*;
 
 /**
  * Provides packet codecs for various integer and float providers used in the game.
@@ -54,12 +60,12 @@ public class ExtraPacketCodecs
     /**
      * A map of integer provider types to their corresponding packet codecs.
      */
-    private static final Map<IntProviderType<?>, PacketCodec<RegistryByteBuf, ? extends IntProvider>> INT_PROVIDER_CODECS = new HashMap<>();
+    private static final Map<IntProviderType<?>, StreamCodec<RegistryFriendlyByteBuf, ? extends IntProvider>> INT_PROVIDER_CODECS = new HashMap<>();
 
     /**
      * A map of float provider types to their corresponding packet codecs.
      */
-    private static final Map<FloatProviderType<?>, PacketCodec<RegistryByteBuf, ? extends FloatProvider>> FLOAT_PROVIDER_CODECS = new HashMap<>();
+    private static final Map<FloatProviderType<?>, StreamCodec<RegistryFriendlyByteBuf, ? extends FloatProvider>> FLOAT_PROVIDER_CODECS = new HashMap<>();
 
     // Static block to register default packet codecs for integer and float providers.
     static
@@ -73,7 +79,7 @@ public class ExtraPacketCodecs
      * @param providerType the integer provider type
      * @param codec        the packet codec to register
      */
-    public static <T extends IntProvider> void registerIntProvider(IntProviderType<T> providerType, PacketCodec<RegistryByteBuf, T> codec)
+    public static <T extends IntProvider> void registerIntProvider(IntProviderType<T> providerType, StreamCodec<RegistryFriendlyByteBuf, T> codec)
     {
         INT_PROVIDER_CODECS.put(providerType, codec);
     }
@@ -84,7 +90,7 @@ public class ExtraPacketCodecs
      * @param providerType the float provider type
      * @param codec        the packet codec to register
      */
-    public static <T extends FloatProvider> void registerFloatProvider(FloatProviderType<T> providerType, PacketCodec<RegistryByteBuf, T> codec)
+    public static <T extends FloatProvider> void registerFloatProvider(FloatProviderType<T> providerType, StreamCodec<RegistryFriendlyByteBuf, T> codec)
     {
         FLOAT_PROVIDER_CODECS.put(providerType, codec);
     }
@@ -95,7 +101,7 @@ public class ExtraPacketCodecs
      * @param providerType the integer provider type
      * @return the corresponding packet codec
      */
-    public static PacketCodec<RegistryByteBuf, ? extends IntProvider> getIntProviderCodec(IntProviderType<?> providerType)
+    public static StreamCodec<RegistryFriendlyByteBuf, ? extends IntProvider> getIntProviderCodec(IntProviderType<?> providerType)
     {
         return INT_PROVIDER_CODECS.get(providerType);
     }
@@ -106,7 +112,7 @@ public class ExtraPacketCodecs
      * @param providerType the float provider type
      * @return the corresponding packet codec
      */
-    public static PacketCodec<RegistryByteBuf, ? extends FloatProvider> getFloatProviderCodec(FloatProviderType<?> providerType)
+    public static StreamCodec<RegistryFriendlyByteBuf, ? extends FloatProvider> getFloatProviderCodec(FloatProviderType<?> providerType)
     {
         return FLOAT_PROVIDER_CODECS.get(providerType);
     }
@@ -119,8 +125,8 @@ public class ExtraPacketCodecs
      */
     public static <T extends IntProvider> void encode(ByteBuf buf, T intProvider)
     {
-        PacketCodec<RegistryByteBuf, T> codec = (PacketCodec<RegistryByteBuf, T>) getIntProviderCodec(intProvider.getType());
-        codec.encode((RegistryByteBuf) buf, intProvider);
+        StreamCodec<RegistryFriendlyByteBuf, T> codec = (StreamCodec<RegistryFriendlyByteBuf, T>) getIntProviderCodec(intProvider.getType());
+        codec.encode((RegistryFriendlyByteBuf) buf, intProvider);
     }
 
     /**
@@ -132,8 +138,8 @@ public class ExtraPacketCodecs
      */
     public static  <T extends IntProvider> T decode(ByteBuf buf, IntProviderType<T> providerType)
     {
-        PacketCodec<RegistryByteBuf, T> codec = (PacketCodec<RegistryByteBuf, T>) getIntProviderCodec(providerType);
-        return codec.decode((RegistryByteBuf) buf);
+        StreamCodec<RegistryFriendlyByteBuf, T> codec = (StreamCodec<RegistryFriendlyByteBuf, T>) getIntProviderCodec(providerType);
+        return codec.decode((RegistryFriendlyByteBuf) buf);
     }
 
     /**
@@ -144,8 +150,8 @@ public class ExtraPacketCodecs
      */
     public static <T extends FloatProvider> void encode(ByteBuf buf, T floatProvider)
     {
-        PacketCodec<RegistryByteBuf, T> codec = (PacketCodec<RegistryByteBuf, T>) getFloatProviderCodec(floatProvider.getType());
-        codec.encode((RegistryByteBuf) buf, floatProvider);
+        StreamCodec<RegistryFriendlyByteBuf, T> codec = (StreamCodec<RegistryFriendlyByteBuf, T>) getFloatProviderCodec(floatProvider.getType());
+        codec.encode((RegistryFriendlyByteBuf) buf, floatProvider);
     }
 
     /**
@@ -157,8 +163,8 @@ public class ExtraPacketCodecs
      */
     public static  <T extends FloatProvider> T decode(ByteBuf buf, FloatProviderType<T> providerType)
     {
-        PacketCodec<RegistryByteBuf, T> codec = (PacketCodec<RegistryByteBuf, T>) getFloatProviderCodec(providerType);
-        return codec.decode((RegistryByteBuf) buf);
+        StreamCodec<RegistryFriendlyByteBuf, T> codec = (StreamCodec<RegistryFriendlyByteBuf, T>) getFloatProviderCodec(providerType);
+        return codec.decode((RegistryFriendlyByteBuf) buf);
     }
 
     /**
@@ -167,114 +173,114 @@ public class ExtraPacketCodecs
     public static void registerDefaults()
     {
         registerIntProvider(IntProviderType.CONSTANT,
-                            PacketCodec.ofStatic(
+                            StreamCodec.of(
                                     (buf, intProvider) -> buf.writeInt(intProvider.getValue()),
-                                    buf -> ConstantIntProvider.create(buf.readInt())
+                                    buf -> ConstantInt.of(buf.readInt())
                             ));
 
         registerIntProvider(IntProviderType.UNIFORM,
-                            PacketCodec.ofStatic(
+                            StreamCodec.of(
                                     (buf, intProvider) ->
                                     {
-                                        buf.writeInt(intProvider.getMin());
-                                        buf.writeInt(intProvider.getMax());
+                                        buf.writeInt(intProvider.getMinValue());
+                                        buf.writeInt(intProvider.getMaxValue());
                                     },
-                                    buf -> UniformIntProvider.create(buf.readInt(), buf.readInt())
+                                    buf -> UniformInt.of(buf.readInt(), buf.readInt())
                             ));
 
         registerIntProvider(IntProviderType.BIASED_TO_BOTTOM,
-                            PacketCodec.ofStatic(
+                            StreamCodec.of(
                                     (buf, intProvider) ->
                                     {
-                                        buf.writeInt(intProvider.getMin());
-                                        buf.writeInt(intProvider.getMax());
+                                        buf.writeInt(intProvider.getMinValue());
+                                        buf.writeInt(intProvider.getMaxValue());
                                     },
-                                    buf -> BiasedToBottomIntProvider.create(buf.readInt(), buf.readInt())
+                                    buf -> BiasedToBottomInt.of(buf.readInt(), buf.readInt())
                             ));
 
         registerIntProvider(IntProviderType.CLAMPED,
-                            PacketCodec.ofStatic(
+                            StreamCodec.of(
                                     (buf, intProvider) ->
                                     {
-                                        IntProviderType<?> type = Registries.INT_PROVIDER_TYPE.get(buf.readIdentifier());
-                                        PacketCodec<RegistryByteBuf, IntProvider> codec = (PacketCodec<RegistryByteBuf, IntProvider>) getIntProviderCodec(type);
+                                        IntProviderType<?> type = BuiltInRegistries.INT_PROVIDER_TYPE.getValue(buf.readResourceLocation());
+                                        StreamCodec<RegistryFriendlyByteBuf, IntProvider> codec = (StreamCodec<RegistryFriendlyByteBuf, IntProvider>) getIntProviderCodec(type);
                                         codec.encode(buf, intProvider.source);
-                                        buf.writeInt(intProvider.getMin());
-                                        buf.writeInt(intProvider.getMax());
+                                        buf.writeInt(intProvider.getMinValue());
+                                        buf.writeInt(intProvider.getMaxValue());
                                     },
-                                    buf -> ClampedIntProvider.create(
+                                    buf -> ClampedInt.of(
                                             getIntProviderCodec(IntProviderType.CONSTANT).decode(buf),
                                                 buf.readInt(), buf.readInt())
                             ));
 
         registerIntProvider(IntProviderType.WEIGHTED_LIST,
-                            PacketCodec.ofStatic(
+                            StreamCodec.of(
                                     (buf, value) ->
                                     {
-                                        PacketCodec<RegistryByteBuf, ? extends IntProvider> codec = getIntProviderCodec(value.getType());
-                                        Pool<IntProvider> entries = value.weightedList;
-                                        PacketCodec<RegistryByteBuf, Pool<IntProvider>> entriesCodec = weightedListCodec((PacketCodec<RegistryByteBuf, IntProvider>) codec);
+                                        StreamCodec<RegistryFriendlyByteBuf, ? extends IntProvider> codec = getIntProviderCodec(value.getType());
+                                        WeightedList<IntProvider> entries = value.distribution;
+                                        StreamCodec<RegistryFriendlyByteBuf, WeightedList<IntProvider>> entriesCodec = weightedListCodec((StreamCodec<RegistryFriendlyByteBuf, IntProvider>) codec);
                                         entriesCodec.encode(buf, entries);
                                     },
                                     buf ->
                                     {
-                                        PacketCodec<RegistryByteBuf, ? extends IntProvider> codec = getIntProviderCodec(IntProviderType.CONSTANT);
-                                        Pool<IntProvider> entries = weightedListCodec((PacketCodec<RegistryByteBuf, IntProvider>) codec).decode(buf);
-                                        return new WeightedListIntProvider(entries);
+                                        StreamCodec<RegistryFriendlyByteBuf, ? extends IntProvider> codec = getIntProviderCodec(IntProviderType.CONSTANT);
+                                        WeightedList<IntProvider> entries = weightedListCodec((StreamCodec<RegistryFriendlyByteBuf, IntProvider>) codec).decode(buf);
+                                        return new WeightedListInt(entries);
                                     }
                             ));
 
         registerIntProvider(IntProviderType.CLAMPED_NORMAL,
-                            PacketCodec.ofStatic(
+                            StreamCodec.of(
                                     (buf, intProvider) ->
                                     {
                                         buf.writeFloat(intProvider.mean);
                                         buf.writeFloat(intProvider.deviation);
-                                        buf.writeInt(intProvider.getMin());
-                                        buf.writeInt(intProvider.getMax());
+                                        buf.writeInt(intProvider.getMinValue());
+                                        buf.writeInt(intProvider.getMaxValue());
                                     },
-                                    buf -> ClampedNormalIntProvider.of(buf.readFloat(),buf.readFloat(),
+                                    buf -> ClampedNormalInt.of(buf.readFloat(),buf.readFloat(),
                                                                            buf.readInt(), buf.readInt())
                             ));
 
         registerFloatProvider(FloatProviderType.CONSTANT,
-                              PacketCodec.ofStatic(
+                              StreamCodec.of(
                                       (buf, floatProvider) -> buf.writeFloat(floatProvider.getValue()),
-                                      buf -> ConstantFloatProvider.create(buf.readFloat())
+                                      buf -> ConstantFloat.of(buf.readFloat())
                               ));
 
         registerFloatProvider(FloatProviderType.UNIFORM,
-                              PacketCodec.ofStatic(
+                              StreamCodec.of(
                                       (buf, floatProvider) ->
                                       {
-                                          buf.writeFloat(floatProvider.getMin());
-                                          buf.writeFloat(floatProvider.getMax());
+                                          buf.writeFloat(floatProvider.getMinValue());
+                                          buf.writeFloat(floatProvider.getMaxValue());
                                       },
-                                      buf -> UniformFloatProvider.create(buf.readFloat(), buf.readFloat())
+                                      buf -> UniformFloat.of(buf.readFloat(), buf.readFloat())
                               ));
 
         registerFloatProvider(FloatProviderType.CLAMPED_NORMAL,
-                            PacketCodec.ofStatic(
+                            StreamCodec.of(
                                     (buf, floatProvider) ->
                                     {
                                         buf.writeFloat(floatProvider.mean);
                                         buf.writeFloat(floatProvider.deviation);
-                                        buf.writeFloat(floatProvider.getMin());
-                                        buf.writeFloat(floatProvider.getMax());
+                                        buf.writeFloat(floatProvider.getMinValue());
+                                        buf.writeFloat(floatProvider.getMaxValue());
                                     },
-                                    buf -> ClampedNormalFloatProvider.create(buf.readFloat(), buf.readFloat(),
+                                    buf -> ClampedNormalFloat.of(buf.readFloat(), buf.readFloat(),
                                                                          buf.readFloat(), buf.readFloat())
                             ));
 
         registerFloatProvider(FloatProviderType.TRAPEZOID,
-                              PacketCodec.ofStatic(
+                              StreamCodec.of(
                                       (buf, floatProvider) ->
                                       {
-                                          buf.writeFloat(floatProvider.getMin());
-                                          buf.writeFloat(floatProvider.getMax());
+                                          buf.writeFloat(floatProvider.getMinValue());
+                                          buf.writeFloat(floatProvider.getMaxValue());
                                           buf.writeFloat(floatProvider.plateau);
                                       },
-                                      buf -> TrapezoidFloatProvider.create(buf.readFloat(), buf.readFloat(),
+                                      buf -> TrapezoidFloat.of(buf.readFloat(), buf.readFloat(),
                                                                                buf.readFloat())
                               ));
     }
@@ -287,11 +293,11 @@ public class ExtraPacketCodecs
      * @param <E>          the type of elements in the weight list
      * @return a packet codec for encoding and decoding weight lists
      */
-    public static <B extends ByteBuf, E> PacketCodec<B, Pool<E>> weightedListCodec(PacketCodec<B, E> elementCodec) {
-        return PacketCodec.<B, Weighted<E>, E, Integer>tuple(
+    public static <B extends ByteBuf, E> StreamCodec<B, WeightedList<E>> weightedListCodec(StreamCodec<B, E> elementCodec) {
+        return StreamCodec.<B, Weighted<E>, E, Integer>composite(
                 elementCodec, Weighted::value,
-                PacketCodecs.VAR_INT, Weighted::weight,
+                ByteBufCodecs.VAR_INT, Weighted::weight,
                 Weighted::new
-        ).collect(PacketCodecs.toList()).xmap(Pool::new, Pool::getEntries);
+        ).apply(ByteBufCodecs.list()).map(WeightedList::new, WeightedList::unwrap);
     }
 }
