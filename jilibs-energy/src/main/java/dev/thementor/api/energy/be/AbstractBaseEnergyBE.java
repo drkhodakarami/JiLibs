@@ -45,7 +45,8 @@ import dev.thementor.api.shared.records.lists.LongList;
 import dev.thementor.api.shared.utils.DirectionHelper;
 
 @SuppressWarnings("UnusedReturnValue")
-public abstract class AbstractBaseEnergyBE<T extends AbstractBaseEnergyBE<T, B, C>, B extends SimpleContainer, C extends EnergyStorage> extends AbstractBaseInventoryBE<T, B>
+public abstract class AbstractBaseEnergyBE<T extends AbstractBaseEnergyBE<T, B, C>, B extends SimpleContainer, C extends EnergyStorage>
+        extends AbstractBaseInventoryBE<T, B>
         implements IEnergyStorageProvider<C>, IEnergyConnector<C>, IEnergySpreader<C>
 {
     protected final EnergyConnector<C> energyConnector;
@@ -54,7 +55,7 @@ public abstract class AbstractBaseEnergyBE<T extends AbstractBaseEnergyBE<T, B, 
     {
         super(type, pos, state);
         energyConnector = new EnergyConnector<>();
-        this.properties.sync().tick();
+        this.properties.tick();
     }
 
     @Override
@@ -118,10 +119,13 @@ public abstract class AbstractBaseEnergyBE<T extends AbstractBaseEnergyBE<T, B, 
     {
         super.applyImplicitComponents(dataComponentGetter);
 
-        if(energyConnector.getStorages().isEmpty())
+        if(energyConnector.getStorages().isEmpty() || getEnergyComponent() == null)
             return;
 
-        LongList list = (LongList) dataComponentGetter.getOrDefault(getEnergyComponent(), List.of());
+        LongList list = dataComponentGetter.getOrDefault(getEnergyComponent(), LongList.EMPTY);
+
+        if(list.values().isEmpty())
+            return;
 
         int index = 0;
 
@@ -132,7 +136,10 @@ public abstract class AbstractBaseEnergyBE<T extends AbstractBaseEnergyBE<T, B, 
 
             EnergyStorage storage = energyConnector.getStorages().get(index);
             if(storage instanceof SimpleEnergyStorage simpleEnergyStorage)
+            {
                 simpleEnergyStorage.amount = longPayload.value();
+                update();
+            }
 
             index++;
         }
@@ -143,6 +150,9 @@ public abstract class AbstractBaseEnergyBE<T extends AbstractBaseEnergyBE<T, B, 
     protected void collectImplicitComponents(DataComponentMap.Builder builder)
     {
         super.collectImplicitComponents(builder);
+
+        if(getEnergyComponent() == null)
+            return;
 
         List<LongPayload> list = new ArrayList<>();
 

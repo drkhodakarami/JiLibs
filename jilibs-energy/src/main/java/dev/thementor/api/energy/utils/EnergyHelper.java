@@ -124,15 +124,20 @@ public class EnergyHelper
         if(storages.isEmpty())
             return;
 
+        long extractable = simulateExtraction(storage);
+        long finalAmount = equalAmount ? extractable / storages.size() : extractable;
+        long current = storage.getAmount();
+        long totalInserted = 0;
+
         try(Transaction transaction = Transaction.openOuter())
         {
-            long current = storage.getAmount();
-            long extractable = simulateExtraction(storage);
-            long totalInserted = 0;
-            long finalAmount = equalAmount ? extractable / storages.size() : extractable;
-
             for (EnergyStorage adjacentStorage : storages)
             {
+                var insertable = simulateInsertion(adjacentStorage, transaction);
+
+                if(insertable < finalAmount)
+                    continue;
+
                 long inserted = adjacentStorage.insert(finalAmount, transaction);
                 totalInserted += inserted;
             }
@@ -141,7 +146,9 @@ public class EnergyHelper
             {
                 try(Transaction inner = transaction.openNested())
                 {
-                    storage.extract(totalInserted, inner);
+                    var extracted = storage.extract(totalInserted, inner);
+                    if(extracted > 0)
+                        inner.commit();
                 }
             }
 

@@ -17,6 +17,8 @@
 package dev.thementor.api.base.block;
 
 import com.mojang.serialization.MapCodec;
+import dev.thementor.api.shared.interfaces.IWrench;
+import net.minecraft.world.InteractionHand;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -262,6 +264,15 @@ public abstract class AbstractBaseBlock extends Block implements EntityBlock, IT
     protected @NotNull MapCodec<? extends Block> codec()
     {
         return CODEC;
+    }
+
+    @Override
+    protected @NotNull InteractionResult useItemOn(ItemStack itemStack, BlockState blockState, Level level, BlockPos blockPos, Player player, InteractionHand interactionHand, BlockHitResult blockHitResult)
+    {
+        if(itemStack.getItem() instanceof IWrench)
+            return InteractionResult.PASS;
+
+        return super.useItemOn(itemStack, blockState, level, blockPos, player, interactionHand, blockHitResult);
     }
 
     protected <T extends BlockEntity> BlockEntityTicker<T> getVanillaTicker(Level world, BlockState state, BlockEntityType<T> type)

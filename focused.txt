@@ -19,3 +19,9 @@ jilibs-fluid
 ==jilibs-pipenetwork
 ==jilibs-multiblock
 jilibs-machina
+== talk about transaction problems on energy/fluid helpers
+== talk about interfaces for spreading energy/fluid
+== talk about changes in the properties on both blocks and block entities
+== talk about bugs in gui texture indicator
+== talk about storing and reading energy/fluid levels
+== talk about advance tweaks in basic machina

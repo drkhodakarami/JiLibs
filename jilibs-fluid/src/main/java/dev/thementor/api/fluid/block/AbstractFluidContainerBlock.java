@@ -37,7 +37,7 @@ public class AbstractFluidContainerBlock extends AbstractBaseBlock
 {
     public AbstractFluidContainerBlock(Properties properties, BlockProperties<?> blockProperties)
     {
-        super(properties, blockProperties);
+        super(properties, blockProperties.tick());
     }
 
     @Override
@@ -45,11 +45,6 @@ public class AbstractFluidContainerBlock extends AbstractBaseBlock
     {
         if(FluidHelper.interactWithBlock(level, pos, player, hand))
             return InteractionResult.SUCCESS;
-
-        if(stack.getItem() instanceof IWrench wrench &&
-           player.isCrouching() &&
-           wrench.breakBlock(level, pos, state, player, stack))
-                return InteractionResult.SUCCESS;
 
         return super.useItemOn(stack, state, level, pos, player, hand, hit);
     }

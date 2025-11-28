@@ -19,10 +19,22 @@ package dev.thementor.api.energy.storage;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
 @SuppressWarnings("unused")
-public class InputEnergyStorage extends PredicateEnergyStorage
+public class InputEnergyStorage extends SyncedEnergyStorage
 {
     public InputEnergyStorage(BlockEntity blockEntity, long capacity, long maxInsert)
     {
-        super(blockEntity, capacity, maxInsert, 0, true, false);
+        super(blockEntity, capacity, maxInsert, 0);
+    }
+
+    @Override
+    public boolean supportsInsertion()
+    {
+        return true;
+    }
+
+    @Override
+    public boolean supportsExtraction()
+    {
+        return false;
     }
 }

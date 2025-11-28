@@ -7,14 +7,14 @@
   "environment": "*",
   "accessWidener" : "jilibs_gas.accesswidener",
   "mixins": [
-    "jilibs-gas.mixins.json",
+    "jilibs_gas.mixins.json",
     {
       "config": "jilibs_gas.client.mixins.json",
       "environment": "client"
     }
   ],
   "license": "MIT",
-  "icon": "assets/jilibs-gas/icon.png",
+  "icon": "assets/jilibs_gas/icon.png",
   "contact": {
     "homepage": "https://www.youtube.com/@TheMentorCodeLab",
     "issues": "https://github.com/drkhodakarami/JiLibs/issues",

@@ -16,6 +16,8 @@
 
 package dev.thementor.api.shared.records;
 
+import java.util.List;
+
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import org.jetbrains.annotations.NotNull;
@@ -31,8 +33,6 @@ import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.fluid.base.SingleFluidStorage;
 
 import dev.thementor.api.shared.annotations.*;
-
-import java.util.List;
 
 /**
  * Represents a custom payload containing a fluid stack, including its variant and amount.

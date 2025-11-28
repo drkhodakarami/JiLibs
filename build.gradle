@@ -395,18 +395,6 @@ allprojects {
         dependsOn(copySourceJars, copyModJars)
     }
 
-    tasks.named('jar').configure {
-        finalizedBy(deployToExternalFolder)
-
-        onlyIf{
-            !gradle.startParameter.taskNames.any { it.startsWith("publish") }
-        }
-    }
-
-    tasks.matching { it.name.startsWith("publish") }.configureEach { task ->
-        task.finalizedBy(deployToExternalFolder)
-    }
-
     tasks.withType(JavaCompile).tap {
         configureEach {
             options.compilerArgs << '-Xlint:unchecked' // show unchecked warnings

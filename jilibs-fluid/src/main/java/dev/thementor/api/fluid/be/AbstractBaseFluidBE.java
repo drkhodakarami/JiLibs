@@ -48,8 +48,9 @@ import dev.thementor.api.shared.records.lists.FluidStackList;
 import dev.thementor.api.shared.utils.DirectionHelper;
 
 @SuppressWarnings("unused")
-public abstract class AbstractBaseFluidBE<T extends AbstractBaseFluidBE<T, B, C>, B extends SimpleContainer, C extends SingleFluidStorage> extends AbstractBaseInventoryBE<T, B>
-    implements IFluidStorageProvider<C>, IFluidConnector<C>, IFluidSpreader<C>
+public abstract class AbstractBaseFluidBE<T extends AbstractBaseFluidBE<T, B, C>, B extends SimpleContainer, C extends SingleFluidStorage>
+        extends AbstractBaseInventoryBE<T, B>
+        implements IFluidStorageProvider<C>, IFluidConnector<C>, IFluidSpreader<C>
 {
     protected final FluidConnector<C> fluidConnector;
 
@@ -57,7 +58,7 @@ public abstract class AbstractBaseFluidBE<T extends AbstractBaseFluidBE<T, B, C>
     {
         super(type, pos, state);
         fluidConnector = new FluidConnector<>();
-        this.properties.sync().tick();
+        this.properties.tick();
     }
 
     @Override
@@ -119,10 +120,13 @@ public abstract class AbstractBaseFluidBE<T extends AbstractBaseFluidBE<T, B, C>
     {
         super.applyImplicitComponents(dataComponentGetter);
 
-        if(fluidConnector.getStorages().isEmpty())
+        if(fluidConnector.getStorages().isEmpty() || getFluidComponent() == null)
             return;
 
-        FluidStackList list = (FluidStackList) dataComponentGetter.getOrDefault(getFluidComponent(), List.of());
+        FluidStackList list = dataComponentGetter.getOrDefault(getFluidComponent(), FluidStackList.EMPTY);
+
+        if(list.values().isEmpty())
+            return;
 
         int index = 0;
 
@@ -137,6 +141,7 @@ public abstract class AbstractBaseFluidBE<T extends AbstractBaseFluidBE<T, B, C>
             {
                 simpleFluidStorage.variant = fluidStack.fluid();
                 simpleFluidStorage.amount = fluidStack.amount();
+                update();
             }
 
             index++;
@@ -148,6 +153,9 @@ public abstract class AbstractBaseFluidBE<T extends AbstractBaseFluidBE<T, B, C>
     protected void collectImplicitComponents(DataComponentMap.Builder builder)
     {
         super.collectImplicitComponents(builder);
+
+        if(getFluidComponent() == null)
+            return;
 
         List<FluidStackPayload> list = new ArrayList<>();
 

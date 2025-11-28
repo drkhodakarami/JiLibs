@@ -21,8 +21,6 @@ import java.util.Set;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 
-import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
-
 import dev.thementor.api.shared.annotations.*;
 
 /**

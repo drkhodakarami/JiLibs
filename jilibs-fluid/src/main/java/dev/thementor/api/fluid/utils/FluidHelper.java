@@ -402,6 +402,10 @@ public class FluidHelper
 
             for(Storage<FluidVariant> adjacentStorage : adjacentStorages)
             {
+                var insertable = simulateInsertion(adjacentStorage, variant);
+                if(insertable < finalAmount)
+                    continue;
+
                 try(Transaction transaction = Transaction.openOuter())
                 {
                     long inserted = adjacentStorage.insert(variant, finalAmount, transaction);

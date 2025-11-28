@@ -70,7 +70,7 @@ import dev.thementor.api.register.ItemRegisterer;
 import dev.thementor.api.shared.annotations.*;
 import dev.thementor.api.shared.utils.BaseHelper;
 
-import dev.thementor.mixin.BETypeAccessor;
+import dev.thementor.mixin.BlockEntityTypeAccessor;
 
 /**
  * Registers a new wood type with all the related family blocks.
@@ -380,7 +380,7 @@ public class WoodSet
 
     static void addBlocksToBlockEntityType(BlockEntityType<?> blockEntityType, Collection<Block> blocks)
     {
-        BETypeAccessor accessor = (BETypeAccessor) blockEntityType;
+        BlockEntityTypeAccessor accessor = (BlockEntityTypeAccessor) blockEntityType;
         Set<Block> originalBlocks = accessor.getBlocks();
         accessor.setBlocks(ImmutableSet.<Block>builderWithExpectedSize(originalBlocks.size() + blocks.size())
                                        .addAll(originalBlocks)

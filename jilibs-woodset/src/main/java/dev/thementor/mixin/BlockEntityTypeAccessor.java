@@ -25,7 +25,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 
 @Mixin(BlockEntityType.class)
-public interface BETypeAccessor
+public interface BlockEntityTypeAccessor
 {
     @Accessor("validBlocks")
     void setBlocks(Set<Block> blocks);

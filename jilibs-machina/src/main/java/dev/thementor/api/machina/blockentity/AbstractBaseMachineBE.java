@@ -124,10 +124,13 @@ public abstract class AbstractBaseMachineBE<T extends AbstractBaseMachineBE<T, B
     {
         super.applyImplicitComponents(dataComponentGetter);
 
-        if(energyConnector.getStorages().isEmpty())
+        if(energyConnector.getStorages().isEmpty() || getEnergyComponent() == null)
             return;
 
-        LongList list = (LongList) dataComponentGetter.getOrDefault(getEnergyComponent(), List.of());
+        LongList list = dataComponentGetter.getOrDefault(getEnergyComponent(), LongList.EMPTY);
+
+        if(list.values().isEmpty())
+            return;
 
         int index = 0;
 
@@ -138,7 +141,10 @@ public abstract class AbstractBaseMachineBE<T extends AbstractBaseMachineBE<T, B
 
             EnergyStorage storage = energyConnector.getStorages().get(index);
             if(storage instanceof SimpleEnergyStorage simpleEnergyStorage)
+            {
                 simpleEnergyStorage.amount = longPayload.value();
+                update();
+            }
 
             index++;
         }
@@ -149,6 +155,9 @@ public abstract class AbstractBaseMachineBE<T extends AbstractBaseMachineBE<T, B
     protected void collectImplicitComponents(DataComponentMap.Builder builder)
     {
         super.collectImplicitComponents(builder);
+
+        if(getEnergyComponent() == null)
+            return;
 
         List<LongPayload> list = new ArrayList<>();
 

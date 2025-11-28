@@ -6,14 +6,14 @@
   "version": "${version}",
   "environment": "*",
   "mixins": [
-    "jilibs-emulsion.mixins.json",
+    "jilibs_emulsion.mixins.json",
     {
       "config": "jilibs_emulsion.client.mixins.json",
       "environment": "client"
     }
   ],
   "license": "MIT",
-  "icon": "assets/jilibs-emulsion/icon.png",
+  "icon": "assets/jilibs_emulsion/icon.png",
   "contact": {
     "homepage": "https://www.youtube.com/@TheMentorCodeLab",
     "issues": "https://github.com/drkhodakarami/JiLibs/issues",

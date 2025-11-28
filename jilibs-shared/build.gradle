@@ -4,6 +4,8 @@ loom {
     accessWidenerPath = file('src/main/resources/jilibs_shared.accesswidener')
 }
 
+
+// This is shared Lib, can't depend on anything else that is from this lib!!!!
 //moduleDependencies(project, [
 //        'jilibs-'
 //])

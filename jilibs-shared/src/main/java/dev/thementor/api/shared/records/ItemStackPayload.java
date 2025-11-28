@@ -16,6 +16,8 @@
 
 package dev.thementor.api.shared.records;
 
+import java.util.List;
+
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import org.jetbrains.annotations.NotNull;
@@ -27,8 +29,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 
 import dev.thementor.api.shared.annotations.*;
-
-import java.util.List;
 
 /**
  * Represents a custom payload containing an ItemStack.

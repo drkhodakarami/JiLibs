@@ -159,22 +159,22 @@ public abstract class AbstractBasicMachineBE<T extends AbstractBasicMachineBE<T>
         super.registerDefaultFields();
 
         this.properties.fields().addField(PROP_ENERGY_AMOUNT_ID,
-                                          this.energyStorage.amount,
+                                          this.getEnergyAmount(),
                                           AbstractBasicMachineBE::getEnergyAmount,
                                           AbstractBasicMachineBE::setEnergyAmount);
 
         this.properties.fields().addField(PROP_ENERGY_CAPACITY_ID,
-                                          this.energyStorage.amount,
+                                          this.getEnergyCapacity(),
                                           AbstractBasicMachineBE::getEnergyCapacity,
                                           null);
 
         this.properties.fields().addField(PROP_FLUID_AMOUNT_ID,
-                                          this.fluidStorage.amount,
-                                          AbstractBasicMachineBE::getFluidAmount,
-                                          AbstractBasicMachineBE::setFluidAmount);
+                                          this.getFluidAmount(),
+                                              AbstractBasicMachineBE::getFluidAmount,
+                                              AbstractBasicMachineBE::setFluidAmount);
 
         this.properties.fields().addField(PROP_FLUID_CAPACITY_ID,
-                                          this.fluidStorage.amount,
+                                          this.getFluidCapacity(),
                                           AbstractBasicMachineBE::getFluidCapacity,
                                           null);
 
@@ -252,17 +252,18 @@ public abstract class AbstractBasicMachineBE<T extends AbstractBasicMachineBE<T>
 
     public long getFluidAmount()
     {
-        return this.fluidStorage.getAmount();
+        return hasFluidStorage() && this.fluidStorage != null ? this.fluidStorage.getAmount() : 0;
     }
 
     public void setFluidAmount(long amount)
     {
-        this.fluidStorage.amount = amount;
+        if(hasFluidStorage() && this.fluidStorage != null)
+            this.fluidStorage.amount = amount;
     }
 
     public long getFluidCapacity()
     {
-        return this.fluidStorage.getCapacity();
+        return hasFluidStorage() && this.fluidStorage != null ? this.fluidStorage.getCapacity() : 0;
     }
 
     public SyncedEnergyStorage getEnergyStorage()
@@ -272,17 +273,18 @@ public abstract class AbstractBasicMachineBE<T extends AbstractBasicMachineBE<T>
 
     public long getEnergyAmount()
     {
-        return this.energyStorage.getAmount();
+        return hasEnergyStorage() && this.energyStorage != null ? this.energyStorage.getAmount() : 0;
     }
 
     public void setEnergyAmount(long amount)
     {
-        this.energyStorage.amount = amount;
+        if(hasEnergyStorage() && this.energyStorage != null)
+            this.energyStorage.amount = amount;
     }
 
     public long getEnergyCapacity()
     {
-        return this.energyStorage.getCapacity();
+        return hasEnergyStorage() && this.energyStorage != null ? this.energyStorage.getCapacity() : 0;
     }
 
     public int getProgress()
@@ -459,13 +461,6 @@ public abstract class AbstractBasicMachineBE<T extends AbstractBasicMachineBE<T>
                 return be.getBaseFluidCapacity() + be.getFluidUpgradeAmount();
             }
 
-            @Override
-            protected void onFinalCommit()
-            {
-                super.onFinalCommit();
-                update();
-            }
-
             @SuppressWarnings("unchecked")
             @Override
             public FluidVariant getResource()
@@ -488,7 +483,7 @@ public abstract class AbstractBasicMachineBE<T extends AbstractBasicMachineBE<T>
 
     protected SyncedEnergyStorage createEnergyStorage()
     {
-        return new SyncedEnergyStorage(this, 100_000, 1000, 0)
+        return new SyncedEnergyStorage(this, getBaseEnergyCapacity(), getBaseEnergyInsertionAmount(), getBaseEnergyExtractionAmount())
         {
             @SuppressWarnings("unchecked")
             @Override
@@ -496,13 +491,6 @@ public abstract class AbstractBasicMachineBE<T extends AbstractBasicMachineBE<T>
             {
                 T be = ((T)getBlockEntity());
                 return be.getBaseEnergyCapacity() + be.getEnergyUpgradeAmount();
-            }
-
-            @Override
-            protected void onFinalCommit()
-            {
-                super.onFinalCommit();
-                update();
             }
         };
     }
@@ -520,6 +508,16 @@ public abstract class AbstractBasicMachineBE<T extends AbstractBasicMachineBE<T>
     protected long getEnergyUpgradeAmount()
     {
         return getEnergyUpgradeCount() * 10_000L;
+    }
+
+    protected long getBaseEnergyInsertionAmount()
+    {
+        return 1_000;
+    }
+
+    protected long getBaseEnergyExtractionAmount()
+    {
+        return 0;
     }
 
     protected long getBaseEnergyCapacity()

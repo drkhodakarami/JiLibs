@@ -16,21 +16,30 @@
 
 package dev.thementor.api.fluid.storage;
 
-import java.util.function.Predicate;
-
 import net.minecraft.world.level.block.entity.BlockEntity;
 
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import net.minecraft.world.level.material.Fluid;
 
-public class InputFluidStorage extends PredicateFluidStorage
+public class InputFluidStorage extends SyncedFluidStorage
 {
-    public InputFluidStorage(BlockEntity blockEntity, long capacity)
+    private final Fluid fluid;
+
+    public InputFluidStorage(BlockEntity blockEntity, long capacity, Fluid fluid)
     {
-        super(blockEntity, capacity, $ -> true, $ -> false);
+        super(blockEntity, capacity);
+        this.fluid = fluid;
     }
 
-    public InputFluidStorage(BlockEntity blockEntity, long capacity, Predicate<FluidVariant> canInsert)
+    @Override
+    public boolean canInsert(FluidVariant variant)
     {
-        super(blockEntity, capacity, canInsert, $ -> false);
+        return variant.isOf(fluid);
+    }
+
+    @Override
+    public boolean canExtract(FluidVariant variant)
+    {
+        return false;
     }
 }
