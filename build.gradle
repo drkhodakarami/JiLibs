@@ -125,7 +125,7 @@ def getSubprojectVersion(Project project) {
 
 //======================================================================================== SETTING UP MODULE DEPENDENCIES
 def moduleDependencies(project, List<String> depNames) {
-    def deps = depNames.iterator().collect { project.dependencies.project(path: ":$it", configuration: 'namedElements') }
+    def deps = depNames.iterator().collect { project.dependencies.project(path: ":$it") }
     def clientOutputs = depNames.iterator().collect { findProject(":$it").sourceSets.client.output }
 
     project.dependencies {
@@ -521,7 +521,7 @@ subprojects {
     dependencies {
         // Make all modules depend on the shared api
         if (project.name != "jilibs-shared") {
-            implementation project(path: ':jilibs-shared', configuration: 'namedElements')
+            implementation project(path: ':jilibs-shared')
         }
     }
 
@@ -665,7 +665,7 @@ dependencies {
                 return
             }
 
-            api project(path: "${it.path}", configuration: 'namedElements')
+            api project(path: "${it.path}")
             clientImplementation project("${it.path}:").sourceSets.client.output
         }
     }

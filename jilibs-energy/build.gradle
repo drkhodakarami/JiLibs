@@ -20,7 +20,7 @@ moduleDependencies(project, [
 
 dependencies{
     // Energy API Handling Dependency ================================================================================================================
-    modApi("teamreborn:energy:${rootProject.energy_version}") {
+    api("teamreborn:energy:${rootProject.energy_version}") {
         exclude(group: "net.fabricmc.fabric-api")
     }
 }
