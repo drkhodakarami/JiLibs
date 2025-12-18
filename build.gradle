@@ -2,7 +2,7 @@ plugins {
     id "java-library"
     id "eclipse"
     id "maven-publish"
-    id "fabric-loom" version "${loom_version}" apply false
+    id "net.fabricmc.fabric-loom" version "${loom_version}" apply false
     id 'com.diffplug.spotless' version "8.1.0"
 }
 
@@ -592,12 +592,12 @@ logger.lifecycle("==============================================================
 publishing {
     publications {
         mavenJava(MavenPublication) {
-            artifact(tasks.jar.archiveFile) {
-                builtBy(tasks.jar)
+            artifact(jar) {
+                builtBy(jar)
             }
 
-            artifact(tasks.sourcesJar) {
-                builtBy tasks.sourcesJar
+            artifact(sourcesJar) {
+                builtBy sourcesJar
             }
 
             artifact javadocJar
@@ -665,7 +665,7 @@ dependencies {
                 return
             }
 
-            api project(path: "${it.path}")
+            api project(path: "${it.path}", configuration: 'namedElements')
             clientImplementation project("${it.path}:").sourceSets.client.output
         }
     }
