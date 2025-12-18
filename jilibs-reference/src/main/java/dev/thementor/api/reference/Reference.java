@@ -20,6 +20,7 @@ import java.util.Objects;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
 
 import net.minecraft.core.Registry;
@@ -27,7 +28,6 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
@@ -100,9 +100,9 @@ public class Reference
      * @return An Identifier instance for the specified path.
      */
     @NotNull
-    public ResourceLocation id(@NotNull String path)
+    public Identifier id(@NotNull String path)
      {
-         return ResourceLocation.fromNamespaceAndPath(ModID(), path);
+         return Identifier.fromNamespaceAndPath(ModID(), path);
      }
 
     /**
@@ -112,9 +112,9 @@ public class Reference
      * @return An Identifier instance for the specified path.
      */
     @NotNull
-    public ResourceLocation vanillaID(@NotNull String path)
+    public Identifier vanillaID(@NotNull String path)
      {
-         return ResourceLocation.withDefaultNamespace(path);
+         return Identifier.withDefaultNamespace(path);
      }
 
     /**
@@ -124,9 +124,9 @@ public class Reference
      * @return An Identifier instance for the specified path.
      */
     @NotNull
-    public ResourceLocation idOf(@NotNull String path)
+    public Identifier idOf(@NotNull String path)
      {
-         return Objects.requireNonNull(ResourceLocation.tryParse(path));
+         return Objects.requireNonNull(Identifier.tryParse(path));
      }
 
     /**
@@ -172,7 +172,7 @@ public class Reference
      */
     protected TagKey<Block> createBlockCommonTag(String name)
      {
-         return TagKey.create(Registries.BLOCK, ResourceLocation.tryBuild("c", name));
+         return TagKey.create(Registries.BLOCK, Objects.requireNonNull(Identifier.tryBuild("c", name)));
      }
 
     /**
@@ -194,7 +194,7 @@ public class Reference
      */
     protected TagKey<Item> createItemCommonTag(String name)
      {
-         return TagKey.create(Registries.ITEM, ResourceLocation.tryBuild("c", name));
+         return TagKey.create(Registries.ITEM, Objects.requireNonNull(Identifier.tryBuild("c", name)));
      }
 
     /**
@@ -216,7 +216,7 @@ public class Reference
      */
     protected TagKey<EntityType<?>> createEntityCommonTag(String name)
      {
-         return TagKey.create(Registries.ENTITY_TYPE, ResourceLocation.tryBuild("c", name));
+         return TagKey.create(Registries.ENTITY_TYPE, Objects.requireNonNull(Identifier.tryBuild("c", name)));
      }
 
     /**

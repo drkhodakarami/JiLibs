@@ -30,7 +30,7 @@ import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.ARGB;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.material.Fluid;
@@ -48,6 +48,7 @@ import dev.thementor.api.shared.annotations.*;
 import dev.thementor.api.shared.client.utils.MouseHelper;
 import dev.thementor.api.shared.utils.BaseHelper;
 import dev.thementor.api.shared.utils.StringHelper;
+import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings("unused")
 @Developer("The Mentor")
@@ -74,7 +75,7 @@ public class FluidWidget implements Renderable, LayoutElement
 
     private final Supplier<BlockPos> posSupplier;
 
-    private final ResourceLocation backgroundTexture, markerTexture;
+    private final Identifier backgroundTexture, markerTexture;
 
     private final boolean drawBackground;
 
@@ -86,7 +87,7 @@ public class FluidWidget implements Renderable, LayoutElement
                        int backgroundU, int backgroundV, int markerU, int markerV,
                        int backgroundSizeWidth, int backgroundSizeHeight,
                        int markerSizeWidth, int markerSizeHeight,
-                       ResourceLocation backgroundTexture, ResourceLocation markerTexture,
+                       Identifier backgroundTexture, Identifier markerTexture,
                        Supplier<BlockPos> posSupplier)
     {
         this.fluidStorage = fluidStorage;
@@ -121,13 +122,13 @@ public class FluidWidget implements Renderable, LayoutElement
 
     @ThanksTo(youtubeUsers = "TurtyWurty", discordUsers = "TurtyWurty")
     @Override
-    public void render(GuiGraphics context, int mouseX, int mouseY, float deltaTicks)
+    public void render(@NotNull GuiGraphics context, int mouseX, int mouseY, float deltaTicks)
     {
-        if(fluidStorage == null || fluidStorage.variant == null)
+        if(fluidStorage == null)
             return;
 
         // Render the fluid widget background
-        if(drawBackground && BaseHelper.validateResource(backgroundTexture))
+        if(drawBackground && BaseHelper.validateIdentifier(backgroundTexture))
             MenuHelper.drawTexture(context, backgroundTexture,
                                     x + backgroundX, y + backgroundY,
                                    backgroundU, backgroundV,
@@ -169,7 +170,7 @@ public class FluidWidget implements Renderable, LayoutElement
                                       x + fluidX, y + fluidY + fluidHeight - barHeight, fluidWidth, barHeight,
                                      ARGB.colorFromFloat(1.0F, red, green, blue));
         // Render the fluid widget marker
-        if(BaseHelper.validateResource(markerTexture))
+        if(BaseHelper.validateIdentifier(markerTexture))
             MenuHelper.drawTexture(context, markerTexture,
                                     x + markerX, y + markerY,
                                    markerU, markerV,
@@ -217,7 +218,7 @@ public class FluidWidget implements Renderable, LayoutElement
     }
 
     @Override
-    public void visitWidgets(Consumer<AbstractWidget> consumer) {}
+    public void visitWidgets(@NotNull Consumer<AbstractWidget> consumer) {}
 
     public SingleFluidStorage getFluidStorage()
     {
@@ -231,7 +232,7 @@ public class FluidWidget implements Renderable, LayoutElement
         long amount = fluidStorage.getAmount();
         long capacity = fluidStorage.getCapacity();
 
-        if(fluid == null || amount <= 0)
+        if(amount <= 0)
             return;
 
         Font textRenderer = Minecraft.getInstance().font;
@@ -267,7 +268,7 @@ public class FluidWidget implements Renderable, LayoutElement
 
         private Supplier<BlockPos> posSupplier = () -> null;
 
-        private ResourceLocation backgroundTexture, markerTexture;
+        private Identifier backgroundTexture, markerTexture;
 
         private boolean drawBackground = false;
 
@@ -344,7 +345,7 @@ public class FluidWidget implements Renderable, LayoutElement
             return this;
         }
 
-        public Builder backgroundTexture(ResourceLocation texture, int u, int v, int width, int height)
+        public Builder backgroundTexture(Identifier texture, int u, int v, int width, int height)
         {
             this.drawBackground = true;
             this.backgroundTexture = texture;
@@ -355,7 +356,7 @@ public class FluidWidget implements Renderable, LayoutElement
             return this;
         }
 
-        public Builder markerTexture(ResourceLocation texture, int u, int v, int width, int height)
+        public Builder markerTexture(Identifier texture, int u, int v, int width, int height)
         {
             this.markerTexture = texture;
             this.markerU = u;

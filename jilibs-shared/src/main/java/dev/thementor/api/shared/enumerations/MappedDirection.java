@@ -19,7 +19,7 @@ package dev.thementor.api.shared.enumerations;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.core.Direction;
 
 import dev.thementor.api.shared.annotations.*;

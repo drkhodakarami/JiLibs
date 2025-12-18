@@ -43,6 +43,7 @@ import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import dev.thementor.api.base.blockentity.AbstractBaseBE;
 import dev.thementor.api.shared.enumerations.MappedDirection;
 import dev.thementor.api.shared.records.FluidStackPayload;
+import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings({"unused", "UnusedReturnValue"})
 public class FluidHelper
@@ -52,7 +53,7 @@ public class FluidHelper
         return storage.getAmount() == 0;
     }
 
-    public static boolean isEmpty(SingleVariantStorage<FluidVariant> storage)
+    public static boolean isEmpty(SingleVariantStorage<@NotNull FluidVariant> storage)
     {
         return storage.getAmount() == 0;
     }
@@ -76,7 +77,7 @@ public class FluidHelper
         return transferFromStorage(world, pos, storage, inputInventory, inputSlot, fullTransfer);
     }
 
-    public static boolean handleStorageTransfer(Level world, BlockPos pos, SingleVariantStorage<FluidVariant> storage,
+    public static boolean handleStorageTransfer(Level world, BlockPos pos, SingleVariantStorage<@NotNull FluidVariant> storage,
                                                 Container inputInventory,
                                                 int inputSlot,
                                                 boolean fullTransfer)
@@ -247,7 +248,7 @@ public class FluidHelper
 
     public static long simulateInsertion(Storage<FluidVariant> storage, FluidVariant variant, Transaction outer)
     {
-        long amount = 0;
+        long amount;
         try(Transaction transaction = outer.openNested())
         {
             amount = storage.insert(variant, Long.MAX_VALUE, transaction);
@@ -258,7 +259,7 @@ public class FluidHelper
 
     public static long simulateInsertion(Storage<FluidVariant> storage, FluidVariant variant)
     {
-        long amount = 0;
+        long amount;
         try(Transaction transaction = Transaction.openOuter())
         {
             amount = storage.insert(variant, Long.MAX_VALUE, transaction);
@@ -269,7 +270,7 @@ public class FluidHelper
 
     public static long simulateExtraction(Storage<FluidVariant> storage, FluidVariant variant, Transaction outer)
     {
-        long amount = 0;
+        long amount;
         try(Transaction transaction = outer.openNested())
         {
             amount = storage.extract(variant, Long.MAX_VALUE, transaction);
@@ -280,7 +281,7 @@ public class FluidHelper
 
     public static long simulateExtraction(Storage<FluidVariant> storage, FluidVariant variant)
     {
-        long amount = 0;
+        long amount;
         try(Transaction transaction = Transaction.openOuter())
         {
             amount = storage.extract(variant, Long.MAX_VALUE, transaction);

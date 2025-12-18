@@ -22,7 +22,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.input.InputWithModifiers;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.ARGB;
 
 import dev.thementor.api.gui.client.constants.ToggleButtonTextures;
@@ -30,6 +30,7 @@ import dev.thementor.api.gui.client.records.TextureData;
 import dev.thementor.api.gui.client.utils.MenuHelper;
 import dev.thementor.api.shared.annotations.*;
 import dev.thementor.api.shared.utils.BaseHelper;
+import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings("unused")
 @Developer("The Mentor")
@@ -42,17 +43,17 @@ import dev.thementor.api.shared.utils.BaseHelper;
 public class ToggleButton extends Button
 {
     private final BiConsumer<ToggleButton, Boolean> onPress;
-    private final ResourceLocation onState;
-    private final ResourceLocation offState;
-    private final ResourceLocation onSelected;
-    private final ResourceLocation offSelected;
+    private final Identifier onState;
+    private final Identifier offState;
+    private final Identifier onSelected;
+    private final Identifier offSelected;
     private final int onStateU, onStateV, offStateU, offStateV,
             onSelectedU, onSelectedV, offSelectedU, offSelectedV;
 
     private boolean toggled;
 
     protected ToggleButton(int x, int y, int width, int height, boolean defaultToggled,
-                           ResourceLocation onState, ResourceLocation offState, ResourceLocation onSelected, ResourceLocation offSelected,
+                           Identifier onState, Identifier offState, Identifier onSelected, Identifier offSelected,
                            int onStateU, int onStateV,
                            int offStateU, int offStateV,
                            int onSelectedU, int onSelectedV,
@@ -79,7 +80,7 @@ public class ToggleButton extends Button
     }
 
     @Override
-    public void onPress(InputWithModifiers input)
+    public void onPress(@NotNull InputWithModifiers input)
     {
         toggle();
         this.onPress.accept(this, this.toggled);
@@ -100,50 +101,50 @@ public class ToggleButton extends Button
         return this.toggled;
     }
 
-    public ResourceLocation getOnState()
+    public Identifier getOnState()
     {
         return this.onState;
     }
 
-    public ResourceLocation getOffState()
+    public Identifier getOffState()
     {
         return this.offState;
     }
 
-    public ResourceLocation getOnStateSelected()
+    public Identifier getOnStateSelected()
     {
         return this.onSelected;
     }
 
-    public ResourceLocation getOffStateSelected()
+    public Identifier getOffStateSelected()
     {
         return this.offSelected;
     }
 
     @Override
-    protected void renderWidget(GuiGraphics context, int mouseX, int mouseY, float deltaTicks)
+    protected void renderContents(@NotNull GuiGraphics context, int mouseX, int mouseY, float deltaTicks)
     {
-        if(BaseHelper.validateResource(this.onSelected) &&
-           BaseHelper.validateResource(this.onState) &&
-           BaseHelper.validateResource(this.offSelected) &&
-           BaseHelper.validateResource(this.offState))
-                MenuHelper.drawTexture(
-                           context,
-                this.toggled
-                            ? (isHovered() ? this.onSelected : this.onState)
-                            : (isHovered() ? this.offSelected : this.offState),
-                        getX(),
-                        getY(),
-                       this.toggled
-                            ? (isHovered() ? this.onSelectedU : this.onStateU)
-                            : (isHovered() ? this.offSelectedU : this.offStateU),
-                       this.toggled
-                           ? (isHovered() ? this.onSelectedV : this.onStateV)
-                           : (isHovered() ? this.offSelectedV : this.offStateV),
-                            getWidth(),
-                            getHeight(),
-                 getWidth(),
-                getHeight(),
+        if(BaseHelper.validateIdentifier(this.onSelected) &&
+           BaseHelper.validateIdentifier(this.onState) &&
+           BaseHelper.validateIdentifier(this.offSelected) &&
+           BaseHelper.validateIdentifier(this.offState))
+            MenuHelper.drawTexture(
+                    context,
+                    this.toggled
+                    ? (isHovered() ? this.onSelected : this.onState)
+                    : (isHovered() ? this.offSelected : this.offState),
+                    getX(),
+                    getY(),
+                    this.toggled
+                    ? (isHovered() ? this.onSelectedU : this.onStateU)
+                    : (isHovered() ? this.offSelectedU : this.offStateU),
+                    this.toggled
+                    ? (isHovered() ? this.onSelectedV : this.onStateV)
+                    : (isHovered() ? this.offSelectedV : this.offStateV),
+                    getWidth(),
+                    getHeight(),
+                    getWidth(),
+                    getHeight(),
                     ARGB.white(this.alpha));
     }
 
@@ -151,10 +152,10 @@ public class ToggleButton extends Button
     {
         private int x, y, width, height;
         private boolean defaultToggled;
-        private  ResourceLocation onState;
-        private  ResourceLocation offState;
-        private  ResourceLocation onSelected;
-        private  ResourceLocation offSelected;
+        private  Identifier onState;
+        private  Identifier offState;
+        private  Identifier onSelected;
+        private  Identifier offSelected;
         private int onStateU, onStateV, offStateU, offStateV,
                 onSelectedU, onSelectedV, offSelectedU, offSelectedV;
 
@@ -249,25 +250,25 @@ public class ToggleButton extends Button
             return this;
         }
 
-        public Builder setOnState(ResourceLocation id)
+        public Builder setOnState(Identifier id)
         {
             this.onState = id;
             return this;
         }
 
-        public Builder setOffState(ResourceLocation id)
+        public Builder setOffState(Identifier id)
         {
             this.offState = id;
             return this;
         }
 
-        public Builder setOnSelected(ResourceLocation id)
+        public Builder setOnSelected(Identifier id)
         {
             this.onSelected = id;
             return this;
         }
 
-        public Builder setOffSelected(ResourceLocation id)
+        public Builder setOffSelected(Identifier id)
         {
             this.offSelected = id;
             return this;

@@ -43,15 +43,17 @@ public class InfoArea extends GuiGraphics
      */
     protected final Rect2i area;
 
+
+
     /**
      * Constructs an InfoArea with default coordinates (0, 0, 0, 0).
      *
      * @param client The MinecraftClient instance.
      * @param state  The GuiRenderState for rendering.
      */
-    public InfoArea(Minecraft client, GuiRenderState state)
+    public InfoArea(Minecraft client, GuiRenderState state, int mouseX, int mouseY)
     {
-        super(client, state);
+        super(client, state, mouseX, mouseY);
         this.area = new Rect2i(0, 0, 0, 0);
     }
 
@@ -62,9 +64,9 @@ public class InfoArea extends GuiGraphics
      * @param state  The GuiRenderState for rendering.
      * @param area   The rectangle representing the area of the information region.
      */
-    public InfoArea(Minecraft client, GuiRenderState state, Rect2i area)
+    public InfoArea(Minecraft client, GuiRenderState state, int mouseX, int mouseY, Rect2i area)
     {
-        super(client, state);
+        super(client, state, mouseX, mouseY);
         this.area = area;
     }
 

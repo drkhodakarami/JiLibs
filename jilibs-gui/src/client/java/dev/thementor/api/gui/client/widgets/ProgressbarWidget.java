@@ -23,7 +23,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.layouts.LayoutElement;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import dev.thementor.api.gui.client.constants.ProgressBarTextures;
 import dev.thementor.api.gui.client.enumerations.WidgetDirection;
@@ -31,6 +31,7 @@ import dev.thementor.api.gui.client.enumerations.WidgetOrientation;
 import dev.thementor.api.gui.client.records.TextureData;
 import dev.thementor.api.gui.client.utils.MenuHelper;
 import dev.thementor.api.shared.utils.BaseHelper;
+import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings("unused")
 public class ProgressbarWidget implements Renderable, LayoutElement
@@ -49,7 +50,7 @@ public class ProgressbarWidget implements Renderable, LayoutElement
     private final WidgetDirection direction;
     private final Supplier<Long> amountSupplier, capacitySupplier;
 
-    private final ResourceLocation backgroundTexture, indicatorTexture;
+    private final Identifier backgroundTexture, indicatorTexture;
 
     private final boolean drawBackground;
 
@@ -62,7 +63,7 @@ public class ProgressbarWidget implements Renderable, LayoutElement
                              int indicatorX, int indicatorY, int indicatorWidth, int indicatorHeight,
                              int indicatorU, int indicatorV,
                              int indicatorSizeWidth, int indicatorSizeHeight,
-                             ResourceLocation backgroundTexture, ResourceLocation indicatorTexture,
+                             Identifier backgroundTexture, Identifier indicatorTexture,
                              Supplier<Long> amountSupplier, Supplier<Long> capacitySupplier)
     {
         this.direction = direction;
@@ -94,9 +95,9 @@ public class ProgressbarWidget implements Renderable, LayoutElement
 
     @SuppressWarnings("DuplicatedCode")
     @Override
-    public void render(GuiGraphics context, int mouseX, int mouseY, float deltaTicks)
+    public void render(@NotNull GuiGraphics context, int mouseX, int mouseY, float deltaTicks)
     {
-        if(drawBackground && BaseHelper.validateResource(backgroundTexture))
+        if(drawBackground && BaseHelper.validateIdentifier(backgroundTexture))
             MenuHelper.drawTexture(context, backgroundTexture,
                                     x + backgroundX, y + backgroundY,
                                    backgroundU, backgroundV,
@@ -106,7 +107,7 @@ public class ProgressbarWidget implements Renderable, LayoutElement
         if(amountSupplier == null || capacitySupplier == null || amountSupplier.get() <= 0 || capacitySupplier.get() <= 0)
             return;
 
-        if(BaseHelper.validateResource(indicatorTexture))
+        if(BaseHelper.validateIdentifier(indicatorTexture))
         {
             long amount = amountSupplier.get();
             long capacity = capacitySupplier.get();
@@ -178,7 +179,7 @@ public class ProgressbarWidget implements Renderable, LayoutElement
     }
 
     @Override
-    public void visitWidgets(Consumer<AbstractWidget> consumer){}
+    public void visitWidgets(@NotNull Consumer<AbstractWidget> consumer){}
 
     @SuppressWarnings("unused")
     public static class Builder
@@ -197,7 +198,7 @@ public class ProgressbarWidget implements Renderable, LayoutElement
         private WidgetDirection direction;
         private Supplier<Long> amountSupplier, capacitySupplier;
 
-        private ResourceLocation backgroundTexture, indicatorTexture;
+        private Identifier backgroundTexture, indicatorTexture;
 
         private boolean drawBackground = false;
 
@@ -299,7 +300,7 @@ public class ProgressbarWidget implements Renderable, LayoutElement
             return this;
         }
 
-        public Builder backgroundTexture(ResourceLocation texture, int u, int v, int width, int height)
+        public Builder backgroundTexture(Identifier texture, int u, int v, int width, int height)
         {
             this.drawBackground = true;
             this.backgroundTexture = texture;
@@ -310,7 +311,7 @@ public class ProgressbarWidget implements Renderable, LayoutElement
             return this;
         }
 
-        public Builder indicatorTexture(ResourceLocation texture, int u, int v, int width, int height)
+        public Builder indicatorTexture(Identifier texture, int u, int v, int width, int height)
         {
             this.indicatorTexture = texture;
             this.indicatorU = u;

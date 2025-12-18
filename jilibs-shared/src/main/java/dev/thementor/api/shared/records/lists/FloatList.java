@@ -26,6 +26,7 @@ import net.minecraft.network.codec.StreamCodec;
 
 import dev.thementor.api.shared.records.FloatPayload;
 
+@SuppressWarnings("unused")
 public record FloatList(List<FloatPayload> values)
 {
     public static Codec<FloatList> CODEC = FloatPayload.LIST_CODEC.xmap(FloatList::new, FloatList::values);

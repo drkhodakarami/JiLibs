@@ -34,6 +34,7 @@ import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.flag.FeatureFlagSet;
+import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Block;
@@ -140,7 +141,7 @@ public class WoodSetDatagen
                                       .unlockedBy(BaseHelper.hasTag(ConventionalItemTags.WOODEN_CHESTS), generator.has(ConventionalItemTags.WOODEN_CHESTS))
                                       .save(exporter);
 
-            generator.generateRecipes(woodSet.createBlockFamily(), FeatureFlagSet.of());
+            generator.generateRecipes(woodSet.createBlockFamily(), FeatureFlagSet.of(FeatureFlags.VANILLA));
         }
     }
 

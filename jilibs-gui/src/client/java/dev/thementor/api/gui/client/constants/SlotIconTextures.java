@@ -16,11 +16,11 @@
 
 package dev.thementor.api.gui.client.constants;
 
-import net.minecraft.resources.ResourceLocation;
 
 import dev.thementor.api.gui.client.records.TextureData;
 import dev.thementor.api.shared.annotations.*;
 import dev.thementor.api.shared.utils.BaseHelper;
+import net.minecraft.resources.Identifier;
 
 @SuppressWarnings("unused")
 @Developer("The Mentor")
@@ -146,10 +146,10 @@ public class SlotIconTextures
                                 BaseHelper.id("jilibs_gui", "textures/gui/container/slot.png"));
         public static final TextureData EMPTY_HIGHLIGHT_BACK =
                 new TextureData(0, 0, 0, 0, 24, 24, 24, 24,
-                                ResourceLocation.withDefaultNamespace("textures/gui/sprites/container/slot_highlight_back.png"));
+                                Identifier.withDefaultNamespace("textures/gui/sprites/container/slot_highlight_back.png"));
         public static final TextureData EMPTY_HIGHLIGHT_FRONT =
                 new TextureData(0, 0, 0, 0, 24, 24, 24, 24,
-                                ResourceLocation.withDefaultNamespace("textures/gui/sprites/container/slot_highlight_front.png"));
+                                Identifier.withDefaultNamespace("textures/gui/sprites/container/slot_highlight_front.png"));
         public static final TextureData EMPTY_BIG =
                 new TextureData(0, 0, 0, 0, 26, 26, 32, 32,
                                 BaseHelper.id("jilibs_gui", "textures/gui/container/slot_large.png"));

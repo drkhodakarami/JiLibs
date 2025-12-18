@@ -30,6 +30,7 @@ import net.minecraft.world.phys.Vec3;
 /**
  * A blackboard used to store and retrieve data in a key-value format.
  */
+@SuppressWarnings("unused")
 public class Blackboard
 {
     /**

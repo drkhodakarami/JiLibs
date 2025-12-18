@@ -27,6 +27,7 @@ import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 
 import dev.thementor.api.energy.utils.EnergyHelper;
 
+@SuppressWarnings("unused")
 public interface IEnergySpreader<T extends EnergyStorage>
 {
     default long simulateInsertion(T storage, Transaction outer)

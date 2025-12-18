@@ -3,7 +3,7 @@ plugins {
     id "eclipse"
     id "maven-publish"
     id "fabric-loom" version "${loom_version}" apply false
-    id 'com.diffplug.spotless' version "8.0.0"
+    id 'com.diffplug.spotless' version "8.1.0"
 }
 
 import com.diffplug.spotless.LineEnding
@@ -64,11 +64,8 @@ def debugArgs = [
         "-Dmixin.debug.countInjections=true",
 ]
 
-
 import groovy.json.JsonSlurper
-import groovy.xml.XmlSlurper
-import net.fabricmc.loom.task.AbstractRemapJarTask
-import net.fabricmc.loom.task.ValidateMixinNameTask
+import org.apache.commons.codec.digest.DigestUtils
 import net.fabricmc.fabric.impl.build.CommitHashValueSource
 import net.fabricmc.fabric.impl.build.GitBranchValueSource
 import java.net.http.HttpClient
@@ -150,6 +147,7 @@ def moduleDependencies(project, List<String> depNames) {
         ]
     }
 
+    // As we manually handle the maven artifacts, we need to also manually specify the deps.
     project.publishing {
         publications {
             mavenJava(MavenPublication) {
@@ -174,7 +172,6 @@ allprojects {
     group = "dev.thementor.jilibs"
 
     apply plugin: "maven-publish"
-    apply plugin: "com.diffplug.spotless"
 
     tasks.withType(GenerateModuleMetadata).configureEach {
         enabled = false
@@ -189,10 +186,11 @@ allprojects {
     }
 
     apply plugin: "java-library"
-    apply plugin: "fabric-loom"
+    apply plugin: "net.fabricmc.fabric-loom"
+    apply plugin: "com.diffplug.spotless"
 
     tasks.withType(JavaCompile).configureEach {
-        it.options.release = 21
+        it.options.release = 25
     }
 
     java {
@@ -202,10 +200,6 @@ allprojects {
 
     loom {
         splitEnvironmentSourceSets()
-        mixin {
-            useLegacyMixinAp = false
-        }
-
         runtimeOnlyLog4j = true
     }
 
@@ -226,10 +220,8 @@ allprojects {
 
     dependencies {
         minecraft "com.mojang:minecraft:$rootProject.minecraft_version"
-        //mappings "net.fabricmc:yarn:${rootProject.minecraft_version}+${rootProject.yarn_version}:v2"
-        mappings loom.officialMojangMappings()
-        modApi "net.fabricmc:fabric-loader:${rootProject.loader_version}"
-        modImplementation "net.fabricmc.fabric-api:fabric-api:${rootProject.fabric_version}+${rootProject.minecraft_version}"
+        api "net.fabricmc:fabric-loader:${rootProject.loader_version}"
+        implementation "net.fabricmc.fabric-api:fabric-api:${rootProject.fabric_version}+${rootProject.minecraft_version.replaceAll('-snapshot.*', '')}"
     }
 
     tasks.withType(ProcessResources).configureEach {
@@ -251,6 +243,11 @@ allprojects {
         reproducibleFileOrder = true
     }
 
+    // Run this task after updating minecraft to regenerate any required resources
+    tasks.register('generateResources') {
+        group = "fabric"
+    }
+
     String archivesName = project.base.archivesName.get()
     [jar, sourcesJar].each {
         it.from(rootProject.file("LICENSE")) {
@@ -258,17 +255,13 @@ allprojects {
         }
     }
 
-    if (file("src/client").exists() && !file("src/main").exists()) {
-        tasks.named("remapJar", AbstractRemapJarTask) {
-            additionalClientOnlyEntries.add("LICENSE-${archivesName}".toString())
-        }
-
-        remapSourcesJar {
-            additionalClientOnlyEntries.add("LICENSE-${archivesName}".toString())
-        }
+    tasks.register('enigma', net.fabricmc.loom.task.tool.ModEnigmaTask) {
+        def clientOnly = file('src/client').exists() && !file('src/main').exists()
+        def dir = clientOnly ? file('src/client/resources') : file('src/main/resources')
+        mappingFile = new File(dir, project.name + '.mapping')
     }
 
-    tasks.register('validateMixinNames', ValidateMixinNameTask) {
+    tasks.register('validateMixinNames', net.fabricmc.loom.task.ValidateMixinNameTask) {
         source(sourceSets.main.output)
         source(sourceSets.client.output)
 
@@ -416,13 +409,10 @@ loom {
 
 javadoc {
     options {
-        source = "21"
+        source = "25"
         encoding = "UTF-8"
         charSet = "UTF-8"
         memberLevel = JavadocMemberLevel.PACKAGE
-        links(
-        //        "https://maven.fabricmc.net/docs/yarn-${rootProject.minecraft_version}+${project.yarn_version}/"
-        )
         // Disable the crazy super-strict doclint tool in Java 8
         addStringOption("Xdoclint:none", "-quiet")
 
@@ -482,16 +472,6 @@ tasks.named('jar').configure {
     finalizedBy(copyDocJars)
 }
 
-//======================================================================================== SETUP PRODUCTION MODS
-
-configurations {
-    productionMods {
-        transitive = false
-    }
-}
-
-def productionMods = project.files(configurations.productionMods, remapJar.archiveFile)
-
 //======================================================================================== POM MOD METADATA INFORMATION
 def addPomMetadataInformation(Project project, MavenPom pom) {
     def modJsonFile = project.file("src/main/resources/fabric.mod.json")
@@ -541,7 +521,7 @@ subprojects {
     dependencies {
         // Make all modules depend on the shared api
         if (project.name != "jilibs-shared") {
-        implementation project(path: ':jilibs-shared', configuration: 'namedElements')
+            implementation project(path: ':jilibs-shared', configuration: 'namedElements')
         }
     }
 
@@ -551,12 +531,12 @@ subprojects {
                 pom {
                     addPomMetadataInformation(project, pom)
                 }
-                artifact(remapJar) {
-                    builtBy(remapJar)
+                artifact(tasks.jar.archiveFile) {
+                    builtBy(tasks.jar)
                 }
 
-                artifact(remapSourcesJar) {
-                    builtBy remapSourcesJar
+                artifact(tasks.sourcesJar) {
+                    builtBy tasks.sourcesJar
                 }
             }
         }
@@ -612,12 +592,12 @@ logger.lifecycle("==============================================================
 publishing {
     publications {
         mavenJava(MavenPublication) {
-            artifact(remapJar) {
-                builtBy(remapJar)
+            artifact(tasks.jar.archiveFile) {
+                builtBy(tasks.jar)
             }
 
-            artifact(sourcesJar) {
-                builtBy remapSourcesJar
+            artifact(tasks.sourcesJar) {
+                builtBy tasks.sourcesJar
             }
 
             artifact javadocJar
@@ -641,9 +621,6 @@ publishing {
                         'scope': 'compile'
                 ])
             }
-
-            def thisGroup = group
-            def thisVersion = version
 
             pom.withXml {
                 def depsNode = asNode().appendNode("dependencies")
@@ -675,15 +652,6 @@ void setupRepositories(RepositoryHandler repositories, String repsyUrl, String r
             }
         }
     }
-}
-
-//======================================================================================== SETTING UP ORDER OF OPERATION FOR REMAP JAR
-subprojects.each {
-    if (metaProjects.contains(it.name)) {
-        return
-    }
-
-    remapJar.dependsOn("${it.path}:remapJar")
 }
 
 //======================================================================================== SETTING UP SUB PROJECT DEPENDENCY ON MAIN
@@ -719,9 +687,7 @@ dependencies {
     }
 }
 
-remapJar {
-    nestedJars.from configurations.nestedJars
-}
+loom.nestJars(tasks.named("jar"), configurations.nestedJars)
 
 //======================================================================================== FILE NAME SANITY CHECK
 // Attempt to create a single jar with all files from all nested jars, this will fail if there are duplicate files.
@@ -740,44 +706,12 @@ tasks.register("checkNoDuplicateFiles", Zip) {
 
 check.dependsOn "checkNoDuplicateFiles"
 
-//======================================================================================== PUBLISHING TO WEBSITES
-//publishMods {
-//    file = remapJar
-//    changelog = providers.environmentVariable("CHANGELOG").getOrElse("No changelog provided")
-//    type = project.prerelease == "true" ? BETA : STABLE
-//    displayName = "[${project.minecraft_version}] Ji Libs $project.version"
-//    modLoaders.add("fabric")
-//    dryRun = providers.environmentVariable("CURSEFORGE_API_KEY").getOrNull() == null
-//
-//    curseforge {
-//        accessToken = providers.environmentVariable("CURSEFORGE_API_KEY")
-//        projectId = "306612"
-//        minecraftVersions.add(project.curseforge_minecraft_version)
-//    }
-//    modrinth {
-//        accessToken = providers.environmentVariable("MODRINTH_TOKEN")
-//        projectId = "P7dR8mSH"
-//        minecraftVersions.add(project.minecraft_version)
-//    }
-//    github {
-//        accessToken = providers.environmentVariable("GITHUB_TOKEN")
-//        repository = providers.environmentVariable("GITHUB_REPOSITORY").getOrElse("FabricMC/dryrun")
-//        commitish = providers.environmentVariable("GITHUB_REF_NAME").getOrElse("dryrun")
-//    }
-//}
-//
-//assemble.dependsOn remapJar
-
-//======================================================================================== NOT USED
-
-//import java.util.stream.Collectors
-
 //======================================================================================== RELEASE VERSION SANITY CHECK
 // A task to ensure that the version being released has not already been released.
 tasks.register('checkVersion') {
     doFirst {
         def xml = new URL(repsyUrl + "/jilibs/maven-metadata.xml").text
-        def metadata = new XmlSlurper().parseText(xml)
+        def metadata = new groovy.xml.XmlSlurper().parseText(xml)
         def versions = metadata.versioning.versions.version*.text();
         if (versions.contains(version)) {
             throw new RuntimeException("${version} has already been released!")

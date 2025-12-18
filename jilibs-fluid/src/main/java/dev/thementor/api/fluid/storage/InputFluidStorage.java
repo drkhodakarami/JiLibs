@@ -21,6 +21,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.minecraft.world.level.material.Fluid;
 
+@SuppressWarnings("unused")
 public class InputFluidStorage extends SyncedFluidStorage
 {
     private final Fluid fluid;

@@ -33,6 +33,7 @@ import dev.thementor.api.ticklogic.node.*;
  *
  * @param <T> the type of block entity associated with this logic tree
  */
+@SuppressWarnings("unused")
 public class HandleResourceSubTree<T extends BlockEntity> extends LogicTree<T>
 {
     /**
@@ -68,16 +69,16 @@ public class HandleResourceSubTree<T extends BlockEntity> extends LogicTree<T>
      */
     private void initTree(boolean useResource, long adjustmentAmount, Supplier<Long> resourceAmountSupplier, Supplier<Long> resourceMaxAmountSupplier, Consumer<Long> adjustResourceConsumer)
     {
-        ConditionNode<T> shouldUseResource = new ConditionNode<T>(() -> useResource);
-        ConditionNode<T> shouldUseResourceNegated = new ConditionNode<T>(() -> useResource);
+        ConditionNode<T> shouldUseResource = new ConditionNode<>(() -> useResource);
+        ConditionNode<T> shouldUseResourceNegated = new ConditionNode<>(() -> useResource);
 
-        ConditionNode<T> hasResourceNode = new ConditionNode<T>(() -> resourceAmountSupplier != null &&
-                                                                                       ((adjustmentAmount >= 0 && resourceMaxAmountSupplier != null &&
-                                                                                            resourceAmountSupplier.get() + adjustmentAmount <= resourceMaxAmountSupplier.get()) ||
-                                                                                        (adjustmentAmount < 0 && resourceAmountSupplier.get() >= adjustmentAmount)));
+        ConditionNode<T> hasResourceNode = new ConditionNode<>(() -> resourceAmountSupplier != null &&
+                                                                     ((adjustmentAmount >= 0 && resourceMaxAmountSupplier != null &&
+                                                                       resourceAmountSupplier.get() + adjustmentAmount <= resourceMaxAmountSupplier.get()) ||
+                                                                      (adjustmentAmount < 0 && resourceAmountSupplier.get() >= adjustmentAmount)));
 
-        SequenceNode<T> resourceCheckSequence = new SequenceNode<T>();
-        NotNode<T> shouldUseResourceNot = new NotNode<T>();
+        SequenceNode<T> resourceCheckSequence = new SequenceNode<>();
+        NotNode<T> shouldUseResourceNot = new NotNode<>();
 
         ActionNode<T> reduceResourceAction = new ActionNode<>(() ->
         {

@@ -53,6 +53,7 @@ import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
+@SuppressWarnings("unused")
 public class BaseLeavesBlock extends Block implements SimpleWaterloggedBlock
 {
     public static MapCodec<? extends BaseLeavesBlock> CODEC;
@@ -94,7 +95,7 @@ public class BaseLeavesBlock extends Block implements SimpleWaterloggedBlock
     }
 
     @Override
-    protected @NotNull VoxelShape getBlockSupportShape(BlockState state, BlockGetter world, BlockPos pos)
+    protected @NotNull VoxelShape getBlockSupportShape(@NotNull BlockState state, @NotNull BlockGetter world, @NotNull BlockPos pos)
     {
         return Shapes.empty();
     }
@@ -106,7 +107,7 @@ public class BaseLeavesBlock extends Block implements SimpleWaterloggedBlock
     }
 
     @Override
-    protected void randomTick(BlockState state, ServerLevel world, BlockPos pos, RandomSource random)
+    protected void randomTick(@NotNull BlockState state, @NotNull ServerLevel world, @NotNull BlockPos pos, @NotNull RandomSource random)
     {
         if(this.shouldDecay(state))
         {
@@ -116,19 +117,19 @@ public class BaseLeavesBlock extends Block implements SimpleWaterloggedBlock
     }
 
     @Override
-    protected int getLightBlock(BlockState state)
+    protected int getLightBlock(@NotNull BlockState state)
     {
         return 1;
     }
 
     @Override
-    protected void tick(BlockState state, ServerLevel world, BlockPos pos, RandomSource random)
+    protected void tick(@NotNull BlockState state, ServerLevel world, @NotNull BlockPos pos, @NotNull RandomSource random)
     {
         world.setBlock(pos, updateDistanceFromLogs(state, world, pos), Block.UPDATE_ALL);
     }
 
     @Override
-    protected @NotNull BlockState updateShape(BlockState state, LevelReader world, ScheduledTickAccess tickView, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, RandomSource random)
+    protected @NotNull BlockState updateShape(BlockState state, @NotNull LevelReader world, @NotNull ScheduledTickAccess tickView, @NotNull BlockPos pos, @NotNull Direction direction, @NotNull BlockPos neighborPos, @NotNull BlockState neighborState, @NotNull RandomSource random)
     {
         if (state.getValue(WATERLOGGED))
             tickView.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(world));
@@ -141,7 +142,7 @@ public class BaseLeavesBlock extends Block implements SimpleWaterloggedBlock
     }
 
     @Override
-    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder)
+    protected void createBlockStateDefinition(StateDefinition.@NotNull Builder<Block, @NotNull BlockState> builder)
     {
         super.createBlockStateDefinition(builder);
         builder.add(DISTANCE, PERSISTENT, WATERLOGGED);
@@ -164,7 +165,7 @@ public class BaseLeavesBlock extends Block implements SimpleWaterloggedBlock
     }
 
     @Override
-    public void animateTick(BlockState state, Level world, BlockPos pos, RandomSource random)
+    public void animateTick(@NotNull BlockState state, Level world, BlockPos pos, @NotNull RandomSource random)
     {
         if (world.isRainingAt(pos.above()))
         {

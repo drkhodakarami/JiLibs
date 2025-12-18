@@ -30,6 +30,7 @@ import dev.thementor.api.ticklogic.base.Node;
  *
  * <p>Parallel nodes evaluate multiple child nodes concurrently and return a tick status based on a success threshold.</p>
  */
+@SuppressWarnings("unused")
 public class ParallelNode<T extends BlockEntity> extends Node<T> implements IRunningNodeManager
 {
     /**

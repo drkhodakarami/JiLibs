@@ -16,6 +16,7 @@
 
 package dev.thementor.api.inventory.base;
 
+import org.jetbrains.annotations.NotNull;
 import oshi.util.tuples.Pair;
 
 import net.minecraft.world.SimpleContainer;
@@ -33,7 +34,7 @@ import dev.thementor.api.shared.enumerations.MappedDirection;
 @Youtube("https://www.youtube.com/@TurtyWurty")
 public class InventoryConnectorCH<T extends SimpleContainer> extends InventoryConnector<T>
 {
-    public static InventoryConnectorCH<SimpleContainer> copyOf(InventoryConnector<?> inventory)
+    public static InventoryConnectorCH<@NotNull SimpleContainer> copyOf(InventoryConnector<?> inventory)
     {
         var storage = new InventoryConnectorCH<>();
         for(Pair<MappedDirection, ? extends SimpleContainer> entry : inventory.getSidedInventories())

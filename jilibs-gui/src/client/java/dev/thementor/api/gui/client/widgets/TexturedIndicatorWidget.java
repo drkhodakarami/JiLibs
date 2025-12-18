@@ -28,7 +28,7 @@ import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.layouts.LayoutElement;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import dev.thementor.api.gui.client.constants.DigitalIndicatorTextures;
 import dev.thementor.api.gui.client.enumerations.WidgetDirection;
@@ -39,6 +39,7 @@ import dev.thementor.api.shared.annotations.*;
 import dev.thementor.api.shared.client.utils.MouseHelper;
 import dev.thementor.api.shared.utils.BaseHelper;
 import dev.thementor.api.shared.utils.StringHelper;
+import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings("unused")
 @Developer("The Mentor")
@@ -61,7 +62,7 @@ public class TexturedIndicatorWidget implements Renderable, LayoutElement
 
     private final Supplier<Long> amountSupplier, capacitySupplier;
 
-    private final ResourceLocation backgroundTexture, indicatorTexture;
+    private final Identifier backgroundTexture, indicatorTexture;
 
     private final String suffix;
 
@@ -79,7 +80,7 @@ public class TexturedIndicatorWidget implements Renderable, LayoutElement
                                    int backgroundU, int backgroundV, int indicatorU, int indicatorV,
                                    int backgroundSizeWidth, int backgroundSizeHeight,
                                    int indicatorSizeWidth, int indicatorSizeHeight,
-                                   ResourceLocation backgroundTexture, ResourceLocation indicatorTexture,
+                                   Identifier backgroundTexture, Identifier indicatorTexture,
                                    Supplier<Long> amountSupplier, Supplier<Long> capacitySupplier)
     {
         this.suffix = suffix;
@@ -111,9 +112,9 @@ public class TexturedIndicatorWidget implements Renderable, LayoutElement
     }
 
     @Override
-    public void render(GuiGraphics context, int mouseX, int mouseY, float deltaTicks)
+    public void render(@NotNull GuiGraphics context, int mouseX, int mouseY, float deltaTicks)
     {
-        if(drawBackground && BaseHelper.validateResource(backgroundTexture))
+        if(drawBackground && BaseHelper.validateIdentifier(backgroundTexture))
             MenuHelper.drawTexture(context, backgroundTexture,
                                     x + backgroundX, y + backgroundY,
                                    backgroundU, backgroundV,
@@ -123,7 +124,7 @@ public class TexturedIndicatorWidget implements Renderable, LayoutElement
         if(amountSupplier == null || capacitySupplier == null || amountSupplier.get() <= 0 || capacitySupplier.get() <= 0)
             return;
 
-        if(BaseHelper.validateResource(indicatorTexture))
+        if(BaseHelper.validateIdentifier(indicatorTexture))
         {
             long amount = amountSupplier.get();
             long capacity = capacitySupplier.get();
@@ -198,7 +199,7 @@ public class TexturedIndicatorWidget implements Renderable, LayoutElement
     }
 
     @Override
-    public void visitWidgets(Consumer<AbstractWidget> consumer) {}
+    public void visitWidgets(@NotNull Consumer<AbstractWidget> consumer) {}
 
     protected  void drawTooltip(GuiGraphics context, int mouseX, int mouseY)
     {
@@ -237,7 +238,7 @@ public class TexturedIndicatorWidget implements Renderable, LayoutElement
         private Supplier<Long> amountSupplier = () -> null;
         private Supplier<Long> capacitySupplier = () -> null;
 
-        private ResourceLocation backgroundTexture, indicatorTexture;
+        private Identifier backgroundTexture, indicatorTexture;
 
         private String suffix = "";
 
@@ -335,7 +336,7 @@ public class TexturedIndicatorWidget implements Renderable, LayoutElement
             return this;
         }
 
-        public Builder backgroundTexture(ResourceLocation texture, int u, int v, int width, int height)
+        public Builder backgroundTexture(Identifier texture, int u, int v, int width, int height)
         {
             this.drawBackground = true;
             this.backgroundTexture = texture;
@@ -346,7 +347,7 @@ public class TexturedIndicatorWidget implements Renderable, LayoutElement
             return this;
         }
 
-        public Builder indicatorTexture(ResourceLocation texture, int u, int v, int width, int height)
+        public Builder indicatorTexture(Identifier texture, int u, int v, int width, int height)
         {
             this.indicatorTexture = texture;
             this.indicatorU = u;

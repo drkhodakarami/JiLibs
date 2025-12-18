@@ -16,9 +16,9 @@
 
 package dev.thementor.api.gui.client.records;
 
-import net.minecraft.resources.ResourceLocation;
 
 import dev.thementor.api.shared.annotations.*;
+import net.minecraft.resources.Identifier;
 
 @Developer("The Mentor")
 @CreatedAt("2025-04-18")
@@ -27,4 +27,4 @@ import dev.thementor.api.shared.annotations.*;
 @Discord("https://discord.gg/pmM4emCbuH")
 @Youtube("https://www.youtube.com/@TheMentorCodeLab")
 
-public record TextureData(int x, int y, int u, int v, int width, int height, int textureWidth, int textureHeight, ResourceLocation id){}
+public record TextureData(int x, int y, int u, int v, int width, int height, int textureWidth, int textureHeight, Identifier id){}

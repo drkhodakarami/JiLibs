@@ -46,6 +46,7 @@ import dev.thementor.api.shared.interfaces.IBEFactory;
 import dev.thementor.api.shared.interfaces.IBETickerFactory;
 import dev.thementor.api.shared.interfaces.IShapeFactory;
 import dev.thementor.api.shared.interfaces.ITick;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Represents properties and settings for a Minecraft block, including its behavior, render type, and state properties.
@@ -1025,7 +1026,7 @@ public class BlockProperties<T extends BlockEntity>
      * @param defaultValue the default value for the state property
      * @return the current instance of BlockProperties for method chaining
      */
-    public <U extends Comparable<U>> BlockProperties<T> addStateProperty(Property<U> property, U defaultValue)
+    public <U extends Comparable<U>> BlockProperties<T> addStateProperty(Property<@NotNull U> property, U defaultValue)
     {
         this.stateProperties.addProperty(new StateProperty<>(property, defaultValue));
         return this;

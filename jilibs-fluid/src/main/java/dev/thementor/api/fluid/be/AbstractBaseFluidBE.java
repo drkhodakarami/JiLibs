@@ -19,6 +19,7 @@ package dev.thementor.api.fluid.be;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.core.BlockPos;
@@ -54,7 +55,7 @@ public abstract class AbstractBaseFluidBE<T extends AbstractBaseFluidBE<T, B, C>
 {
     protected final FluidConnector<C> fluidConnector;
 
-    public AbstractBaseFluidBE(BlockEntityType<T> type, BlockPos pos, BlockState state)
+    public AbstractBaseFluidBE(BlockEntityType<@NotNull T> type, BlockPos pos, BlockState state)
     {
         super(type, pos, state);
         fluidConnector = new FluidConnector<>();
@@ -68,14 +69,14 @@ public abstract class AbstractBaseFluidBE<T extends AbstractBaseFluidBE<T, B, C>
     }
 
     @Override
-    protected void loadAdditional(ValueInput view)
+    protected void loadAdditional(@NotNull ValueInput view)
     {
         super.loadAdditional(view);
         fluidConnector.loadAdditional(view);
     }
 
     @Override
-    protected void saveAdditional(ValueOutput view)
+    protected void saveAdditional(@NotNull ValueOutput view)
     {
         super.saveAdditional(view);
         fluidConnector.saveAdditional(view);
@@ -116,7 +117,7 @@ public abstract class AbstractBaseFluidBE<T extends AbstractBaseFluidBE<T, B, C>
 
     //TODO: Explain this
     @Override
-    protected void applyImplicitComponents(DataComponentGetter dataComponentGetter)
+    protected void applyImplicitComponents(@NotNull DataComponentGetter dataComponentGetter)
     {
         super.applyImplicitComponents(dataComponentGetter);
 
@@ -150,7 +151,7 @@ public abstract class AbstractBaseFluidBE<T extends AbstractBaseFluidBE<T, B, C>
 
     //TODO: Explain this
     @Override
-    protected void collectImplicitComponents(DataComponentMap.Builder builder)
+    protected void collectImplicitComponents(DataComponentMap.@NotNull Builder builder)
     {
         super.collectImplicitComponents(builder);
 

@@ -55,10 +55,10 @@ public abstract class AbstractBaseBE<T extends AbstractBaseBE<T>> extends BlockE
     protected int ticks;
     protected int clientTicks;
 
-    protected BEProperties<T> properties;
+    protected BEProperties<@NotNull T> properties;
 
     @SuppressWarnings("unchecked")
-    public AbstractBaseBE(BlockEntityType<T> type, BlockPos pos, BlockState state)
+    public AbstractBaseBE(BlockEntityType<@NotNull T> type, BlockPos pos, BlockState state)
     {
         super(type, pos, state);
         properties = new BEProperties<>((T)this);
@@ -91,13 +91,13 @@ public abstract class AbstractBaseBE<T extends AbstractBaseBE<T>> extends BlockE
     }
 
     @Override
-    public @Nullable Packet<ClientGamePacketListener> getUpdatePacket()
+    public @Nullable Packet<@NotNull ClientGamePacketListener> getUpdatePacket()
     {
         return ClientboundBlockEntityDataPacket.create(this);
     }
 
     @Override
-    public @NotNull CompoundTag getUpdateTag(HolderLookup.Provider registries)
+    public @NotNull CompoundTag getUpdateTag(HolderLookup.@NotNull Provider registries)
     {
         CompoundTag nbt = super.getUpdateTag(registries);
         Logger logger = LogUtils.getLogger();
@@ -138,6 +138,7 @@ public abstract class AbstractBaseBE<T extends AbstractBaseBE<T>> extends BlockE
         return this.properties.isSynced();
     }
 
+    @SuppressWarnings("DataFlowIssue")
     protected void registerDefaultFields()
     {
         this.properties.fields().addField("isDirty", this.isDirty, blockEntity -> blockEntity.isDirty, ((blockEntity, value) -> blockEntity.isDirty = value));
@@ -145,7 +146,8 @@ public abstract class AbstractBaseBE<T extends AbstractBaseBE<T>> extends BlockE
         this.properties.fields().addField("ticks", this.ticks, blockEntity -> blockEntity.ticks, ((blockEntity, value) -> blockEntity.ticks = value));
         this.properties.fields().addField("ticksClient", this.clientTicks, blockEntity -> blockEntity.clientTicks, ((blockEntity, value) -> blockEntity.clientTicks = value));
 
-        this.properties.fields().addField("world", this.level, AbstractBaseBE::getLevel, null);
+        if(this.level != null)
+            this.properties.fields().addField("world", this.level, AbstractBaseBE::getLevel, null);
         this.properties.fields().addField("pos", this.worldPosition, AbstractBaseBE::getBlockPos, null);
         this.properties.fields().addField("cachedState", getBlockState(), AbstractBaseBE::getBlockState, null);
     }

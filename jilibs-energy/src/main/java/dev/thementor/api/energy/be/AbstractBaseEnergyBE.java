@@ -18,6 +18,7 @@ package dev.thementor.api.energy.be;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import team.reborn.energy.api.EnergyStorage;
 import team.reborn.energy.api.base.SimpleEnergyStorage;
@@ -44,14 +45,14 @@ import dev.thementor.api.shared.records.LongPayload;
 import dev.thementor.api.shared.records.lists.LongList;
 import dev.thementor.api.shared.utils.DirectionHelper;
 
-@SuppressWarnings("UnusedReturnValue")
+@SuppressWarnings({"UnusedReturnValue", "unused"})
 public abstract class AbstractBaseEnergyBE<T extends AbstractBaseEnergyBE<T, B, C>, B extends SimpleContainer, C extends EnergyStorage>
         extends AbstractBaseInventoryBE<T, B>
         implements IEnergyStorageProvider<C>, IEnergyConnector<C>, IEnergySpreader<C>
 {
     protected final EnergyConnector<C> energyConnector;
 
-    public AbstractBaseEnergyBE(BlockEntityType<T> type, BlockPos pos, BlockState state)
+    public AbstractBaseEnergyBE(BlockEntityType<@NotNull T> type, BlockPos pos, BlockState state)
     {
         super(type, pos, state);
         energyConnector = new EnergyConnector<>();
@@ -65,14 +66,14 @@ public abstract class AbstractBaseEnergyBE<T extends AbstractBaseEnergyBE<T, B, 
     }
 
     @Override
-    protected void loadAdditional(ValueInput view)
+    protected void loadAdditional(@NotNull ValueInput view)
     {
         super.loadAdditional(view);
         energyConnector.loadAdditional(view);
     }
 
     @Override
-    protected void saveAdditional(ValueOutput view)
+    protected void saveAdditional(@NotNull ValueOutput view)
     {
         super.saveAdditional(view);
         energyConnector.saveAdditional(view);
@@ -115,7 +116,7 @@ public abstract class AbstractBaseEnergyBE<T extends AbstractBaseEnergyBE<T, B, 
 
     //TODO: Explain this
     @Override
-    protected void applyImplicitComponents(DataComponentGetter dataComponentGetter)
+    protected void applyImplicitComponents(@NotNull DataComponentGetter dataComponentGetter)
     {
         super.applyImplicitComponents(dataComponentGetter);
 
@@ -147,7 +148,7 @@ public abstract class AbstractBaseEnergyBE<T extends AbstractBaseEnergyBE<T, B, 
 
     //TODO: Explain this
     @Override
-    protected void collectImplicitComponents(DataComponentMap.Builder builder)
+    protected void collectImplicitComponents(DataComponentMap.@NotNull Builder builder)
     {
         super.collectImplicitComponents(builder);
 

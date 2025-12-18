@@ -31,6 +31,7 @@ import dev.thementor.api.shared.data.CachedBlockEntity;
 import dev.thementor.api.shared.interfaces.IStorageConnector;
 import dev.thementor.api.shared.interfaces.IStorageProvider;
 import dev.thementor.api.shared.records.BlockPosPayload;
+import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings({"unused", "unchecked", "DataFlowIssue"})
 @Developer("The Mentor")
@@ -39,7 +40,7 @@ import dev.thementor.api.shared.records.BlockPosPayload;
 @Discord("https://discord.gg/pmM4emCbuH")
 @Youtube("https://www.youtube.com/@TheMentorCodeLab")
 
-public abstract class AbstractBaseInventoryCH<T extends BlockEntity & IStorageProvider<InventoryStorage> & IStorageConnector<InventoryConnector<?>>> extends AbstractBaseCH<T>
+public abstract class AbstractBaseInventoryCH<T extends BlockEntity & IStorageProvider<InventoryStorage> & IStorageConnector<InventoryConnector<?>>> extends AbstractBaseCH<@NotNull T>
 {
     protected final InventoryConnector<?> inventory;
 
@@ -53,7 +54,7 @@ public abstract class AbstractBaseInventoryCH<T extends BlockEntity & IStoragePr
         this(type, syncID, playerInventory, payload, new CachedBlockEntity<>(blockEntityClass));
     }
 
-    public AbstractBaseInventoryCH(MenuType<?> type, int syncID, Inventory playerInventory, BlockPosPayload payload, CachedBlockEntity<T> cachedBE)
+    public AbstractBaseInventoryCH(MenuType<?> type, int syncID, Inventory playerInventory, BlockPosPayload payload, CachedBlockEntity<@NotNull T> cachedBE)
     {
         this(type, syncID, playerInventory,
              InventoryConnectorCH.copyOf(cachedBE.apply(playerInventory, payload.pos()).getConnector()),
@@ -70,7 +71,7 @@ public abstract class AbstractBaseInventoryCH<T extends BlockEntity & IStoragePr
     }
 
     @Override
-    public void removed(Player player)
+    public void removed(@NotNull Player player)
     {
         super.removed(player);
         this.inventory.removed(player);

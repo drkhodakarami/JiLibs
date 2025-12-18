@@ -30,6 +30,7 @@ import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerType;
 
 import dev.thementor.api.shared.annotations.*;
 import dev.thementor.api.shared.utils.BaseHelper;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Registers custom screens and screen handlers for Minecraft.
@@ -68,8 +69,8 @@ public class ScreenRegisterer
      * @param codec           the packet codec for the custom payload
      * @return the registered extended screen handler type
      */
-    public <R extends AbstractContainerMenu, D extends CustomPacketPayload> ExtendedScreenHandlerType<R, D>
-            register(String name, ExtendedScreenHandlerType.ExtendedFactory<R, D> factory,
+    public <R extends AbstractContainerMenu, D extends CustomPacketPayload> ExtendedScreenHandlerType<@NotNull R, D>
+            register(String name, ExtendedScreenHandlerType.ExtendedFactory<@NotNull R, D> factory,
                      StreamCodec<? super RegistryFriendlyByteBuf, D> codec)
     {
         ResourceKey<MenuType<?>> key = BaseHelper.resourceKey(this.modId, name, Registries.MENU);

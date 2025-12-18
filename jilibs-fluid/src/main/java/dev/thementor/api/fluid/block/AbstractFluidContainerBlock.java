@@ -29,7 +29,6 @@ import net.minecraft.world.phys.BlockHitResult;
 
 import dev.thementor.api.base.block.AbstractBaseBlock;
 import dev.thementor.api.fluid.utils.FluidHelper;
-import dev.thementor.api.shared.interfaces.IWrench;
 import dev.thementor.api.shared.properties.BlockProperties;
 
 @SuppressWarnings("unused")
@@ -41,7 +40,7 @@ public class AbstractFluidContainerBlock extends AbstractBaseBlock
     }
 
     @Override
-    protected @NotNull InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit)
+    protected @NotNull InteractionResult useItemOn(ItemStack stack, @NotNull BlockState state, @NotNull Level level, @NotNull BlockPos pos, @NotNull Player player, @NotNull InteractionHand hand, @NotNull BlockHitResult hit)
     {
         if(FluidHelper.interactWithBlock(level, pos, player, hand))
             return InteractionResult.SUCCESS;

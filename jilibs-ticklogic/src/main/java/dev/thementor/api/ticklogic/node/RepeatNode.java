@@ -27,6 +27,7 @@ import dev.thementor.api.ticklogic.base.Node;
  *
  * <p>Repeat nodes execute their child node multiple times, specified by the repeat count.</p>
  */
+@SuppressWarnings("unused")
 public class RepeatNode<T extends BlockEntity> extends Node<T> implements IRunningNodeManager
 {
     /**

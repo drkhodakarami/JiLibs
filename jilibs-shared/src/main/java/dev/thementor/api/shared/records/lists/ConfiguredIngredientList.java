@@ -26,6 +26,7 @@ import net.minecraft.network.codec.StreamCodec;
 
 import dev.thementor.api.shared.records.ConfiguredIngredient;
 
+@SuppressWarnings("unused")
 public record ConfiguredIngredientList(List<ConfiguredIngredient> values)
 {
     public static Codec<ConfiguredIngredientList> CODEC = ConfiguredIngredient.LIST_CODEC.xmap(ConfiguredIngredientList::new, ConfiguredIngredientList::values);

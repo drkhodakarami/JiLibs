@@ -16,6 +16,7 @@
 
 package dev.thementor.api.shared.enumerations;
 
+@SuppressWarnings("unused")
 public enum ActiveMode
 {
     ACTIVE(true), INACTIVE(false);

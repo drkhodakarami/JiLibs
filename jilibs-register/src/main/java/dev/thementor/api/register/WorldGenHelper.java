@@ -33,6 +33,7 @@ import net.minecraft.world.level.levelgen.placement.RarityFilter;
 
 import dev.thementor.api.shared.annotations.*;
 import dev.thementor.api.shared.exceptions.Exceptions;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Provides utility methods for registering world generation features and placed features.
@@ -94,9 +95,9 @@ public class WorldGenHelper
      * @param feature       the feature to configure
      * @param configuration the configuration for the feature
      */
-    public static <FC extends FeatureConfiguration, F extends Feature<FC>> void registerConfiguredFeature(BootstrapContext<ConfiguredFeature<?, ?>> context,
-                                                                                                   ResourceKey<ConfiguredFeature<?, ?>> key,
-                                                                                                   F feature, FC configuration)
+    public static <FC extends FeatureConfiguration, F extends Feature<@NotNull FC>> void registerConfiguredFeature(BootstrapContext<ConfiguredFeature<?, ?>> context,
+                                                                                                                   ResourceKey<ConfiguredFeature<?, ?>> key,
+                                                                                                                   F feature, FC configuration)
     {
         context.register(key, new ConfiguredFeature<>(feature, configuration));
     }

@@ -27,6 +27,7 @@ import dev.thementor.api.ticklogic.base.Node;
  *
  * <p>Selector nodes evaluate its child nodes sequentially and returns the first success or running status encountered.</p>
  */
+@SuppressWarnings("unused")
 public class SelectorNode<T extends BlockEntity> extends Node<T> implements IRunningNodeManager
 {
     /**

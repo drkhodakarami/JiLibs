@@ -27,7 +27,7 @@ import dev.thementor.api.shared.interfaces.ITickLogic;
  *
  * @param <T> the type of BlockEntity being managed
  */
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "UnusedReturnValue"})
 @Developer("TurtyWurty")
 @ModifiedBy("TheMentor")
 @CreatedAt("2025-04-18")

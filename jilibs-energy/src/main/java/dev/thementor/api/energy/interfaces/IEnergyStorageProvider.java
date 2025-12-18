@@ -22,6 +22,7 @@ import net.minecraft.core.Direction;
 
 import dev.thementor.api.shared.enumerations.MappedDirection;
 
+@SuppressWarnings("unused")
 public interface IEnergyStorageProvider<T>
 {
     /**

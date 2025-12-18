@@ -17,6 +17,7 @@
 package dev.thementor.api.gui.screen;
 
 import java.util.List;
+import java.util.Objects;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -65,7 +66,7 @@ public abstract class AbstractBaseCH<T extends BlockEntity> extends AbstractCont
     @SuppressWarnings("unchecked")
     public AbstractBaseCH(MenuType<?> type, int syncId, Inventory playerInventory, BlockPosPayload payload)
     {
-        this(type, syncId, playerInventory, (T) playerInventory.player.level().getBlockEntity(payload.pos()));
+        this(type, syncId, playerInventory, (T) Objects.requireNonNull(playerInventory.player.level().getBlockEntity(payload.pos())));
     }
 
     public AbstractBaseCH(MenuType<?> type, int syncId, Inventory playerInventory, T blockEntity)
@@ -83,7 +84,7 @@ public abstract class AbstractBaseCH<T extends BlockEntity> extends AbstractCont
     }
 
     @Override
-    public @NotNull ItemStack quickMoveStack(Player player, int slotIndex)
+    public @NotNull ItemStack quickMoveStack(@NotNull Player player, int slotIndex)
     {
         ItemStack newStack = ItemStack.EMPTY;
         Slot slot = this.slots.get(slotIndex);
@@ -113,7 +114,7 @@ public abstract class AbstractBaseCH<T extends BlockEntity> extends AbstractCont
     }
 
     @Override
-    public boolean stillValid(Player player)
+    public boolean stillValid(@NotNull Player player)
     {
         boolean validBlock = false;
         for (Block block : getValidBlocks())

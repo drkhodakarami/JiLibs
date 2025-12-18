@@ -68,7 +68,7 @@ public class InventoryConnector<T extends SimpleContainer> extends StorageConnec
     private final List<T> inventories = new ArrayList<>();
     private final List<Pair<MappedDirection, T>> sidedInventories = new ArrayList<>();
 
-    private final CombinedStorage<ItemVariant, InventoryStorage> combinedStorage = new CombinedStorage<>(this.storages);
+    private final CombinedStorage<ItemVariant, @NotNull InventoryStorage> combinedStorage = new CombinedStorage<>(this.storages);
 
     //region ADD INVENTORY
     public void addStorage(@NotNull T inventory) {
@@ -215,7 +215,7 @@ public class InventoryConnector<T extends SimpleContainer> extends StorageConnec
         return inventories;
     }
 
-    public CombinedStorage<ItemVariant, InventoryStorage> getCombinedStorage()
+    public CombinedStorage<ItemVariant, @NotNull InventoryStorage> getCombinedStorage()
     {
         return combinedStorage;
     }

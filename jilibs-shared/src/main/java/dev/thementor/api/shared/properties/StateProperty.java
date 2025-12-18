@@ -19,6 +19,7 @@ package dev.thementor.api.shared.properties;
 import net.minecraft.world.level.block.state.properties.Property;
 
 import dev.thementor.api.shared.annotations.*;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Represents a state property of a block, including its delegate Property and default value.
@@ -37,7 +38,7 @@ public class StateProperty<T extends Comparable<T>>
     /**
      * The delegate Property of the state property.
      */
-    private final Property<T> delegate;
+    private final Property<@NotNull T> delegate;
 
     /**
      * The default value for the state property.
@@ -50,7 +51,7 @@ public class StateProperty<T extends Comparable<T>>
      * @param delegate  the delegate Property
      * @param defaultValue the default value for the state property
      */
-    public StateProperty(Property<T> delegate, T defaultValue)
+    public StateProperty(Property<@NotNull T> delegate, T defaultValue)
     {
         this.delegate = delegate;
         this.defaultValue = defaultValue;
@@ -61,7 +62,7 @@ public class StateProperty<T extends Comparable<T>>
      *
      * @return the delegate Property
      */
-    public Property<T> delegate()
+    public Property<@NotNull T> delegate()
     {
         return this.delegate;
     }

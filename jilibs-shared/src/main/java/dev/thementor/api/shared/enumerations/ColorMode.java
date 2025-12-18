@@ -19,6 +19,7 @@ package dev.thementor.api.shared.enumerations;
 /**
  * Enum representing different color modification modes.
  */
+@SuppressWarnings("unused")
 public enum ColorMode
 {
     /**

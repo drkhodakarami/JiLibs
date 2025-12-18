@@ -34,6 +34,7 @@ import dev.thementor.api.ticklogic.node.StartNode;
  *
  * @param <T> the type of block entity associated with this logic tree
  */
+@SuppressWarnings("unused")
 public class HasResourceSubTree<T extends BlockEntity> extends LogicTree<T>
 {
     /**
@@ -61,11 +62,11 @@ public class HasResourceSubTree<T extends BlockEntity> extends LogicTree<T>
      */
     private void initTree(boolean useResource, Supplier<Long> resourceAmountSupplier)
     {
-        ConditionNode<T> shouldUseResource = new ConditionNode<T>(() -> useResource);
-        ConditionNode<T> shouldUseResourceNegated = new ConditionNode<T>(() -> useResource);
-        ConditionNode<T> hasResourceNode = new ConditionNode<T>(() -> resourceAmountSupplier != null && resourceAmountSupplier.get() > 0);
-        SequenceNode<T> resourceCheckSequence = new SequenceNode<T>();
-        NotNode<T> shouldUseResourceNot = new NotNode<T>();
+        ConditionNode<T> shouldUseResource = new ConditionNode<>(() -> useResource);
+        ConditionNode<T> shouldUseResourceNegated = new ConditionNode<>(() -> useResource);
+        ConditionNode<T> hasResourceNode = new ConditionNode<>(() -> resourceAmountSupplier != null && resourceAmountSupplier.get() > 0);
+        SequenceNode<T> resourceCheckSequence = new SequenceNode<>();
+        NotNode<T> shouldUseResourceNot = new NotNode<>();
         SequenceNode<T> root = new SequenceNode<>();
 
         resourceCheckSequence.addChild(shouldUseResource);

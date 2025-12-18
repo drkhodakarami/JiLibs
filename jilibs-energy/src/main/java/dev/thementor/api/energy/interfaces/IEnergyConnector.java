@@ -20,6 +20,7 @@ import team.reborn.energy.api.EnergyStorage;
 
 import dev.thementor.api.energy.base.EnergyConnector;
 
+@SuppressWarnings("unused")
 public interface IEnergyConnector<T extends EnergyStorage>
 {
     EnergyConnector<T> getEnergyConnector();

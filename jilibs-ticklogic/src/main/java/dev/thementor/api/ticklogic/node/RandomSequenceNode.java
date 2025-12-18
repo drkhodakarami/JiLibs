@@ -32,6 +32,7 @@ import dev.thementor.api.ticklogic.base.Node;
  *
  * <p>Random sequence nodes execute their child nodes randomly, but ensure that each child is executed only once before moving on to the next.</p>
  */
+@SuppressWarnings("unused")
 public class RandomSequenceNode<T extends BlockEntity> extends Node<T> implements IRunningNodeManager
 {
     /**

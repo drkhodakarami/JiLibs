@@ -26,6 +26,7 @@ import net.minecraft.network.codec.StreamCodec;
 
 import dev.thementor.api.shared.records.OutputItemStackPayload;
 
+@SuppressWarnings("unused")
 public record OutputItemStackList(List<OutputItemStackPayload> values)
 {
     public static Codec<OutputItemStackList> CODEC = OutputItemStackPayload.LIST_CODEC.xmap(OutputItemStackList::new, OutputItemStackList::values);

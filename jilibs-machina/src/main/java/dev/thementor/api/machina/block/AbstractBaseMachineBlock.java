@@ -21,6 +21,7 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import dev.thementor.api.fluid.block.AbstractFluidContainerBlock;
 import dev.thementor.api.shared.properties.BlockProperties;
 
+@SuppressWarnings("unused")
 public class AbstractBaseMachineBlock extends AbstractFluidContainerBlock
 {
     public AbstractBaseMachineBlock(Properties properties, BlockProperties<?> blockProperty)

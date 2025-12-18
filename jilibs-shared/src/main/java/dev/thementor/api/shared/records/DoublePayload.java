@@ -20,13 +20,13 @@ import java.util.List;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
 
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
 
 import dev.thementor.api.shared.annotations.*;
 
@@ -47,7 +47,7 @@ public record DoublePayload(double value) implements CustomPacketPayload
     /**
      * The unique identifier for this custom payload.
      */
-    public static final Type<DoublePayload> ID = new Type<>(ResourceLocation.fromNamespaceAndPath("jilibs_shared", "double_payload"));
+    public static final Type<@NotNull DoublePayload> ID = new Type<>(Identifier.fromNamespaceAndPath("jilibs_shared", "double_payload"));
 
     /**
      * The codec used to serialize and deserialize the DoublePayload.
@@ -70,7 +70,7 @@ public record DoublePayload(double value) implements CustomPacketPayload
      * @return the unique identifier
      */
     @Override
-    public @NotNull Type<? extends CustomPacketPayload> type()
+    public @NotNull Type<? extends @NotNull CustomPacketPayload> type()
     {
         return ID;
     }

@@ -22,6 +22,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
 import dev.thementor.api.shared.annotations.*;
+import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings("unused")
 @Developer("TurtyWurty")
@@ -48,7 +49,7 @@ public class PredicateInventory extends SyncedInventory
     }
 
     @Override
-    public boolean canPlaceItem(int slotIndex, ItemStack stack)
+    public boolean canPlaceItem(int slotIndex, @NotNull ItemStack stack)
     {
         return this.predicate.test(stack, slotIndex);
     }
@@ -58,5 +59,5 @@ public class PredicateInventory extends SyncedInventory
         return this.predicate;
     }
 
-    //TODO: Check if we need the fluid and slurry code
+    //TODO: Check if we need the fluid, suspension and emulsion code here or not!
 }

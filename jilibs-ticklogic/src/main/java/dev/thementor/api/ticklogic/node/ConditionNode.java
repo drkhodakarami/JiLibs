@@ -28,6 +28,7 @@ import dev.thementor.api.ticklogic.base.Node;
  *
  * <p>Condition nodes evaluate a specified condition and return a tick status.</p>
  */
+@SuppressWarnings("unused")
 public class ConditionNode<T extends BlockEntity> extends Node<T>
 {
     /**

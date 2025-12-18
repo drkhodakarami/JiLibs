@@ -26,6 +26,7 @@ import net.minecraft.network.codec.StreamCodec;
 
 import dev.thementor.api.shared.records.CoordinateDataPayload;
 
+@SuppressWarnings("unused")
 public record CoordinateDataList(List<CoordinateDataPayload> values)
 {
     public static Codec<CoordinateDataList> CODEC = CoordinateDataPayload.LIST_CODEC.xmap(CoordinateDataList::new, CoordinateDataList::values);

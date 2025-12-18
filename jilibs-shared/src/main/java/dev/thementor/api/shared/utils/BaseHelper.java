@@ -21,6 +21,9 @@ import java.util.List;
 import java.util.Objects;
 
 import com.google.common.collect.ImmutableList;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.entity.npc.villager.VillagerProfession;
+import net.minecraft.world.entity.npc.villager.VillagerType;
 import org.jetbrains.annotations.NotNull;
 
 import net.minecraft.advancements.CriterionTrigger;
@@ -28,14 +31,11 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.valueproviders.FloatProviderType;
 import net.minecraft.util.valueproviders.IntProviderType;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.Attribute;
-import net.minecraft.world.entity.npc.VillagerProfession;
-import net.minecraft.world.entity.npc.VillagerType;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
@@ -83,9 +83,9 @@ public class BaseHelper
      * @param path  The path for the identifier.
      * @return The created Identifier.
      */
-    public static ResourceLocation id(String modID, @NotNull String path)
+    public static Identifier id(String modID, @NotNull String path)
     {
-        return ResourceLocation.fromNamespaceAndPath(modID, path);
+        return Identifier.fromNamespaceAndPath(modID, path);
     }
 
     /**
@@ -115,7 +115,7 @@ public class BaseHelper
      */
     public static @NotNull String hasTag(@NotNull TagKey<Item> tag)
     {
-        return "has_" + tag.location().toString();
+        return "has_" + tag.location();
     }
 
     /**
@@ -201,7 +201,7 @@ public class BaseHelper
      * @param identifier The custom stat identifier to get the registry name for.
      * @return The registry name of the custom stat.
      */
-    public static String registryName(ResourceLocation identifier)
+    public static String registryName(Identifier identifier)
     {
         return Objects.requireNonNull(BuiltInRegistries.CUSTOM_STAT.getKey(identifier)).getPath();
     }
@@ -436,9 +436,9 @@ public class BaseHelper
      * @param level The level to get the dimension identifier for.
      * @return The dimension identifier.
      */
-    public static ResourceLocation dimensionId(Level level)
+    public static Identifier dimensionId(Level level)
     {
-        return level.dimension().location();
+        return level.dimension().identifier();
     }
 
     /**
@@ -474,8 +474,8 @@ public class BaseHelper
         return dimensionName.substring(dimensionName.indexOf(':') + 1).replace('_', ' ');
     }
 
-    public static boolean validateResource(ResourceLocation id)
+    public static boolean validateIdentifier(Identifier id)
     {
-        return ResourceLocation.isValidNamespace(id.getNamespace()) && ResourceLocation.isValidPath(id.getPath());
+        return Identifier.isValidNamespace(id.getNamespace()) && Identifier.isValidPath(id.getPath());
     }
 }

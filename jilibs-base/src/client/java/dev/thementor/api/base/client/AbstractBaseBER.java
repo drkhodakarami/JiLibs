@@ -55,6 +55,7 @@ import net.minecraft.world.phys.Vec3;
  * @param <T>
  * @param <U>
  */
+@SuppressWarnings("unused")
 public abstract class AbstractBaseBER<T extends BlockEntity, U extends BaseBERS> implements BlockEntityRenderer<T, U>
 {
     private final ItemModelResolver itemModelManager;
@@ -78,7 +79,7 @@ public abstract class AbstractBaseBER<T extends BlockEntity, U extends BaseBERS>
     }
 
     @Override
-    public void extractRenderState(T blockEntity, U state, float tickProgress, Vec3 cameraPos, @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay)
+    public void extractRenderState(T blockEntity, U state, float tickProgress, @NotNull Vec3 cameraPos, @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay)
     {
         BlockEntityRenderer.super.extractRenderState(blockEntity, state, tickProgress, cameraPos, crumblingOverlay);
 
@@ -90,7 +91,7 @@ public abstract class AbstractBaseBER<T extends BlockEntity, U extends BaseBERS>
     }
 
     @Override
-    public void submit(U state, PoseStack matrices, SubmitNodeCollector queue, CameraRenderState cameraState)
+    public void submit(U state, @NotNull PoseStack matrices, @NotNull SubmitNodeCollector queue, @NotNull CameraRenderState cameraState)
     {
         if (shouldRenderItem())
             renderItemStack(matrices, queue, state.itemRenderState, cameraState);

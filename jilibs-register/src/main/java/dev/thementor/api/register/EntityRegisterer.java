@@ -19,8 +19,8 @@ package dev.thementor.api.register;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
@@ -101,7 +101,7 @@ public class EntityRegisterer
      */
     public <R extends Entity> EntityType<R> register(String name, EntityType.Builder<R> type)
     {
-        ResourceLocation id = BaseHelper.id(this.modId, name);
+        Identifier id = BaseHelper.id(this.modId, name);
         return Registry.register(BuiltInRegistries.ENTITY_TYPE, id, type.build(ResourceKey.create(Registries.ENTITY_TYPE, id)));
     }
 }

@@ -19,42 +19,33 @@ package dev.thementor.api.shared.exceptions;
 import dev.thementor.api.shared.annotations.*;
 
 /**
- * Contains custom exceptions for the Jibase project.
+ * This exception class is used to prevent instantiation of the {@link ArgumentException} class.
+ * <p>
+ * The purpose of this exception is to ensure that the {@link ArgumentException} class should not be instantiated, which can lead to unexpected behavior or security issues if it were allowed.
+ * </p>
+ *
+ * @author Alireza Khodakarami (TheMentor)
+ * @version 1.0
+ * @since 2025-04-18
  */
-@SuppressWarnings("unused")
 @Developer("TheMentor")
 @CreatedAt("2025-04-18")
 @Repository("https://github.com/drkhodakarami/")
 @Discord("https://discord.gg/pmM4emCbuH")
 @Youtube("https://www.youtube.com/@TheMentorCodeLab")
 
-public class Exceptions
+public class ArgumentException extends java.lang.RuntimeException
 {
     /**
-     * Private constructor to prevent instantiation.
+     * The default message thrown by the {@link ArgumentException}.
      */
-    public Exceptions()
-    {
-        throwCtorAssertion();
-    }
+    public static String ARGUMENT_ERROR_TEXT = "Argument not acceptable!";
 
     /**
-     * Throws an assertion error if the constructor is invoked directly.
-     *
-     * @throws InitCtorException always, as this method is a singleton and should not be instantiated
+     * Constructor that throws the {@link ArgumentException} with a default message.
      */
-    public static void throwCtorAssertion()
+    public ArgumentException()
     {
-        throw new InitCtorException();
-    }
-
-    public static void throwRuntimeException()
-    {
-        throw new RuntimeExeException();
-    }
-
-    public static void throwArgumentException()
-    {
-        throw new ArgumentException();
+        super(ARGUMENT_ERROR_TEXT);
     }
 }

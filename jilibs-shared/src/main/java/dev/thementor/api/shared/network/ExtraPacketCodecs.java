@@ -43,6 +43,7 @@ import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.util.valueproviders.WeightedListInt;
 
 import dev.thementor.api.shared.annotations.*;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Provides packet codecs for various integer and float providers used in the game.
@@ -79,7 +80,7 @@ public class ExtraPacketCodecs
      * @param providerType the integer provider type
      * @param codec        the packet codec to register
      */
-    public static <T extends IntProvider> void registerIntProvider(IntProviderType<T> providerType, StreamCodec<RegistryFriendlyByteBuf, T> codec)
+    public static <T extends IntProvider> void registerIntProvider(IntProviderType<@NotNull T> providerType, StreamCodec<RegistryFriendlyByteBuf, T> codec)
     {
         INT_PROVIDER_CODECS.put(providerType, codec);
     }
@@ -136,7 +137,7 @@ public class ExtraPacketCodecs
      * @param providerType the type of the integer provider
      * @return the decoded integer provider
      */
-    public static  <T extends IntProvider> T decode(ByteBuf buf, IntProviderType<T> providerType)
+    public static  <T extends IntProvider> T decode(ByteBuf buf, IntProviderType<@NotNull T> providerType)
     {
         StreamCodec<RegistryFriendlyByteBuf, T> codec = (StreamCodec<RegistryFriendlyByteBuf, T>) getIntProviderCodec(providerType);
         return codec.decode((RegistryFriendlyByteBuf) buf);
@@ -202,7 +203,7 @@ public class ExtraPacketCodecs
                             StreamCodec.of(
                                     (buf, intProvider) ->
                                     {
-                                        IntProviderType<?> type = BuiltInRegistries.INT_PROVIDER_TYPE.getValue(buf.readResourceLocation());
+                                        IntProviderType<?> type = BuiltInRegistries.INT_PROVIDER_TYPE.getValue(buf.readIdentifier());
                                         StreamCodec<RegistryFriendlyByteBuf, IntProvider> codec = (StreamCodec<RegistryFriendlyByteBuf, IntProvider>) getIntProviderCodec(type);
                                         codec.encode(buf, intProvider.source);
                                         buf.writeInt(intProvider.getMinValue());

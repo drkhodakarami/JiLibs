@@ -19,6 +19,7 @@ package dev.thementor.api.machina.blockentity;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jetbrains.annotations.NotNull;
 import team.reborn.energy.api.base.SimpleEnergyStorage;
 
 import net.minecraft.core.BlockPos;
@@ -44,7 +45,7 @@ import dev.thementor.api.shared.interfaces.IContainerDataProvider;
 
 @SuppressWarnings("unused")
 public abstract class AbstractBasicMachineBE<T extends AbstractBasicMachineBE<T>>
-        extends AbstractBaseMachineBE<T, SyncedInventory, SyncedFluidStorage, SimpleEnergyStorage>
+        extends AbstractBaseMachineBE<T, @NotNull SyncedInventory, @NotNull SyncedFluidStorage, SimpleEnergyStorage>
         implements IContainerDataProvider
 {
     protected SyncedFluidStorage fluidStorage;
@@ -85,7 +86,7 @@ public abstract class AbstractBasicMachineBE<T extends AbstractBasicMachineBE<T>
 
     private final String modID;
 
-    public AbstractBasicMachineBE(String modID, BlockEntityType<T> type, BlockPos pos, BlockState state)
+    public AbstractBasicMachineBE(String modID, BlockEntityType<@NotNull T> type, BlockPos pos, BlockState state)
     {
         super(type, pos, state);
         this.modID = modID;
@@ -130,7 +131,7 @@ public abstract class AbstractBasicMachineBE<T extends AbstractBasicMachineBE<T>
     }
 
     @Override
-    protected void saveAdditional(ValueOutput view)
+    protected void saveAdditional(@NotNull ValueOutput view)
     {
         super.saveAdditional(view);
         view.putInt(modID + ".energy.upgrade.count", this.energyUpgradeCount);
@@ -142,7 +143,7 @@ public abstract class AbstractBasicMachineBE<T extends AbstractBasicMachineBE<T>
     }
 
     @Override
-    protected void loadAdditional(ValueInput view)
+    protected void loadAdditional(@NotNull ValueInput view)
     {
         super.loadAdditional(view);
         this.energyUpgradeCount = view.getIntOr(modID + ".energy.upgrade.count", 0);
@@ -205,7 +206,7 @@ public abstract class AbstractBasicMachineBE<T extends AbstractBasicMachineBE<T>
     }
 
     @Override
-    public void preRemoveSideEffects(BlockPos pos, BlockState oldState)
+    public void preRemoveSideEffects(@NotNull BlockPos pos, @NotNull BlockState oldState)
     {
         super.preRemoveSideEffects(pos, oldState);
         List<ItemStack> stacks = new ArrayList<>();
@@ -463,7 +464,7 @@ public abstract class AbstractBasicMachineBE<T extends AbstractBasicMachineBE<T>
 
             @SuppressWarnings("unchecked")
             @Override
-            public FluidVariant getResource()
+            public @NotNull FluidVariant getResource()
             {
                 T be = ((T)getBlockEntity());
                 return be.fluidStorageVariant();

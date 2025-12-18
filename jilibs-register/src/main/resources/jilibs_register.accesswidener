@@ -1,3 +1,5 @@
 accessWidener v2 named
 
 transitive-accessible field net/minecraft/client/data/models/BlockModelGenerators ROTATION_HORIZONTAL_FACING Lnet/minecraft/client/data/models/blockstates/PropertyDispatch;
+transitive-accessible field net/minecraft/data/recipes/RecipeProvider SHAPE_BUILDERS Ljava/util/Map;
+transitive-accessible class net/minecraft/data/recipes/RecipeProvider$FamilyRecipeProvider

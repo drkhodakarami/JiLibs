@@ -97,7 +97,7 @@ public class StreamCodecComposites
         return new StreamCodec<>()
         {
             @Override
-            public @NotNull C decode(B buf)
+            public @NotNull C decode(@NotNull B buf)
             {
                 T1 object1 = codec1.decode(buf);
                 T2 object2 = codec2.decode(buf);
@@ -112,7 +112,7 @@ public class StreamCodecComposites
             }
 
             @Override
-            public void encode(B buf, C value)
+            public void encode(@NotNull B buf, @NotNull C value)
             {
                 codec1.encode(buf, from1.apply(value));
                 codec2.encode(buf, from2.apply(value));
@@ -191,7 +191,7 @@ public class StreamCodecComposites
         return new StreamCodec<>()
         {
             @Override
-            public @NotNull C decode(B buf)
+            public @NotNull C decode(@NotNull B buf)
             {
                 T1 object1 = codec1.decode(buf);
                 T2 object2 = codec2.decode(buf);
@@ -207,7 +207,7 @@ public class StreamCodecComposites
             }
 
             @Override
-            public void encode(B buf, C value)
+            public void encode(@NotNull B buf, @NotNull C value)
             {
                 codec1.encode(buf, from1.apply(value));
                 codec2.encode(buf, from2.apply(value));
@@ -291,7 +291,7 @@ public class StreamCodecComposites
     ) {
         return new StreamCodec<>() {
             @Override
-            public @NotNull C decode(B object) {
+            public @NotNull C decode(@NotNull B object) {
                 T1 object2 = codec1.decode(object);
                 T2 object3 = codec2.decode(object);
                 T3 object4 = codec3.decode(object);
@@ -308,7 +308,7 @@ public class StreamCodecComposites
             }
 
             @Override
-            public void encode(B object, C object2) {
+            public void encode(@NotNull B object, @NotNull C object2) {
                 codec1.encode(object, from1.apply(object2));
                 codec2.encode(object, from2.apply(object2));
                 codec3.encode(object, from3.apply(object2));
@@ -385,7 +385,7 @@ public class StreamCodecComposites
     ) {
         return new StreamCodec<>() {
             @Override
-            public @NotNull C decode(B object) {
+            public @NotNull C decode(@NotNull B object) {
                 T1 object2 = codec1.decode(object);
                 T2 object3 = codec2.decode(object);
                 T3 object4 = codec3.decode(object);
@@ -403,7 +403,7 @@ public class StreamCodecComposites
             }
 
             @Override
-            public void encode(B object, C object2) {
+            public void encode(@NotNull B object, @NotNull C object2) {
                 codec1.encode(object, from1.apply(object2));
                 codec2.encode(object, from2.apply(object2));
                 codec3.encode(object, from3.apply(object2));
@@ -485,7 +485,7 @@ public class StreamCodecComposites
     ) {
         return new StreamCodec<>() {
             @Override
-            public @NotNull C decode(B object) {
+            public @NotNull C decode(@NotNull B object) {
                 T1 object2 = codec1.decode(object);
                 T2 object3 = codec2.decode(object);
                 T3 object4 = codec3.decode(object);
@@ -504,7 +504,7 @@ public class StreamCodecComposites
             }
 
             @Override
-            public void encode(B object, C object2) {
+            public void encode(@NotNull B object, @NotNull C object2) {
                 codec1.encode(object, from1.apply(object2));
                 codec2.encode(object, from2.apply(object2));
                 codec3.encode(object, from3.apply(object2));
@@ -591,7 +591,7 @@ public class StreamCodecComposites
     ) {
         return new StreamCodec<>() {
             @Override
-            public @NotNull C decode(B object) {
+            public @NotNull C decode(@NotNull B object) {
                 T1 object2 = codec1.decode(object);
                 T2 object3 = codec2.decode(object);
                 T3 object4 = codec3.decode(object);
@@ -611,7 +611,7 @@ public class StreamCodecComposites
             }
 
             @Override
-            public void encode(B object, C object2) {
+            public void encode(@NotNull B object, @NotNull C object2) {
                 codec1.encode(object, from1.apply(object2));
                 codec2.encode(object, from2.apply(object2));
                 codec3.encode(object, from3.apply(object2));
@@ -703,7 +703,7 @@ public class StreamCodecComposites
     ) {
         return new StreamCodec<>() {
             @Override
-            public @NotNull C decode(B object) {
+            public @NotNull C decode(@NotNull B object) {
                 T1 object2 = codec1.decode(object);
                 T2 object3 = codec2.decode(object);
                 T3 object4 = codec3.decode(object);
@@ -724,7 +724,7 @@ public class StreamCodecComposites
             }
 
             @Override
-            public void encode(B object, C object2) {
+            public void encode(@NotNull B object, @NotNull C object2) {
                 codec1.encode(object, from1.apply(object2));
                 codec2.encode(object, from2.apply(object2));
                 codec3.encode(object, from3.apply(object2));
@@ -821,7 +821,7 @@ public class StreamCodecComposites
     ) {
         return new StreamCodec<>() {
             @Override
-            public @NotNull C decode(B object) {
+            public @NotNull C decode(@NotNull B object) {
                 T1 object2 = codec1.decode(object);
                 T2 object3 = codec2.decode(object);
                 T3 object4 = codec3.decode(object);
@@ -843,7 +843,7 @@ public class StreamCodecComposites
             }
 
             @Override
-            public void encode(B object, C object2) {
+            public void encode(@NotNull B object, @NotNull C object2) {
                 codec1.encode(object, from1.apply(object2));
                 codec2.encode(object, from2.apply(object2));
                 codec3.encode(object, from3.apply(object2));

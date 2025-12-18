@@ -19,6 +19,7 @@ package dev.thementor.api.shared.properties;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.core.Direction;
@@ -172,7 +173,7 @@ public class StateProperties
      * @param property the delegate Property
      * @return the retrieved state property if it exists; null otherwise
      */
-    public <T extends Comparable<T>> Property<T> getProperty(Property<T> property)
+    public <T extends Comparable<T>> Property<@NotNull T> getProperty(Property<@NotNull T> property)
     {
         String name = property.getName();
         return containsProperty(name) ? getProperty(name, property.getValueClass()).delegate() : null;
@@ -247,7 +248,7 @@ public class StateProperties
      *
      * @param builder the StateManager.Builder to add the properties to
      */
-    public void addToBuilder(StateDefinition.Builder<Block, BlockState> builder)
+    public void addToBuilder(StateDefinition.Builder<Block, @NotNull BlockState> builder)
     {
         for (StateProperty<?> property : this.properties.values())
             builder.add(property.delegate());

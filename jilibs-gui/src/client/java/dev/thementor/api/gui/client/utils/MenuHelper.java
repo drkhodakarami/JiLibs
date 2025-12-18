@@ -19,14 +19,16 @@ package dev.thementor.api.gui.client.utils;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 
 import dev.thementor.api.gui.client.constants.ContainerBaseTextures;
 import dev.thementor.api.gui.client.records.TextureData;
 import dev.thementor.api.shared.annotations.*;
+import org.w3c.dom.css.Rect;
 
 @SuppressWarnings("unused")
 @Developer("TurtyWurty")
@@ -43,34 +45,224 @@ public class MenuHelper
         drawTexture(context, texture.id(), x + texture.x(), y + texture.y(), texture.u(), texture.v(), texture.width(), texture.height(), texture.textureWidth(), texture.textureHeight());
     }
 
-    public static void drawTexture(GuiGraphics context, ResourceLocation texture, int x, int y, float u, float v, int width, int height)
+    public static void drawTexture(GuiGraphics context, Identifier texture, int x, int y, float u, float v, int width, int height)
     {
         drawTexture(context, texture, x, y, u, v, width, height, 256, 256);
     }
 
-    public static void drawTexture(GuiGraphics context, ResourceLocation texture, int x, int y, float u, float v, int width, int height, int color)
+    public static void drawTexture(GuiGraphics context, Identifier texture, int x, int y, float u, float v, int width, int height, int color)
     {
         drawTexture(context, texture, x, y, u, v, width, height, 256, 256, color);
     }
 
-    public static void drawTexture(GuiGraphics context, ResourceLocation texture, int x, int y, float u, float v, int width, int height, int texWidth, int texHeight)
+    public static void drawTexture(GuiGraphics context, Identifier texture, int x, int y, float u, float v, int width, int height, int texWidth, int texHeight)
     {
         drawTexture(context, texture, x, y, u, v, width, height, texWidth, texHeight, -1);
     }
 
-    public static void drawTexture(GuiGraphics context, ResourceLocation texture, int x, int y, float u, float v, int width, int height, int texWidth, int texHeight, int color)
+    public static void drawTexture(GuiGraphics context, Identifier texture, int x, int y, float u, float v, int width, int height, int texWidth, int texHeight, int color)
     {
         context.blit(RenderPipelines.GUI_TEXTURED, texture, x, y, u, v, width, height, texWidth, texHeight, color);
     }
 
-    public static void drawTexture(GuiGraphics context, ResourceLocation texture, int x, int y, int width, int height)
+    public static void drawTexture(GuiGraphics context, Identifier texture, int x, int y, int width, int height)
     {
         drawTexture(context, texture, x, y, width, height, -1);
     }
 
-    public static void drawTexture(GuiGraphics context, ResourceLocation texture, int x, int y, int width, int height, int color)
+    public static void drawTexture(GuiGraphics context, Identifier texture, int x, int y, int width, int height, int color)
     {
         context.blitSprite(RenderPipelines.GUI_TEXTURED, texture, x, y, width, height, color);
+    }
+
+    public static void drawNineSliced(GuiGraphics context, TextureData texture, int x, int y, int panelWidth, int panelHeight, int slice)
+    {
+        drawNineSliced(context, texture.id(), x + texture.x(), y + texture.y(), panelWidth, panelHeight, texture.u(), texture.v(), texture.width(), texture.height(), slice, texture.textureWidth(), texture.textureHeight(), -1);
+    }
+
+    public static void drawNineSliced(GuiGraphics context, TextureData texture, int x, int y, int panelWidth, int panelHeight, int slice, int color)
+    {
+        drawNineSliced(context, texture.id(), x + texture.x(), y + texture.y(), panelWidth, panelHeight, texture.u(), texture.v(), texture.width(), texture.height(), slice, texture.textureWidth(), texture.textureHeight(), color);
+    }
+
+    public static void drawNineSliced(GuiGraphics context, Identifier texture, int x, int y, int panelWidth, int panelHeight, float u, float v, int width, int height, int slice)
+    {
+        drawNineSliced(context, texture, x, y, panelWidth, panelHeight, u, v, width, height, slice, 256, 256, -1);
+    }
+
+    public static void drawNineSliced(GuiGraphics context, Identifier texture, int x, int y, int panelWidth, int panelHeight, float u, float v, int width, int height, int slice, int texWidth, int texHeight)
+    {
+        drawNineSliced(context, texture, x, y, panelWidth, panelHeight, u, v, width, height, slice, texWidth, texHeight, -1);
+    }
+
+    public static void drawNineSliced(GuiGraphics context, Identifier texture, Rect2i panel, float u, float v, int width, int height, int slice, int texWidth, int texHeight)
+    {
+        drawNineSliced(context, texture, panel.getX(), panel.getY(), panel.getWidth(), panel.getHeight(), u, v, width, height, slice, texWidth, texHeight, -1);
+    }
+
+    public static void drawNineSliced(GuiGraphics context, Identifier texture, int x, int y, int panelWidth, int panelHeight, float u, float v, int width, int height, int slice, int color)
+    {
+        drawNineSliced(context, texture, x, y, panelWidth, panelHeight, u, v, width, height, slice, 256, 256, color);
+    }
+
+    public static void drawNineSliced(GuiGraphics context, Identifier texture, Rect2i panel, float u, float v, int width, int height, int slice, int color)
+    {
+        drawNineSliced(context, texture, panel.getX(), panel.getY(), panel.getWidth(), panel.getHeight(), u, v, width, height, slice, 256, 256, color);
+    }
+
+    public static void drawNineSliced(GuiGraphics context, Identifier texture, int x, int y,  int panelWidth, int panelHeight, float u, float v, int width, int height, int slice, int texWidth, int texHeight, int color)
+    {
+        drawNineAdvanceSliced(context, texture, x, y, panelWidth, panelHeight, u, v, width, height, slice, slice, slice, slice, texWidth, texHeight, color);
+    }
+
+    public static void drawNineSliced(GuiGraphics context, Identifier texture, Rect2i panel, float u, float v, int width, int height, int slice, int texWidth, int texHeight, int color)
+    {
+        drawNineAdvanceSliced(context, texture, panel.getX(), panel.getY(), panel.getWidth(), panel.getHeight(), u, v, width, height, slice, slice, slice, slice, texWidth, texHeight, color);
+    }
+
+    public static void drawNineAdvanceSliced(GuiGraphics context, TextureData texture, int x, int y, int panelWidth, int panelHeight, int topSlice, int bottomSlice, int leftSlice, int rightSlice)
+    {
+        drawNineAdvanceSliced(context, texture.id(), x + texture.x(), y + texture.y(), panelWidth, panelHeight, texture.u(), texture.v(), texture.width(), texture.height(), topSlice, bottomSlice, leftSlice, rightSlice, texture.textureWidth(), texture.textureHeight(), -1);
+    }
+
+    public static void drawNineAdvanceSliced(GuiGraphics context, TextureData texture, Rect2i panel, int topSlice, int bottomSlice, int leftSlice, int rightSlice)
+    {
+        drawNineAdvanceSliced(context, texture.id(), panel.getX() + texture.x(), panel.getY() + texture.y(), panel.getWidth(), panel.getHeight(), texture.u(), texture.v(), texture.width(), texture.height(), topSlice, bottomSlice, leftSlice, rightSlice, texture.textureWidth(), texture.textureHeight(),
+                              -1);
+    }
+
+    public static void drawNineAdvanceSliced(GuiGraphics context, TextureData texture, int x, int y, int panelWidth, int panelHeight, int topSlice, int bottomSlice, int leftSlice, int rightSlice, int color)
+    {
+        drawNineAdvanceSliced(context, texture.id(), x + texture.x(), y + texture.y(), panelWidth, panelHeight, texture.u(), texture.v(), texture.width(), texture.height(), topSlice, bottomSlice, leftSlice, rightSlice, texture.textureWidth(), texture.textureHeight(), color);
+    }
+
+    public static void drawNineAdvanceSliced(GuiGraphics context, TextureData texture, Rect2i panel, int topSlice, int bottomSlice, int leftSlice, int rightSlice, int color)
+    {
+        drawNineAdvanceSliced(context, texture.id(), panel.getX() + texture.x(), panel.getY() + texture.y(), panel.getWidth(), panel.getHeight(), texture.u(), texture.v(), texture.width(), texture.height(), topSlice, bottomSlice, leftSlice, rightSlice, texture.textureWidth(), texture.textureHeight(), color);
+    }
+
+    public static void drawNineAdvanceSliced(GuiGraphics context, Identifier texture, int x, int y, int panelWidth, int panelHeight, float u, float v, int width, int height, int topSlice, int bottomSlice, int leftSlice, int rightSlice)
+    {
+        drawNineAdvanceSliced(context, texture, x, y, panelWidth, panelHeight, u, v, width, height, topSlice, bottomSlice, leftSlice, rightSlice, 256, 256, -1);
+    }
+
+    public static void drawNineAdvanceSliced(GuiGraphics context, Identifier texture, Rect2i panel, float u, float v, int width, int height, int topSlice, int bottomSlice, int leftSlice, int rightSlice)
+    {
+        drawNineAdvanceSliced(context, texture, panel.getX(), panel.getY(), panel.getWidth(), panel.getHeight(), u, v, width, height, topSlice, bottomSlice, leftSlice, rightSlice, 256, 256, -1);
+    }
+
+    public static void drawNineAdvanceSliced(GuiGraphics context, Identifier texture, int x, int y, int panelWidth, int panelHeight, float u, float v, int width, int height, int topSlice, int bottomSlice, int leftSlice, int rightSlice, int texWidth, int texHeight)
+    {
+        drawNineAdvanceSliced(context, texture, x, y, panelWidth, panelHeight, u, v, width, height, topSlice, bottomSlice, leftSlice, rightSlice, texWidth, texHeight, -1);
+    }
+
+    public static void drawNineAdvanceSliced(GuiGraphics context, Identifier texture, Rect2i panel, float u, float v, int width, int height, int topSlice, int bottomSlice, int leftSlice, int rightSlice, int texWidth, int texHeight)
+    {
+        drawNineAdvanceSliced(context, texture, panel.getX(), panel.getY(), panel.getWidth(), panel.getHeight(), u, v, width, height, topSlice, bottomSlice, leftSlice, rightSlice, texWidth, texHeight, -1);
+    }
+
+    public static void drawNineAdvanceSliced(GuiGraphics context, Identifier texture, int x, int y, int panelWidth, int panelHeight, float u, float v, int width, int height, int topSlice, int bottomSlice, int leftSlice, int rightSlice, int color)
+    {
+        drawNineAdvanceSliced(context, texture, x, y, panelWidth, panelHeight, u, v, width, height, topSlice, bottomSlice, leftSlice, rightSlice, 256, 256, color);
+    }
+
+    public static void drawNineAdvanceSliced(GuiGraphics context, Identifier texture, Rect2i panel, float u, float v, int width, int height, int topSlice, int bottomSlice, int leftSlice, int rightSlice, int color)
+    {
+        drawNineAdvanceSliced(context, texture, panel.getX(), panel.getY(), panel.getWidth(), panel.getHeight(), u, v, width, height, topSlice, bottomSlice, leftSlice, rightSlice, 256, 256, color);
+    }
+
+    public static void drawNineAdvanceSliced(GuiGraphics context, Identifier texture, Rect2i panel, float u, float v, int width, int height, int topSlice, int bottomSlice, int leftSlice, int rightSlice, int texWidth, int texHeight, int color)
+    {
+        drawNineAdvanceSliced(context, texture, panel.getX(), panel.getY(), panel.getWidth(), panel.getHeight(), u, v, width, height, topSlice, bottomSlice, leftSlice, rightSlice, texWidth, texHeight, color);
+    }
+
+    public static void drawNineAdvanceSliced(GuiGraphics context, Identifier texture, int x, int y, int panelWidth, int panelHeight, float u, float v, int width, int height, int topSlice, int bottomSlice, int leftSlice, int rightSlice, int texWidth, int texHeight, int color)
+    {
+        // --- Calculate sizes ---
+        // These are the actual pixel widths/heights of the tiles we will use.
+        int centerTexWidth = width - leftSlice - rightSlice;
+        int centerTexHeight = height - topSlice - bottomSlice;
+
+        // 2. Calculate the space available for each section of the panel on screen
+        int centerPanelWidth = panelWidth - leftSlice - rightSlice;
+        int centerPanelHeight  = panelHeight - topSlice - bottomSlice;
+
+        // --- 1. CORNER DRAWING (Drawn exactly once) ---
+        // Top-Left Corner (Screen: x, y | Texture: u, v)
+        drawTexture(context, texture,
+                    x, y,
+                    u, v,
+                    leftSlice, topSlice,
+                    texWidth, texHeight, color);
+        // Top-Right Corner: Draw size = rightSlice x topSlice
+        drawTexture(context, texture,
+                    x + panelWidth - rightSlice, y,
+                    u + width - rightSlice, v,
+                    rightSlice, topSlice,
+                    texWidth, texHeight, color);
+        // Bottom-Left Corner: Draw size = leftSlice x bottomSlice
+        drawTexture(context, texture,
+                    x, y + panelHeight - bottomSlice,
+                    u, v + height - bottomSlice,
+                    leftSlice, bottomSlice,
+                    texWidth, texHeight, color);
+        // Bottom-Right Corner: Draw size = rightSlice x bottomSlice
+        drawTexture(context, texture,
+                    x + panelWidth - rightSlice, y + panelHeight - bottomSlice,
+                    u + width - rightSlice, v + height - bottomSlice,
+                    rightSlice, bottomSlice,
+                    texWidth, texHeight, color);
+
+        // --- 2. EDGE DRAWING (Tiled Horizontally) ---
+        for (int tx = 0; tx < centerPanelWidth; tx += centerTexWidth)
+        {
+            int segmentWidth = Math.min(centerTexWidth, centerPanelWidth - tx);
+            // Top Edge: Draw height = topSlice
+            drawTexture(context, texture,
+                        x + leftSlice + tx, y,
+                        u + leftSlice, v,
+                        segmentWidth, topSlice,
+                        texWidth, texHeight, color);
+            // Bottom Edge: Draw height = bottomSlice
+            drawTexture(context, texture,
+                        x + leftSlice + tx, y + panelHeight - bottomSlice,
+                        u + leftSlice, v + height - bottomSlice,
+                        segmentWidth, bottomSlice,
+                        texWidth, texHeight, color);
+        }
+
+        // --- 3. EDGE DRAWING (Tiled Vertically) ---
+        for (int ty = 0; ty < centerPanelHeight; ty += centerTexHeight)
+        {
+            int segmentHeight = Math.min(centerTexHeight, centerPanelHeight - ty);
+            // Left Edge: Draw width = leftSlice
+            drawTexture(context, texture,
+                        x, y + topSlice + ty,
+                        u, v + topSlice,
+                        leftSlice, segmentHeight,
+                        texWidth, texHeight, color);
+            // Right Edge: Draw width = rightSlice
+            drawTexture(context, texture,
+                        x + panelWidth - rightSlice, y + topSlice + ty,
+                        u + width - rightSlice, v + topSlice,
+                        rightSlice, segmentHeight,
+                        texWidth, texHeight, color);
+        }
+
+        // --- 4. CENTER DRAWING (Tiled Both Ways) ---
+        for (int tx = 0; tx < centerPanelWidth; tx += centerTexWidth)
+        {
+            int segmentHeight = Math.min(centerTexWidth, centerPanelWidth - tx);
+            for (int ty = 0; ty < centerPanelHeight; ty += centerTexHeight)
+            {
+                int segmentWidth = Math.min(centerTexHeight, centerPanelHeight - ty);
+                drawTexture(context, texture,
+                            x + leftSlice + tx, y + topSlice + ty,
+                            u + leftSlice, v + topSlice,
+                            segmentWidth, segmentHeight,
+                            texWidth, texHeight, color);
+            }
+        }
     }
 
     public static void renderTiledSprite(GuiGraphics context, RenderPipeline renderPipeline, TextureAtlasSprite sprite, int x, int y, int width, int height, int color)
@@ -83,7 +275,7 @@ public class MenuHelper
         int xRemainder = width % spriteWidth;
         int yRemainder = height % spriteHeight;
 
-        ResourceLocation atlasId = sprite.atlasLocation();
+        Identifier atlasId = sprite.atlasLocation();
         float minU = sprite.getU0();
         float minV = sprite.getV0();
 

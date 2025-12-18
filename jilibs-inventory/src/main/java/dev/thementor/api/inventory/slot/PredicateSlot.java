@@ -24,6 +24,7 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
 import dev.thementor.api.shared.annotations.*;
+import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings("unused")
 @Developer("TurtyWurty")
@@ -62,7 +63,7 @@ public class PredicateSlot extends Slot
     }
 
     @Override
-    public boolean mayPlace(ItemStack stack)
+    public boolean mayPlace(@NotNull ItemStack stack)
     {
         if(maxCount == 0)
             return this.predicate.test(stack);

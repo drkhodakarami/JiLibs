@@ -22,18 +22,19 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.layouts.LayoutElement;
-import net.minecraft.resources.ResourceLocation;
 
 import dev.thementor.api.gui.client.constants.IndicatorLightTextures;
 import dev.thementor.api.gui.client.records.TextureData;
 import dev.thementor.api.gui.client.utils.MenuHelper;
 import dev.thementor.api.shared.utils.BaseHelper;
+import net.minecraft.resources.Identifier;
+import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings("unused")
 public class AlarmLightWidget implements Renderable, LayoutElement
 {
-    private  final ResourceLocation onState;
-    private  final ResourceLocation offState;
+    private  final Identifier onState;
+    private  final Identifier offState;
 
     private boolean isOn;
 
@@ -44,7 +45,7 @@ public class AlarmLightWidget implements Renderable, LayoutElement
     private final int onStateTextureWidth, onStateTextureHeight;
 
     public AlarmLightWidget(int x, int y, int width, int height, boolean defaultOn,
-                            ResourceLocation onState, ResourceLocation offState,
+                            Identifier onState, Identifier offState,
                             int onStateTextureWidth, int onStateTextureHeight,
                             int offStateTextureWidth, int offStateTextureHeight,
                             int onStateU, int onStateV, int offStateU, int offStateV)
@@ -72,14 +73,14 @@ public class AlarmLightWidget implements Renderable, LayoutElement
     }
 
     @Override
-    public void render(GuiGraphics context, int mouseX, int mouseY, float deltaTicks)
+    public void render(@NotNull GuiGraphics context, int mouseX, int mouseY, float deltaTicks)
     {
-        if(BaseHelper.validateResource(offState))
+        if(BaseHelper.validateIdentifier(offState))
             MenuHelper.drawTexture(context, offState,
                                    this.x, this.y, offStateU, offStateV, width, height,
                                    offStateTextureWidth, offStateTextureHeight);
 
-        if(this.isOn && BaseHelper.validateResource(onState))
+        if(this.isOn && BaseHelper.validateIdentifier(onState))
             MenuHelper.drawTexture(context, onState,
                                    this.x, this.y, onStateU, onStateV, width, height,
                                    onStateTextureWidth, onStateTextureHeight);
@@ -122,12 +123,12 @@ public class AlarmLightWidget implements Renderable, LayoutElement
     }
 
     @Override
-    public void visitWidgets(Consumer<AbstractWidget> consumer)
+    public void visitWidgets(@NotNull Consumer<AbstractWidget> consumer)
     {}
 
     public static class Builder
     {
-        private  ResourceLocation onState, offState;
+        private  Identifier onState, offState;
 
         private boolean isOn;
 
@@ -210,13 +211,13 @@ public class AlarmLightWidget implements Renderable, LayoutElement
             return this;
         }
 
-        public Builder onState(ResourceLocation id)
+        public Builder onState(Identifier id)
         {
             this.onState = id;
             return this;
         }
 
-        public Builder offState(ResourceLocation id)
+        public Builder offState(Identifier id)
         {
             this.offState = id;
             return this;

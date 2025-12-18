@@ -35,6 +35,7 @@ import dev.thementor.api.gui.client.enumerations.WidgetOrientation;
 import dev.thementor.api.shared.annotations.*;
 import dev.thementor.api.shared.client.utils.MouseHelper;
 import dev.thementor.api.shared.utils.StringHelper;
+import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings("unused")
 @Developer("The Mentor")
@@ -72,7 +73,7 @@ public class ColorIndicatorWidget implements Renderable, LayoutElement
     }
 
     @Override
-    public void render(GuiGraphics context, int mouseX, int mouseY, float deltaTicks)
+    public void render(@NotNull GuiGraphics context, int mouseX, int mouseY, float deltaTicks)
     {
         if(amountSupplier == null || capacitySupplier == null || amountSupplier.get() <= 0 || capacitySupplier.get() <= 0)
             return;
@@ -142,7 +143,7 @@ public class ColorIndicatorWidget implements Renderable, LayoutElement
     }
 
     @Override
-    public void visitWidgets(Consumer<AbstractWidget> consumer){}
+    public void visitWidgets(@NotNull Consumer<AbstractWidget> consumer){}
 
     protected  void drawTooltip(GuiGraphics context, int mouseX, int mouseY)
     {

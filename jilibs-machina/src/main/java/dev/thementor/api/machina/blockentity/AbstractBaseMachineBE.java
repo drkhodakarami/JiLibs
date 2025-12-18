@@ -19,6 +19,7 @@ package dev.thementor.api.machina.blockentity;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import team.reborn.energy.api.EnergyStorage;
 import team.reborn.energy.api.base.SimpleEnergyStorage;
@@ -57,7 +58,7 @@ public abstract class AbstractBaseMachineBE<T extends AbstractBaseMachineBE<T, B
 {
     protected final EnergyConnector<D> energyConnector;
 
-    public AbstractBaseMachineBE(BlockEntityType<T> type, BlockPos pos, BlockState state)
+    public AbstractBaseMachineBE(BlockEntityType<@NotNull T> type, BlockPos pos, BlockState state)
     {
         super(type, pos, state);
         energyConnector = new EnergyConnector<>();
@@ -70,14 +71,14 @@ public abstract class AbstractBaseMachineBE<T extends AbstractBaseMachineBE<T, B
     }
 
     @Override
-    protected void loadAdditional(ValueInput view)
+    protected void loadAdditional(@NotNull ValueInput view)
     {
         super.loadAdditional(view);
         energyConnector.loadAdditional(view);
     }
 
     @Override
-    protected void saveAdditional(ValueOutput view)
+    protected void saveAdditional(@NotNull ValueOutput view)
     {
         super.saveAdditional(view);
         energyConnector.saveAdditional(view);
@@ -120,7 +121,7 @@ public abstract class AbstractBaseMachineBE<T extends AbstractBaseMachineBE<T, B
 
     //TODO: Explain this
     @Override
-    protected void applyImplicitComponents(DataComponentGetter dataComponentGetter)
+    protected void applyImplicitComponents(@NotNull DataComponentGetter dataComponentGetter)
     {
         super.applyImplicitComponents(dataComponentGetter);
 
@@ -152,7 +153,7 @@ public abstract class AbstractBaseMachineBE<T extends AbstractBaseMachineBE<T, B
 
     //TODO: Explain this
     @Override
-    protected void collectImplicitComponents(DataComponentMap.Builder builder)
+    protected void collectImplicitComponents(DataComponentMap.@NotNull Builder builder)
     {
         super.collectImplicitComponents(builder);
 

@@ -24,6 +24,7 @@ import net.minecraft.world.item.crafting.*;
 
 import dev.thementor.api.shared.annotations.*;
 import dev.thementor.api.shared.utils.BaseHelper;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Registers custom recipes and recipe serializers for Minecraft.
@@ -61,7 +62,7 @@ public class RecipeRegisterer
      * @param serializer      the recipe serializer to register
      * @return the registered recipe serializer
      */
-    public <R extends Recipe<D>, D extends RecipeInput> RecipeSerializer<R> register(String name, RecipeSerializer<R> serializer)
+    public <R extends Recipe<@NotNull D>, D extends RecipeInput> RecipeSerializer<@NotNull R> register(String name, RecipeSerializer<@NotNull R> serializer)
     {
         ResourceKey<RecipeSerializer<?>> key = BaseHelper.resourceKey(this.modId, name, Registries.RECIPE_SERIALIZER);
         return Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, key, serializer);
@@ -75,7 +76,7 @@ public class RecipeRegisterer
      * @param recipeType      the recipe type to register
      * @return the registered recipe type
      */
-    public <R extends Recipe<D>, D extends RecipeInput> RecipeType<R> register(String name, RecipeType<R> recipeType)
+    public <R extends Recipe<@NotNull D>, D extends RecipeInput> RecipeType<@NotNull R> register(String name, RecipeType<@NotNull R> recipeType)
     {
         ResourceKey<RecipeType<?>> key = BaseHelper.resourceKey(this.modId, name, Registries.RECIPE_TYPE);
         return Registry.register(BuiltInRegistries.RECIPE_TYPE, key, recipeType);

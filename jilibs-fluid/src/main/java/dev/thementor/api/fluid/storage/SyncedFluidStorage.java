@@ -28,6 +28,7 @@ import dev.thementor.api.shared.interfaces.ISyncable;
 import dev.thementor.api.shared.interfaces.IUpdatable;
 import dev.thementor.api.shared.records.FluidStackPayload;
 
+@SuppressWarnings("unused")
 public class SyncedFluidStorage extends SingleFluidStorage implements ISyncable
 {
     private final BlockEntity blockEntity;

@@ -29,8 +29,8 @@ import net.minecraft.data.BlockFamily;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
-import net.minecraft.world.entity.vehicle.Boat;
-import net.minecraft.world.entity.vehicle.ChestBoat;
+import net.minecraft.world.entity.vehicle.boat.Boat;
+import net.minecraft.world.entity.vehicle.boat.ChestBoat;
 import net.minecraft.world.item.BoatItem;
 import net.minecraft.world.item.HangingSignItem;
 import net.minecraft.world.item.Item;
@@ -71,6 +71,7 @@ import dev.thementor.api.shared.annotations.*;
 import dev.thementor.api.shared.utils.BaseHelper;
 
 import dev.thementor.mixin.BlockEntityTypeAccessor;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Registers a new wood type with all the related family blocks.
@@ -129,8 +130,8 @@ public class WoodSet
     public final SignItem signItem;
     public final HangingSignItem hangingSignItem;
 
-    public final EntityType<Boat> boatEntityType;
-    public final EntityType<ChestBoat> chestBoatEntityType;
+    public final EntityType<@NotNull Boat> boatEntityType;
+    public final EntityType<@NotNull ChestBoat> chestBoatEntityType;
     public final Item boatItem;
     public final Item chestBoatItem;
 
@@ -161,8 +162,8 @@ public class WoodSet
                    Function<BlockBehaviour.Properties, WallHangingSignBlock> wallHangingSign,
                    Function<Item.Properties, SignItem> signItem,
                    Function<Item.Properties, HangingSignItem> hangingSignItem,
-                   Function<Supplier<Item>, EntityType.Builder<Boat>> boatEntityType,
-                   Function<Supplier<Item>, EntityType.Builder<ChestBoat>> chestBoatEntityType,
+                   Function<Supplier<Item>, EntityType.Builder<@NotNull Boat>> boatEntityType,
+                   Function<Supplier<Item>, EntityType.Builder<@NotNull ChestBoat>> chestBoatEntityType,
                    Function<Item.Properties, Item> boatItem,
                    Function<Item.Properties, Item> chestBoatItem)
     {
@@ -418,8 +419,8 @@ public class WoodSet
         private Function<Item.Properties, SignItem> signItem;
         private Function<Item.Properties, HangingSignItem> hangingSignItem;
 
-        private Function<Supplier<Item>, EntityType.Builder<Boat>> boatType;
-        private Function<Supplier<Item>, EntityType.Builder<ChestBoat>> chestBoatType;
+        private Function<Supplier<Item>, EntityType.Builder<@NotNull Boat>> boatType;
+        private Function<Supplier<Item>, EntityType.Builder<@NotNull ChestBoat>> chestBoatType;
         private Function<Item.Properties, Item> boatItem;
         private Function<Item.Properties, Item> chestBoatItem;
 
@@ -674,21 +675,21 @@ public class WoodSet
             return this;
         }
 
-        public Builder boatType(Function<Supplier<Item>, EntityType.Builder<Boat>> boatType,
-                                Function<Supplier<Item>, EntityType.Builder<ChestBoat>> chestBoatType)
+        public Builder boatType(Function<Supplier<Item>, EntityType.Builder<@NotNull Boat>> boatType,
+                                Function<Supplier<Item>, EntityType.Builder<@NotNull ChestBoat>> chestBoatType)
         {
             this.boatType = boatType;
             this.chestBoatType = chestBoatType;
             return this;
         }
 
-        public Builder boatType(Function<Supplier<Item>, EntityType.Builder<Boat>> boatType)
+        public Builder boatType(Function<Supplier<Item>, EntityType.Builder<@NotNull Boat>> boatType)
         {
             this.boatType = boatType;
             return this;
         }
 
-        public Builder chestBoatType(Function<Supplier<Item>, EntityType.Builder<ChestBoat>> chestBoatType)
+        public Builder chestBoatType(Function<Supplier<Item>, EntityType.Builder<@NotNull ChestBoat>> chestBoatType)
         {
             this.chestBoatType = chestBoatType;
             return this;

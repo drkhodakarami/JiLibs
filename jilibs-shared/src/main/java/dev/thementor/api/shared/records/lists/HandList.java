@@ -26,6 +26,7 @@ import net.minecraft.network.codec.StreamCodec;
 
 import dev.thementor.api.shared.records.HandPayload;
 
+@SuppressWarnings("unused")
 public record HandList(List<HandPayload> values)
 {
     public static Codec<HandList> CODEC = HandPayload.LIST_CODEC.xmap(HandList::new, HandList::values);

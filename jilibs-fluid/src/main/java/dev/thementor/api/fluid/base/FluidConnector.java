@@ -143,7 +143,6 @@ public class FluidConnector<T extends SingleFluidStorage> extends StorageConnect
         }
     }
 
-    @SuppressWarnings("DataFlowIssue")
     @Override
     public void loadAdditional(ValueInput readView)
     {

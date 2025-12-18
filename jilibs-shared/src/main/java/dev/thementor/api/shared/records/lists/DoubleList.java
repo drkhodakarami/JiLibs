@@ -26,6 +26,7 @@ import net.minecraft.network.codec.StreamCodec;
 
 import dev.thementor.api.shared.records.DoublePayload;
 
+@SuppressWarnings("unused")
 public record DoubleList(List<DoublePayload> values)
 {
     public static Codec<DoubleList> CODEC = DoublePayload.LIST_CODEC.xmap(DoubleList::new, DoubleList::values);

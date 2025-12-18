@@ -27,6 +27,7 @@ import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 
 import dev.thementor.api.fluid.utils.FluidHelper;
 
+@SuppressWarnings("unused")
 public interface IFluidSpreader<T extends Storage<FluidVariant>>
 {
     default long simulateInsertion(T storage, FluidVariant variant, Transaction outer)

@@ -16,6 +16,7 @@
 
 package dev.thementor.api.inventory.be;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.core.BlockPos;
@@ -56,7 +57,7 @@ import dev.thementor.api.shared.utils.DirectionHelper;
 @Repository("https://github.com/drkhodakarami/___PROJECTS___")
 @Discord("https://discord.gg/pmM4emCbuH")
 @Youtube("https://www.youtube.com/@TheMentorCodeLab")
-public abstract class AbstractBaseInventoryBE<T extends AbstractBaseInventoryBE<T, B>, B extends SimpleContainer> extends AbstractScreenBE<T, BlockPosPayload>
+public abstract class AbstractBaseInventoryBE<T extends AbstractBaseInventoryBE<T, B>, B extends SimpleContainer> extends AbstractScreenBE<@NotNull T, BlockPosPayload>
     implements IContentDrop<B>, IStorageProvider<InventoryStorage>, IStorageConnector<InventoryConnector<?>>
 {
     protected final InventoryConnector<B> inventoryConnector;
@@ -68,7 +69,7 @@ public abstract class AbstractBaseInventoryBE<T extends AbstractBaseInventoryBE<
      * @param pos  The position of the block entity.
      * @param state The block state of the block entity.
      */
-    public AbstractBaseInventoryBE(BlockEntityType<T> type, BlockPos pos, BlockState state)
+    public AbstractBaseInventoryBE(BlockEntityType<@NotNull T> type, BlockPos pos, BlockState state)
     {
         super(type, pos, state);
         inventoryConnector = new InventoryConnector<>();
@@ -84,7 +85,7 @@ public abstract class AbstractBaseInventoryBE<T extends AbstractBaseInventoryBE<
      * @return A {@link BlockPosPayload} containing the block position of this block entity.
      */
     @Override
-    public BlockPosPayload getScreenOpeningData(ServerPlayer serverPlayerEntity)
+    public @NotNull BlockPosPayload getScreenOpeningData(@NotNull ServerPlayer serverPlayerEntity)
     {
         return new BlockPosPayload(this.worldPosition);
     }
@@ -148,7 +149,7 @@ public abstract class AbstractBaseInventoryBE<T extends AbstractBaseInventoryBE<
      * @param view The read view containing the data to be read.
      */
     @Override
-    protected void loadAdditional(ValueInput view)
+    protected void loadAdditional(@NotNull ValueInput view)
     {
         super.loadAdditional(view);
         inventoryConnector.loadAdditional(view);
@@ -160,7 +161,7 @@ public abstract class AbstractBaseInventoryBE<T extends AbstractBaseInventoryBE<
      * @param view The write view where the data will be written.
      */
     @Override
-    protected void saveAdditional(ValueOutput view)
+    protected void saveAdditional(@NotNull ValueOutput view)
     {
         super.saveAdditional(view);
         inventoryConnector.saveAdditional(view);
@@ -173,7 +174,7 @@ public abstract class AbstractBaseInventoryBE<T extends AbstractBaseInventoryBE<
      * @param oldState The state of the old block.
      */
     @Override
-    public void preRemoveSideEffects(BlockPos pos, BlockState oldState)
+    public void preRemoveSideEffects(@NotNull BlockPos pos, @NotNull BlockState oldState)
     {
         if(this.level != null)
         {

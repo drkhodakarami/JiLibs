@@ -27,7 +27,7 @@ import dev.thementor.api.ticklogic.node.StartNode;
  *
  * @param <T> the type of block entity associated with this logic tree
  */
-@SuppressWarnings("FieldCanBeLocal")
+@SuppressWarnings({"FieldCanBeLocal", "unused"})
 public class LogicTree<T extends BlockEntity>
 {
     /**

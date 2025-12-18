@@ -22,6 +22,7 @@ import dev.thementor.api.shared.enumerations.TickStatus;
 import dev.thementor.api.ticklogic.base.IRunningNodeManager;
 import dev.thementor.api.ticklogic.base.Node;
 
+@SuppressWarnings("unused")
 public class UntilFailureNode<T extends BlockEntity> extends Node<T> implements IRunningNodeManager
 {
     public UntilFailureNode()

@@ -18,6 +18,7 @@ package dev.thementor.api.shared.utils;
 
 import java.util.Optional;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
@@ -62,8 +63,8 @@ public class TransferHelper
      */
     public static <V, T extends TransferVariant<V>>Optional<T> findFirstVariant(Storage<T> storage, @Nullable T variant, long transferAmount)
     {
-        if(storage instanceof SingleVariantStorage<T> singleVariantStorage)
-            return Optional.ofNullable(singleVariantStorage.variant);
+        if(storage instanceof SingleVariantStorage<@NotNull T> singleVariantStorage)
+            return Optional.of(singleVariantStorage.variant);
 
         if(variant != null && !variant.isBlank())
         {
@@ -77,7 +78,7 @@ public class TransferHelper
         }
 
         for (StorageView<T> storageView : storage.nonEmptyViews())
-            return Optional.ofNullable(storageView.getResource());
+            return Optional.of(storageView.getResource());
 
         return Optional.empty();
     }

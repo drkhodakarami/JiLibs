@@ -30,6 +30,7 @@ import net.minecraft.world.level.block.state.StateDefinition;
 
 import dev.thementor.api.shared.interfaces.ITickedBlock;
 
+@SuppressWarnings("unused")
 public class BaseWoodBlock extends RotatedPillarBlock implements ITickedBlock
 {
     public final boolean isStripped;
@@ -43,27 +44,27 @@ public class BaseWoodBlock extends RotatedPillarBlock implements ITickedBlock
     }
 
     @Override
-    public @NotNull BlockState getStateForPlacement(BlockPlaceContext ctx)
+    public @NotNull BlockState getStateForPlacement(@NotNull BlockPlaceContext ctx)
     {
         return withRandomTick(ctx, super.getStateForPlacement(ctx), this, 0, 20);
     }
 
     @Override
-    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder)
+    protected void createBlockStateDefinition(StateDefinition.@NotNull Builder<Block, @NotNull BlockState> builder)
     {
         super.createBlockStateDefinition(builder);
         builder.add(TICK_LEVEL);
     }
 
     @Override
-    protected void randomTick(BlockState state, ServerLevel world, BlockPos pos, RandomSource random)
+    protected void randomTick(@NotNull BlockState state, @NotNull ServerLevel world, @NotNull BlockPos pos, @NotNull RandomSource random)
     {
         super.randomTick(state, world, pos, random);
         tickBlock(state, world, pos, random);
     }
 
     @Override
-    protected boolean isRandomlyTicking(BlockState state)
+    protected boolean isRandomlyTicking(@NotNull BlockState state)
     {
         return this.isStripped && state.getValue(TICK_LEVEL) > 0;
     }

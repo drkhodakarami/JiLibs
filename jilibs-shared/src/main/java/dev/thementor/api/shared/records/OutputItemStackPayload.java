@@ -21,6 +21,7 @@ import java.util.stream.IntStream;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
 
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -29,7 +30,6 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.valueproviders.ConstantFloat;
 import net.minecraft.util.valueproviders.ConstantInt;
@@ -60,7 +60,7 @@ public record OutputItemStackPayload(Item output, IntProvider count, FloatProvid
     /**
      * The unique identifier for this custom payload.
      */
-    public static final Type<BlockPosPayload> ID = new Type<>(ResourceLocation.fromNamespaceAndPath("jilibs_shared", "output_item_stack_payload"));
+    public static final Type<@NotNull BlockPosPayload> ID = new Type<>(Identifier.fromNamespaceAndPath("jilibs_shared", "output_item_stack_payload"));
 
     /**
      * The default chance value (1.0f).
@@ -297,7 +297,7 @@ public record OutputItemStackPayload(Item output, IntProvider count, FloatProvid
      * @return the unique identifier
      */
     @Override
-    public @NotNull Type<? extends CustomPacketPayload> type()
+    public @NotNull Type<? extends @NotNull CustomPacketPayload> type()
     {
         return ID;
     }

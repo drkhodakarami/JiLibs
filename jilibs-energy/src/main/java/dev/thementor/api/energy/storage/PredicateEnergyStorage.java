@@ -21,6 +21,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+@SuppressWarnings("unused")
 public class PredicateEnergyStorage extends SyncedEnergyStorage
 {
     private final Predicate<Boolean> canInsert;

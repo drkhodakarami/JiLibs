@@ -21,13 +21,13 @@ import java.util.Objects;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
 
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 
 import dev.thementor.api.shared.annotations.*;
@@ -48,7 +48,7 @@ public record HandPayload(InteractionHand hand) implements CustomPacketPayload
     /**
      * The unique identifier for this custom payload.
      */
-    public static final Type<HandPayload> ID = new Type<>(ResourceLocation.fromNamespaceAndPath("jilibs_shared", "hand_payload"));
+    public static final Type<@NotNull HandPayload> ID = new Type<>(Identifier.fromNamespaceAndPath("jilibs_shared", "hand_payload"));
 
     /**
      * The codec used to serialize and deserialize the HandPayload.
@@ -74,7 +74,7 @@ public record HandPayload(InteractionHand hand) implements CustomPacketPayload
      * @return the unique identifier
      */
     @Override
-    public @NotNull Type<? extends CustomPacketPayload> type()
+    public @NotNull Type<? extends @NotNull CustomPacketPayload> type()
     {
         return ID;
     }

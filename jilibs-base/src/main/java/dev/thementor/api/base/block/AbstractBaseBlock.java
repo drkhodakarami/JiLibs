@@ -79,7 +79,7 @@ public abstract class AbstractBaseBlock extends Block implements EntityBlock, IT
         super(settings);
         this.properties = properties;
 
-        StateDefinition.Builder<Block, BlockState> builder = new StateDefinition.Builder<>(this);
+        StateDefinition.Builder<Block, @NotNull BlockState> builder = new StateDefinition.Builder<>(this);
         createBlockStateDefinition(builder);
 
          this.stateDefinition = builder.create(Block::defaultBlockState, BlockState::new);
@@ -87,11 +87,12 @@ public abstract class AbstractBaseBlock extends Block implements EntityBlock, IT
 
         BlockState state = this.stateDefinition.any();
         state = this.properties.getStateProperties().applyDefaults(state);
-        registerDefaultState(state);
+        if(state != null)
+            registerDefaultState(state);
     }
 
     @Override
-    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder)
+    protected void createBlockStateDefinition(StateDefinition.@NotNull Builder<Block, @NotNull BlockState> builder)
     {
         super.createBlockStateDefinition(builder);
 
@@ -100,7 +101,7 @@ public abstract class AbstractBaseBlock extends Block implements EntityBlock, IT
     }
 
     @Override
-    public @Nullable BlockState getStateForPlacement(BlockPlaceContext ctx)
+    public @Nullable BlockState getStateForPlacement(@NotNull BlockPlaceContext ctx)
     {
         BlockState state = super.getStateForPlacement(ctx);
         if(state == null)
@@ -130,7 +131,7 @@ public abstract class AbstractBaseBlock extends Block implements EntityBlock, IT
     }
 
     @Override
-    protected @NotNull BlockState rotate(BlockState state, Rotation rotation)
+    protected @NotNull BlockState rotate(@NotNull BlockState state, @NotNull Rotation rotation)
     {
         if(this.properties.getStateProperties().containsProperty(BlockStateProperties.HORIZONTAL_FACING))
             return state.setValue(BlockStateProperties.HORIZONTAL_FACING, rotation.rotate(state.getValue(BlockStateProperties.HORIZONTAL_FACING)));
@@ -141,7 +142,7 @@ public abstract class AbstractBaseBlock extends Block implements EntityBlock, IT
     }
 
     @Override
-    protected @NotNull BlockState mirror(BlockState state, Mirror mirror)
+    protected @NotNull BlockState mirror(@NotNull BlockState state, @NotNull Mirror mirror)
     {
         if(this.properties.getStateProperties().containsProperty(BlockStateProperties.HORIZONTAL_FACING))
             return state.setValue(BlockStateProperties.HORIZONTAL_FACING, mirror.mirror(state.getValue(BlockStateProperties.HORIZONTAL_FACING)));
@@ -152,7 +153,7 @@ public abstract class AbstractBaseBlock extends Block implements EntityBlock, IT
     }
 
     @Override
-    public @Nullable BlockEntity newBlockEntity(BlockPos pos, BlockState state)
+    public @Nullable BlockEntity newBlockEntity(@NotNull BlockPos pos, @NotNull BlockState state)
     {
         return (this.properties.getBEType() != null && this.properties.getBEFactory() != null)
                 ? this.properties.getBEFactory().create(pos, state)
@@ -160,7 +161,7 @@ public abstract class AbstractBaseBlock extends Block implements EntityBlock, IT
     }
 
     @Override
-    public @Nullable <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type)
+    public @Nullable <T extends BlockEntity> BlockEntityTicker<T> getTicker(@NotNull Level level, @NotNull BlockState state, @NotNull BlockEntityType<T> type)
     {
         if(this.properties.isTickable())
             return ITickProvider.super.getTicker(level);
@@ -174,13 +175,13 @@ public abstract class AbstractBaseBlock extends Block implements EntityBlock, IT
     }
 
     @Override
-    protected boolean hasAnalogOutputSignal(BlockState state)
+    protected boolean hasAnalogOutputSignal(@NotNull BlockState state)
     {
         return this.properties.hasComparatorOutput();
     }
 
     @Override
-    protected int getAnalogOutputSignal(BlockState state, Level world, BlockPos pos, Direction direction)
+    protected int getAnalogOutputSignal(@NotNull BlockState state, @NotNull Level world, @NotNull BlockPos pos, @NotNull Direction direction)
     {
         return this.properties.hasComparatorOutput()
                ? this.properties.getComparatorOutput().apply(state, world, pos, direction)
@@ -188,25 +189,25 @@ public abstract class AbstractBaseBlock extends Block implements EntityBlock, IT
     }
 
     @Override
-    protected @NotNull RenderShape getRenderShape(BlockState state)
+    protected @NotNull RenderShape getRenderShape(@NotNull BlockState state)
     {
         return this.properties.getRenderShape();
     }
 
     @Override
-    protected @NotNull VoxelShape getShape(BlockState state, BlockGetter blockGetter, BlockPos pos, CollisionContext context)
+    protected @NotNull VoxelShape getShape(@NotNull BlockState state, @NotNull BlockGetter blockGetter, @NotNull BlockPos pos, @NotNull CollisionContext context)
     {
         return this.properties.getShapeFactory().create(state, blockGetter, pos, context);
     }
 
     @Override
-    protected void affectNeighborsAfterRemoval(BlockState state, ServerLevel world, BlockPos pos, boolean moved)
+    protected void affectNeighborsAfterRemoval(@NotNull BlockState state, @NotNull ServerLevel world, @NotNull BlockPos pos, boolean moved)
     {
         Containers.updateNeighboursAfterDestroy(state, world, pos);
     }
 
     @Override
-    protected @NotNull InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit)
+    protected @NotNull InteractionResult useWithoutItem(@NotNull BlockState state, @NotNull Level world, @NotNull BlockPos pos, @NotNull Player player, @NotNull BlockHitResult hit)
     {
         if (this.properties.hasGUI())
         {
@@ -228,9 +229,8 @@ public abstract class AbstractBaseBlock extends Block implements EntityBlock, IT
     }
 
     @Override
-    public @NotNull BlockState playerWillDestroy(Level level, BlockPos blockPos, BlockState blockState, Player player)
+    public @NotNull BlockState playerWillDestroy(Level level, @NotNull BlockPos blockPos, @NotNull BlockState blockState, @NotNull Player player)
     {
-        //TODO: Check if this works or not!!
         BlockEntity blockEntity = level.getBlockEntity(blockPos);
         if(blockEntity instanceof AbstractBaseBE<?> be)
         {
@@ -247,13 +247,13 @@ public abstract class AbstractBaseBlock extends Block implements EntityBlock, IT
     }
 
     @Override
-    protected boolean canSurvive(BlockState state, LevelReader world, BlockPos pos)
+    protected boolean canSurvive(@NotNull BlockState state, @NotNull LevelReader world, @NotNull BlockPos pos)
     {
         return this.properties.canExistAt().test(world, pos);
     }
 
     @Override
-    protected @NotNull BlockState updateShape(BlockState state, LevelReader world, ScheduledTickAccess tickView, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, RandomSource random)
+    protected @NotNull BlockState updateShape(BlockState state, @NotNull LevelReader world, @NotNull ScheduledTickAccess tickView, @NotNull BlockPos pos, @NotNull Direction direction, @NotNull BlockPos neighborPos, @NotNull BlockState neighborState, @NotNull RandomSource random)
     {
         return !state.canSurvive(world, pos)
                 ? Blocks.AIR.defaultBlockState()
@@ -267,7 +267,7 @@ public abstract class AbstractBaseBlock extends Block implements EntityBlock, IT
     }
 
     @Override
-    protected @NotNull InteractionResult useItemOn(ItemStack itemStack, BlockState blockState, Level level, BlockPos blockPos, Player player, InteractionHand interactionHand, BlockHitResult blockHitResult)
+    protected @NotNull InteractionResult useItemOn(ItemStack itemStack, @NotNull BlockState blockState, @NotNull Level level, @NotNull BlockPos blockPos, @NotNull Player player, @NotNull InteractionHand interactionHand, @NotNull BlockHitResult blockHitResult)
     {
         if(itemStack.getItem() instanceof IWrench)
             return InteractionResult.PASS;
@@ -275,14 +275,20 @@ public abstract class AbstractBaseBlock extends Block implements EntityBlock, IT
         return super.useItemOn(itemStack, blockState, level, blockPos, player, interactionHand, blockHitResult);
     }
 
+    /**
+     * Example Method Body:
+     * <pre>
+     *     {@code
+     *          return validateTicker(ModBlockEntities.SOME_BE,
+     *                               (world1, pos, state1, blockEntity) ->
+     *                               {
+     *                                   blockEntity.tick(world1, pos, state1);
+     *                               });
+     *     }
+     * </pre>
+     */
     protected <T extends BlockEntity> BlockEntityTicker<T> getVanillaTicker(Level world, BlockState state, BlockEntityType<T> type)
     {
-        //EXAMPLE USAGE FOR VANILLA BLOCKS WITHOUT THE INTERFACE IMPLEMENTATION
-        /*return validateTicker(ModBlockEntities.SOME_BE,
-                              (world1, pos, state1, blockEntity) ->
-                              {
-                                  blockEntity.tick(world1, pos, state1);
-                              });*/
         return EntityBlock.super.getTicker(world, state, type);
     }
 

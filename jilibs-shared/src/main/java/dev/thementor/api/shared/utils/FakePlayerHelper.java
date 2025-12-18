@@ -19,6 +19,7 @@ package dev.thementor.api.shared.utils;
 import java.util.List;
 import java.util.Optional;
 
+import net.minecraft.world.entity.projectile.arrow.Arrow;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.core.BlockPos;
@@ -35,7 +36,6 @@ import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeMap;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.entity.projectile.Arrow;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
@@ -452,6 +452,7 @@ public class FakePlayerHelper
      * @param level  The level where the interaction occurs.
      * @return A ray trace result that will likely be of type entity, but may be type block, or null.
      */
+    @SuppressWarnings("DataFlowIssue")
     public static HitResult traceEntities(UsefulFakePlayer player, Vec3 base, Vec3 target, Level level)
     {
         Entity pointedEntity = null;
@@ -459,7 +460,7 @@ public class FakePlayerHelper
         Vec3 vec3d3 = null;
         AABB search = new AABB(base.x, base.y, base.z, target.x, target.y, target.z).inflate(.5, .5, .5);
         List<Entity> list = level.getEntitiesOfClass(Entity.class, search,
-                                                     entity -> EntitySelector.NO_SPECTATORS.test(entity) && entity != null && entity.isPickable());
+                                                     entity -> EntitySelector.NO_SPECTATORS.test(entity) && entity.isPickable());
         double d2 = 5;
 
         for (Entity entity1 : list)

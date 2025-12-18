@@ -20,6 +20,7 @@ import java.util.List;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -27,7 +28,6 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
 
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.fluid.base.SingleFluidStorage;
@@ -50,7 +50,7 @@ public record FluidStackPayload(FluidVariant fluid, long amount) implements Cust
     /**
      * The unique identifier for this custom payload.
      */
-    public static final Type<FluidStackPayload> ID = new Type<>(ResourceLocation.fromNamespaceAndPath("jilibs_shared", "fluid_stack_payload"));
+    public static final Type<@NotNull FluidStackPayload> ID = new Type<>(Identifier.fromNamespaceAndPath("jilibs_shared", "fluid_stack_payload"));
 
     /**
      * An empty instance of FluidStackPayload.
@@ -81,7 +81,7 @@ public record FluidStackPayload(FluidVariant fluid, long amount) implements Cust
      * @return the unique identifier
      */
     @Override
-    public @NotNull Type<? extends CustomPacketPayload> type()
+    public @NotNull Type<? extends @NotNull CustomPacketPayload> type()
     {
         return ID;
     }

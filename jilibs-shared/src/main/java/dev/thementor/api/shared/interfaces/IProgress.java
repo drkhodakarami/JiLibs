@@ -14,47 +14,40 @@
  * limitations under the License.
  */
 
-package dev.thementor.api.shared.exceptions;
+package dev.thementor.api.shared.interfaces;
 
 import dev.thementor.api.shared.annotations.*;
+import dev.thementor.api.shared.enumerations.MappedDirection;
+import net.minecraft.core.Direction;
+import org.jetbrains.annotations.Nullable;
 
 /**
- * Contains custom exceptions for the Jibase project.
+ * Represents an interface for providing storage entities based on direction and facing.
+ *
+ * @param <T> the type of the storage entity
  */
 @SuppressWarnings("unused")
 @Developer("TheMentor")
-@CreatedAt("2025-04-18")
+@CreatedAt("2025-12-16")
 @Repository("https://github.com/drkhodakarami/")
 @Discord("https://discord.gg/pmM4emCbuH")
 @Youtube("https://www.youtube.com/@TheMentorCodeLab")
 
-public class Exceptions
+public interface IProgress<T>
 {
     /**
-     * Private constructor to prevent instantiation.
+     * Retrieves the current progress.
+     *
+     * @return the progress
      */
-    public Exceptions()
-    {
-        throwCtorAssertion();
-    }
+    @Nullable
+    T getProgress();
 
     /**
-     * Throws an assertion error if the constructor is invoked directly.
+     * Retrieves the max progress.
      *
-     * @throws InitCtorException always, as this method is a singleton and should not be instantiated
+     * @return the max progress
      */
-    public static void throwCtorAssertion()
-    {
-        throw new InitCtorException();
-    }
-
-    public static void throwRuntimeException()
-    {
-        throw new RuntimeExeException();
-    }
-
-    public static void throwArgumentException()
-    {
-        throw new ArgumentException();
-    }
+    @Nullable
+    T getMaxProgress();
 }

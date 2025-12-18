@@ -28,6 +28,7 @@ import dev.thementor.api.ticklogic.base.Node;
  *
  * <p>Action nodes execute a specified action and return a tick status.</p>
  */
+@SuppressWarnings("unused")
 public class ActionNode<T extends BlockEntity> extends Node<T>
 {
     /**

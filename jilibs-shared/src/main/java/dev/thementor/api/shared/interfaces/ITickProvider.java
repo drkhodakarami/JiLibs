@@ -46,5 +46,5 @@ public interface ITickProvider
                     ticker.tickClient();
             }
         });
-    };
+    }
 }

@@ -20,6 +20,7 @@ import net.fabricmc.fabric.api.transfer.v1.fluid.base.SingleFluidStorage;
 
 import dev.thementor.api.fluid.base.FluidConnector;
 
+@SuppressWarnings("unused")
 public interface IFluidConnector<T extends SingleFluidStorage>
 {
     FluidConnector<T> getFluidConnector();

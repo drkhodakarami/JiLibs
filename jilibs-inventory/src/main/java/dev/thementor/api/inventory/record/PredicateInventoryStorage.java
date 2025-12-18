@@ -55,7 +55,7 @@ public record PredicateInventoryStorage(InventoryStorage storage, Supplier<Boole
     }
 
     @Override
-    public @UnmodifiableView List<SingleSlotStorage<ItemVariant>> getSlots()
+    public @UnmodifiableView @NotNull List<SingleSlotStorage<ItemVariant>> getSlots()
     {
         return this.storage.getSlots();
     }
@@ -73,13 +73,13 @@ public record PredicateInventoryStorage(InventoryStorage storage, Supplier<Boole
     }
 
     @Override
-    public long insert(ItemVariant resource, long maxAmount, TransactionContext transactionContext)
+    public long insert(@NotNull ItemVariant resource, long maxAmount, @NotNull TransactionContext transactionContext)
     {
         return storage.insert(resource, maxAmount, transactionContext);
     }
 
     @Override
-    public long extract(ItemVariant resource, long maxAmount, TransactionContext transactionContext)
+    public long extract(@NotNull ItemVariant resource, long maxAmount, @NotNull TransactionContext transactionContext)
     {
         return storage.extract(resource, maxAmount, transactionContext);
     }
@@ -97,7 +97,7 @@ public record PredicateInventoryStorage(InventoryStorage storage, Supplier<Boole
     }
 
     @Override
-    public SingleSlotStorage<ItemVariant> getSlot(int slotIndex)
+    public @NotNull SingleSlotStorage<ItemVariant> getSlot(int slotIndex)
     {
         return storage.getSlot(slotIndex);
     }
@@ -122,13 +122,13 @@ public record PredicateInventoryStorage(InventoryStorage storage, Supplier<Boole
     }
 
     @Override
-    public Iterator<StorageView<ItemVariant>> nonEmptyIterator()
+    public @NotNull Iterator<StorageView<ItemVariant>> nonEmptyIterator()
     {
         return storage.nonEmptyIterator();
     }
 
     @Override
-    public Iterable<StorageView<ItemVariant>> nonEmptyViews()
+    public @NotNull Iterable<StorageView<ItemVariant>> nonEmptyViews()
     {
         return storage.nonEmptyViews();
     }

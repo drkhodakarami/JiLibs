@@ -26,6 +26,7 @@ import net.minecraft.network.codec.StreamCodec;
 
 import dev.thementor.api.shared.records.IntegerPayload;
 
+@SuppressWarnings("unused")
 public record IntegerList(List<IntegerPayload> values)
 {
     public static Codec<IntegerList> CODEC = IntegerPayload.LIST_CODEC.xmap(IntegerList::new, IntegerList::values);

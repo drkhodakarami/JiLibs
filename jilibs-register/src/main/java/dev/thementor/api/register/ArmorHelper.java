@@ -18,11 +18,11 @@ package dev.thementor.api.register;
 
 import java.util.EnumMap;
 
-import net.minecraft.Util;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.tags.TagKey;
+import net.minecraft.util.Util;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.equipment.ArmorMaterial;
 import net.minecraft.world.item.equipment.ArmorType;
@@ -69,7 +69,7 @@ public class ArmorHelper
         ResourceKey<EquipmentAsset> key = ResourceKey.create(EquipmentAssets.ROOT_ID, BaseHelper.id(modID, name));
         return new ArmorMaterial(durability,
                                  Util.make(new EnumMap<>(ArmorType.class),
-                                            (map) ->
+                                           (map) ->
                                                            {
                                                                map.put(ArmorType.BOOTS, bootDefence);
                                                                map.put(ArmorType.LEGGINGS, leggingsDefence);

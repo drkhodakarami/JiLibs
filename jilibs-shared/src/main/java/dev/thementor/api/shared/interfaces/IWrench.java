@@ -32,6 +32,7 @@ public interface IWrench
      * This method is called when the player right-clicks a block with the wrench.
      * This method should be override in the wrench item implementations
      * This is the primary interaction point for configuration.
+     * The check and code to handle functionality is responsibility of impl
      *
      * @param context The context from using the item on a block method
      * @return true if the interaction consumed the action (e.g., it rotated a machine and should stop further processing).
@@ -42,9 +43,9 @@ public interface IWrench
     }
 
     /**
-     * This method is called when the player right-clicks a block entity
+     * This method is called when the player right-clicks a living entity
      * This method should be override in the wrench item implementations.
-     * The check to see if the block contains a block entity or not is responsibility of impl
+     * The check and code to handle functionality is responsibility of impl
      * with the wrench, allowing for specialized configuration of entities like pipes, machines, etc.
      *
      * @param user The player holding the wrench.
@@ -53,7 +54,23 @@ public interface IWrench
      * @param hand The hand holding the wrench
      * @return true if the interaction consumed the action.
      */
-    default boolean onWrenchRightClickBlockEntity(ItemStack stack, Player user, LivingEntity entity, InteractionHand hand)
+    default boolean onWrenchRightClickEntity(ItemStack stack, Player user, LivingEntity entity, InteractionHand hand)
+    {
+        return false;
+    }
+
+    /**
+     * This method is called when the player right-clicks with wrench in hand.
+     * This method should be override in the wrench item implementations.
+     * The check and code to handle functionality is responsibility of impl
+     * with the wrench, allowing for specialized configuration of entities like pipes, machines, etc.
+     *
+     * @param user The player holding the wrench.
+     * @param stack The item stack representing the wrench itself.
+     * @param hand The hand holding the wrench
+     * @return true if the interaction consumed the action.
+     */
+    default boolean onWrenchUse(ItemStack stack, Player user, InteractionHand hand)
     {
         return false;
     }

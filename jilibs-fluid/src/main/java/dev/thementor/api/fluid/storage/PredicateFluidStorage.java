@@ -22,6 +22,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 
+@SuppressWarnings("unused")
 public class PredicateFluidStorage extends SyncedFluidStorage
 {
     private final Predicate<FluidVariant> canInsert;

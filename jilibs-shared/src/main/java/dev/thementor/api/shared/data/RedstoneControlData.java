@@ -29,8 +29,8 @@ import dev.thementor.api.shared.enumerations.RedstoneMode;
  *
  * @author Direwolf20
  * @created_at 2025-04-18
- * @repository https://github.com/Direwolf20-MC/JustDireThings
- * @youtube https://www.youtube.com/@direwolf20
+ * @repository <a href="https://github.com/Direwolf20-MC/JustDireThings">Repository</a>
+ * @youtube <a href="https://www.youtube.com/@direwolf20">Youtube</a>
  */
 @SuppressWarnings("unused")
 @Developer("Direwolf20")

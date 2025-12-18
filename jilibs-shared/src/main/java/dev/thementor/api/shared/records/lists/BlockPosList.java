@@ -26,6 +26,7 @@ import net.minecraft.network.codec.StreamCodec;
 
 import dev.thementor.api.shared.records.BlockPosPayload;
 
+@SuppressWarnings("unused")
 public record BlockPosList(List<BlockPosPayload> values)
 {
     public static Codec<BlockPosList> CODEC = BlockPosPayload.LIST_CODEC.xmap(BlockPosList::new, BlockPosList::values);

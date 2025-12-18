@@ -28,6 +28,7 @@ import dev.thementor.api.ticklogic.base.Node;
  *
  * <p>Sub-tree nodes encapsulate another LogicTree, allowing for nested tick logic structures.</p>
  */
+@SuppressWarnings("unused")
 public class SubTreeNode <T extends BlockEntity> extends Node<T> implements IRunningNodeManager
 {
     /**
