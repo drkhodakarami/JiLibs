@@ -665,7 +665,7 @@ dependencies {
                 return
             }
 
-            api project(path: "${it.path}", configuration: "namedElements")
+            api project(path: "${it.path}")
             clientImplementation project("${it.path}:").sourceSets.client.output
         }
     }
